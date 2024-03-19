@@ -1,6 +1,6 @@
 # Kraken-Async-Rs
 
-![badge](https://github.com/Brendan-Blanchard/kraken-async-rs/actions/workflows/main.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![badge](https://github.com/Brendan-Blanchard/kraken-async-rs/actions/workflows/main.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs/graph/badge.svg?token=30Y7BIDSNK)](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs)
 
 A complete[^4] wrapper of the Kraken Pro trading API, written in asynchronous Rust.
 
