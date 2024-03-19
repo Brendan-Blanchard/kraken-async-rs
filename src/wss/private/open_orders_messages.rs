@@ -40,10 +40,10 @@ const OPEN_ORDER_FIELDS: &[&str] = &[
 /// Message containing a `Vec<OpenOrder>` of all open orders (or updates to them)
 #[derive(Debug, Deserialize_tuple)]
 pub struct OpenOrdersMessage {
-    open_orders: Vec<OpenOrder>,
+    pub open_orders: Vec<OpenOrder>,
     #[serde(rename = "channelName")]
-    channel_name: String,
-    sequence: Sequence,
+    pub channel_name: String,
+    pub sequence: Sequence,
 }
 
 /// Type to deserialize to, missing the order_id field (Kraken API design)
@@ -377,6 +377,7 @@ mod tests {
 
         assert_eq!(expected_open_order, open_order);
     }
+
     #[test]
     fn test_deserialize_open_contingent_order() {
         let expected_open_contingent_order = OpenOrder {

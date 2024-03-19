@@ -92,7 +92,7 @@ impl<'de> Deserialize<'de> for OrderbookUpdateMessage {
                     }
                 }
 
-                let mut channel_id = None;
+                let channel_id;
                 let mut bids = None;
                 let mut asks = None;
                 let mut channel_name = None;
@@ -250,7 +250,7 @@ impl<'de> Deserialize<'de> for BidAskUpdates {
                                 "a" => side = BidOrAsk::Ask,
                                 "b" => side = BidOrAsk::Bid,
                                 field => {
-                                    return Err(de::Error::unknown_field(field, &["a", "b", "c"]))
+                                    return Err(de::Error::unknown_field(field, &["a", "b", "c"]));
                                 }
                             }
                         }

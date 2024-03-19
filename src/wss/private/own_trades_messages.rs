@@ -57,28 +57,28 @@ impl RawOwnTrade {
 /// A user's trade
 #[derive(Debug, PartialEq)]
 pub struct OwnTrade {
-    trade_id: String,
-    order_tx_id: String,
-    position_trade_id: String,
-    pair: String,
-    time: OffsetDateTime,
-    trade_type: BuySell,
-    order_type: OrderType,
-    price: String,
-    cost: String,
-    fee: String,
-    volume: String,
-    margin: String,
-    user_ref: Option<String>,
+    pub trade_id: String,
+    pub order_tx_id: String,
+    pub position_trade_id: String,
+    pub pair: String,
+    pub time: OffsetDateTime,
+    pub trade_type: BuySell,
+    pub order_type: OrderType,
+    pub price: String,
+    pub cost: String,
+    pub fee: String,
+    pub volume: String,
+    pub margin: String,
+    pub user_ref: Option<String>,
 }
 
 /// A message containing a user's trades
 #[derive(Debug, Deserialize_tuple)]
 pub struct OwnTradeMessage {
-    trades: Vec<OwnTrade>,
+    pub trades: Vec<OwnTrade>,
     #[serde(rename = "channelName")]
-    channel_name: String,
-    sequence: Sequence,
+    pub channel_name: String,
+    pub sequence: Sequence,
 }
 
 impl<'de> Deserialize<'de> for OwnTrade {
@@ -87,12 +87,6 @@ impl<'de> Deserialize<'de> for OwnTrade {
         D: Deserializer<'de>,
     {
         struct OwnTradeVisitor;
-
-        #[derive(Debug, Deserialize)]
-        enum OwnTradeField {
-            String(String),
-            Integer(i64),
-        }
 
         impl<'de> Visitor<'de> for OwnTradeVisitor {
             type Value = OwnTrade;

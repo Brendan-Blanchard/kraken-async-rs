@@ -152,7 +152,7 @@ mod tests {
     fn test_deserializing_object_with_invalid_event() {
         test_deserializing_produces_error(
             OBJECT_INVALID_EVENT,
-            "unknown variant `emergency`, expected one of `heartbeat`, `ping`, `pong`, `systemStatus`, `subscriptionStatus`, `addOrderStatus`, `editOrderStatus`, `cancelOrderStatus`"
+            "unknown variant `emergency`, expected one of `heartbeat`, `ping`, `pong`, `systemStatus`, `subscriptionStatus`, `addOrderStatus`, `editOrderStatus`, `cancelOrderStatus`",
         );
     }
 
