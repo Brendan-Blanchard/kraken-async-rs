@@ -19,3 +19,5 @@ pub mod errors;
 pub mod http_response_types;
 pub mod kraken_client;
 pub mod rate_limited_kraken_client;
+#[cfg(feature = "test-util")]
+pub mod test_clients;

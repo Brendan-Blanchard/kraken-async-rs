@@ -10,6 +10,9 @@ keywords = ["tokio", "async", "kraken", "trading", "crypto"]
 categories = ["asynchronous", "finance", "api-bindings"]
 exclude = [".idea", ".gitignore", ".github", ".env"]
 
+[features]
+test-util = []
+
 [dependencies]
 base64 = "0.22.0"
 hmac = "0.12.1"
