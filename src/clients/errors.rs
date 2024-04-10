@@ -107,12 +107,12 @@ impl Error for ClientError {
 /// More documentation can be found on Kraken's [API error support page].
 ///
 /// [API error support page]: https://support.kraken.com/hc/en-us/articles/360001491786-API-error-messages
-#[derive(Debug, Deserialize, Eq, PartialEq, Copy, Clone)]
+#[derive(Debug, Deserialize, Eq, PartialEq, Clone)]
 pub enum KrakenError {
     PermissionDenied,
     InvalidKey,
     UnknownAssetPair,
-    InvalidArguments,
+    InvalidArguments(String),
     InvalidSignature,
     InvalidNonce,
     InvalidSession,
@@ -136,7 +136,7 @@ impl Display for KrakenError {
             KrakenError::PermissionDenied => write!(f, "PermissionDenied"),
             KrakenError::InvalidKey => write!(f, "InvalidKey"),
             KrakenError::UnknownAssetPair => write!(f, "UnknownAssetPair"),
-            KrakenError::InvalidArguments => write!(f, "InvalidArguments"),
+            KrakenError::InvalidArguments(s) => write!(f, "{s}"),
             KrakenError::InvalidSignature => write!(f, "InvalidSignature"),
             KrakenError::InvalidNonce => write!(f, "InvalidNonce"),
             KrakenError::InvalidSession => write!(f, "InvalidSession"),
@@ -166,7 +166,7 @@ impl TryFrom<&String> for KrakenError {
         } else if value.starts_with("EQuery:Unknown asset pair") {
             Ok(KrakenError::UnknownAssetPair)
         } else if value.starts_with("EGeneral:Invalid arguments") {
-            Ok(KrakenError::InvalidArguments)
+            Ok(KrakenError::InvalidArguments(value.clone()))
         } else if value.starts_with("EAPI:Invalid signature") {
             Ok(KrakenError::InvalidSignature)
         } else if value.starts_with("EAPI:Invalid nonce") {
