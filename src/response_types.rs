@@ -437,8 +437,8 @@ pub struct TradableAssetPair {
 /// Ticker helper type to serve differently typed data for the last 24 hours.
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct Ticker<T>
-where
-    T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
 {
     pub today: T,
     pub last_24_h: T,
@@ -657,8 +657,10 @@ pub struct Order {
     #[serde(rename = "closetm")]
     pub close_time: Option<f64>,
     pub descr: OrderDescription,
-    pub vol: String,
-    pub vol_exec: String,
+    #[serde(rename(deserialize = "vol"))]
+    pub volume: String,
+    #[serde(rename(deserialize = "vol_exec"))]
+    pub volume_executed: String,
     pub cost: String,
     pub fee: String,
     pub price: String,
@@ -691,8 +693,10 @@ pub struct ClosedOrder {
     pub expire_time: f64,
     #[serde(rename = "closetm")]
     pub close_time: Option<f64>,
-    pub vol: String,
-    pub vol_exec: String,
+    #[serde(rename(deserialize = "vol"))]
+    pub volume: String,
+    #[serde(rename(deserialize = "vol_exec"))]
+    pub volume_executed: String,
     pub cost: String,
     pub fee: String,
     pub price: String,
@@ -734,7 +738,8 @@ pub struct Trade {
     pub price: String,
     pub cost: String,
     pub fee: String,
-    pub vol: String,
+    #[serde(rename(deserialize = "vol"))]
+    pub volume: String,
     pub margin: String,
     pub misc: String,
     pub ledgers: Option<Vec<String>>,
@@ -769,8 +774,10 @@ pub struct OpenPosition {
     pub order_type: OrderType,
     pub cost: String,
     pub fee: String,
-    pub vol: String,
-    pub vol_closed: String,
+    #[serde(rename(deserialize = "vol"))]
+    pub volume: String,
+    #[serde(rename(deserialize = "vol_closed"))]
+    pub volume_closed: String,
     pub margin: String,
     pub value: String,
     pub net: String,
