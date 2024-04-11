@@ -437,8 +437,8 @@ pub struct TradableAssetPair {
 /// Ticker helper type to serve differently typed data for the last 24 hours.
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct Ticker<T>
-    where
-        T: for<'a> Deserialize<'a>,
+where
+    T: for<'a> Deserialize<'a>,
 {
     pub today: T,
     pub last_24_h: T,

@@ -51,8 +51,8 @@ use tokio::sync::Mutex;
 /// [api rate-limiting page]: https://support.kraken.com/hc/en-us/articles/206548367-What-are-the-API-rate-limits-#3
 /// [trading rate-limiting page]: https://support.kraken.com/hc/en-us/articles/360045239571-Trading-rate-limits
 pub struct RateLimitedKrakenClient<C>
-    where
-        C: KrakenClient,
+where
+    C: KrakenClient,
 {
     core_client: C,
     private_rate_limiter: TokenBucketRateLimiter,
@@ -62,8 +62,8 @@ pub struct RateLimitedKrakenClient<C>
 }
 
 impl<C> KrakenClient for RateLimitedKrakenClient<C>
-    where
-        C: KrakenClient,
+where
+    C: KrakenClient,
 {
     fn new(
         secrets_provider: Box<dyn SecretsProvider>,
@@ -535,8 +535,8 @@ impl<C> KrakenClient for RateLimitedKrakenClient<C>
 }
 
 impl<C> RateLimitedKrakenClient<C>
-    where
-        C: KrakenClient,
+where
+    C: KrakenClient,
 {
     /// Notify the trading rate limiter that an order was created at this time, this timestamp is
     /// used for determining the order's lifetime for edit and cancel penalties.
@@ -546,9 +546,9 @@ impl<C> RateLimitedKrakenClient<C>
         user_ref: Option<i64>,
     ) {
         if let Ok(ResultErrorResponse {
-                      result: Some(result),
-                      ..
-                  }) = order_response
+            result: Some(result),
+            ..
+        }) = order_response
         {
             for tx_id in &result.tx_id {
                 self.trading_rate_limiter.notify_add_order(
@@ -568,9 +568,9 @@ impl<C> RateLimitedKrakenClient<C>
         request: &AddBatchedOrderRequest,
     ) {
         if let Ok(ResultErrorResponse {
-                      result: Some(result),
-                      ..
-                  }) = order_response
+            result: Some(result),
+            ..
+        }) = order_response
         {
             for (order, request) in result.orders.iter().zip(request.orders.iter()) {
                 self.trading_rate_limiter.notify_add_order(
@@ -590,9 +590,9 @@ impl<C> RateLimitedKrakenClient<C>
         user_ref: Option<i64>,
     ) {
         if let Ok(ResultErrorResponse {
-                      result: Some(result),
-                      ..
-                  }) = order_response
+            result: Some(result),
+            ..
+        }) = order_response
         {
             self.trading_rate_limiter.notify_add_order(
                 result.tx_id.clone(),
@@ -604,8 +604,8 @@ impl<C> RateLimitedKrakenClient<C>
 }
 
 impl<C> RateLimitedKrakenClient<C>
-    where
-        C: KrakenClient,
+where
+    C: KrakenClient,
 {
     /// Create a new rate limited client that delegates calls to any type that implements [KrakenClient].
     pub fn new_with_client(

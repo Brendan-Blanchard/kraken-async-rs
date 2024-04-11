@@ -599,9 +599,9 @@ impl CoreKrakenClient {
         url: &str,
         request: &R,
     ) -> Result<ResultErrorResponse<T>, ClientError>
-        where
-            T: for<'a> Deserialize<'a>,
-            R: ToQueryParams,
+    where
+        T: for<'a> Deserialize<'a>,
+        R: ToQueryParams,
     {
         let mut url = Url::from_str(&self.api_url(url))?;
         Self::add_query_params(&mut url, request);
@@ -615,9 +615,9 @@ impl CoreKrakenClient {
         url: &str,
         request: &R,
     ) -> Result<ResultErrorResponse<T>, ClientError>
-        where
-            T: for<'a> Deserialize<'a>,
-            R: ToQueryParams,
+    where
+        T: for<'a> Deserialize<'a>,
+        R: ToQueryParams,
     {
         let signature = self.get_form_signature(url, request).await;
         let url = Url::from_str(&self.api_url(url))?;
@@ -634,9 +634,9 @@ impl CoreKrakenClient {
         url: &str,
         request: &R,
     ) -> Result<ResultErrorResponse<T>, ClientError>
-        where
-            T: for<'a> Deserialize<'a>,
-            R: Serialize,
+    where
+        T: for<'a> Deserialize<'a>,
+        R: Serialize,
     {
         let signature = self.get_json_signature(url, request).await?;
         let url = Url::from_str(&self.api_url(url))?;
@@ -653,8 +653,8 @@ impl CoreKrakenClient {
         url: &str,
         request: &R,
     ) -> Result<Vec<u8>, ClientError>
-        where
-            R: ToQueryParams,
+    where
+        R: ToQueryParams,
     {
         let signature = self.get_form_signature(url, request).await;
         let url = Url::from_str(&self.api_url(url))?;
@@ -664,8 +664,8 @@ impl CoreKrakenClient {
     }
 
     fn parse_body_and_errors<T>(body: &str) -> Result<ResultErrorResponse<T>, ClientError>
-        where
-            T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
     {
         let result: ResultErrorResponse<T> = serde_json::from_str(body)?;
 
@@ -783,8 +783,8 @@ impl CoreKrakenClient {
     }
 
     async fn get_form_signature<R>(&mut self, endpoint: &str, request: &R) -> Signature
-        where
-            R: ToQueryParams,
+    where
+        R: ToQueryParams,
     {
         let mut provider = self.nonce_provider.lock().await;
         let nonce = provider.get_nonce();
@@ -802,8 +802,8 @@ impl CoreKrakenClient {
         endpoint: &str,
         request: &R,
     ) -> Result<Signature, ClientError>
-        where
-            R: Serialize,
+    where
+        R: Serialize,
     {
         let mut provider = self.nonce_provider.lock().await;
         let nonce = provider.get_nonce();
@@ -817,16 +817,16 @@ impl CoreKrakenClient {
     }
 
     fn encode_json_request<R>(&self, nonce: u64, request: &R) -> Result<String, ClientError>
-        where
-            R: Serialize,
+    where
+        R: Serialize,
     {
         let nonce_request = NonceRequest::new(nonce, request);
         Ok(serde_json::to_string(&nonce_request)?)
     }
 
     fn encode_form_request<R>(&self, nonce: u64, request: &R) -> String
-        where
-            R: ToQueryParams,
+    where
+        R: ToQueryParams,
     {
         let mut query_params = form_urlencoded::Serializer::new(String::new());
         query_params.append_pair("nonce", &nonce.to_string());
