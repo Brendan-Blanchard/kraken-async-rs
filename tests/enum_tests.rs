@@ -187,7 +187,7 @@ fn test_kraken_error_display() {
     test_display_output(KrakenError::PermissionDenied, "PermissionDenied");
     test_display_output(KrakenError::InvalidKey, "InvalidKey");
     test_display_output(KrakenError::UnknownAssetPair, "UnknownAssetPair");
-    test_display_output(KrakenError::InvalidArguments, "InvalidArguments");
+    test_display_output(KrakenError::InvalidArguments("InvalidArguments:type".to_string()), "InvalidArguments:type");
     test_display_output(KrakenError::InvalidSignature, "InvalidSignature");
     test_display_output(KrakenError::InvalidNonce, "InvalidNonce");
     test_display_output(KrakenError::InvalidSession, "InvalidSession");

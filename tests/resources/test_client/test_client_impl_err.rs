@@ -66,7 +66,7 @@ impl KrakenClient for TestClientErr {
         Self {}
     }
 
-    fn set_user_agent(&mut self, _user_agent: String) {}
+    async fn set_user_agent(&mut self, _user_agent: String) {}
 
     async fn get_server_time(&mut self) -> Result<ResultErrorResponse<SystemTime>, ClientError> {
         Err(ClientError::Parse("StubbedForTesting"))

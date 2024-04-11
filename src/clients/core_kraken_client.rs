@@ -124,7 +124,7 @@ impl KrakenClient for CoreKrakenClient {
         }
     }
 
-    fn set_user_agent(&mut self, user_agent: String) {
+    async fn set_user_agent(&mut self, user_agent: String) {
         self.user_agent = Some(user_agent);
     }
 

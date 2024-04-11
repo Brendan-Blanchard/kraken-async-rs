@@ -31,7 +31,7 @@ async fn client_user_agent() {
     let _resp = client.get_server_time().await;
     mock_server.verify().await;
 
-    client.set_user_agent("Strategy#1".to_string());
+    client.set_user_agent("Strategy#1".to_string()).await;
 
     Mock::given(method("GET"))
         .and(path("/0/public/Time"))
