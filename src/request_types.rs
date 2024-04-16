@@ -17,6 +17,24 @@ pub enum IntOrString {
     String(String),
 }
 
+impl From<i64> for IntOrString {
+    fn from(value: i64) -> Self {
+        IntOrString::Int(value)
+    }
+}
+
+impl From<&str> for IntOrString {
+    fn from(value: &str) -> Self {
+        IntOrString::String(value.to_string())
+    }
+}
+
+impl From<String> for IntOrString {
+    fn from(value: String) -> Self {
+        IntOrString::String(value)
+    }
+}
+
 impl Display for IntOrString {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -125,6 +143,12 @@ pub struct OrderFlags(Vec<OrderFlag>);
 impl OrderFlags {
     pub fn new(order_flags: Vec<OrderFlag>) -> OrderFlags {
         OrderFlags(order_flags)
+    }
+}
+
+impl From<OrderFlag> for OrderFlags {
+    fn from(value: OrderFlag) -> Self {
+        OrderFlags::new(vec![value])
     }
 }
 
@@ -269,6 +293,24 @@ pub struct StringCSV(pub Vec<String>);
 impl StringCSV {
     pub fn new(strings: Vec<String>) -> StringCSV {
         StringCSV(strings)
+    }
+}
+
+impl From<&str> for StringCSV {
+    fn from(value: &str) -> Self {
+        StringCSV::new(vec![value.to_string()])
+    }
+}
+
+impl From<String> for StringCSV {
+    fn from(value: String) -> Self {
+        StringCSV::new(vec![value])
+    }
+}
+
+impl From<&String> for StringCSV {
+    fn from(value: &String) -> Self {
+        StringCSV::new(vec![value.clone()])
     }
 }
 
@@ -872,7 +914,8 @@ pub struct ListEarnAllocationsRequest {
 
 #[cfg(test)]
 mod tests {
-    use crate::request_types::{CancelBatchOrdersRequest, IntOrString};
+    use crate::request_types::{CancelBatchOrdersRequest, IntOrString, OrderFlags, StringCSV};
+    use crate::response_types::OrderFlag;
 
     #[test]
     fn test_cancel_batch_order_request_ids() {
@@ -889,5 +932,43 @@ mod tests {
 
         let expected = vec![IntOrString::Int(42)];
         assert_eq!(expected, request.orders);
+    }
+
+    #[test]
+    fn test_string_csv_conversions() {
+        let expected_string_csv = StringCSV::new(vec!["post".to_string()]);
+
+        let from_str: StringCSV = "post".into();
+        let from_string: StringCSV = "post".to_string().into();
+
+        let string_ref: &String = &("post".to_string());
+        let from_string_ref: StringCSV = string_ref.into();
+
+        assert_eq!(expected_string_csv, from_str);
+        assert_eq!(expected_string_csv, from_string);
+        assert_eq!(expected_string_csv, from_string_ref);
+    }
+
+    #[test]
+    fn test_order_flag_conversions() {
+        let expected_order_flag = OrderFlags::new(vec![OrderFlag::NoMarketPriceProtection]);
+
+        let order_flags: OrderFlags = OrderFlag::NoMarketPriceProtection.into();
+
+        assert_eq!(expected_order_flag, order_flags);
+    }
+
+    #[test]
+    fn test_int_or_string_conversions() {
+        let expected_int = IntOrString::Int(42);
+        let expected_string = IntOrString::String("someString".to_string());
+
+        let int: IntOrString = 42.into();
+        let str: IntOrString = "someString".into();
+        let string: IntOrString = "someString".to_string().into();
+
+        assert_eq!(expected_int, int);
+        assert_eq!(expected_string, str);
+        assert_eq!(expected_string, string);
     }
 }

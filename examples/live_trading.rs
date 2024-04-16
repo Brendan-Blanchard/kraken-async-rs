@@ -35,7 +35,8 @@ async fn main() {
         "USDCUSD".into(),
     )
     .price("0.99".to_string())
-    .order_flags(OrderFlags::new(vec![OrderFlag::Post]))
+    // individual OrderFlag variants have a From<OrderFlag> for OrderFlags conversion for convenience
+    .order_flags(OrderFlag::Post.into())
     .build();
 
     let new_order = client
@@ -47,12 +48,10 @@ async fn main() {
 
     info!("{:?}", new_order);
 
-    let order_query = OrderRequest::builder(StringCSV::new(vec![new_order
-        .tx_id
-        .first()
-        .unwrap()
-        .clone()]))
-    .build();
+    let order_id = new_order.tx_id.first().unwrap();
+
+    // there's an impl From<&str/&String/String> conversion for StringCSV when requesting a single id
+    let order_query = OrderRequest::builder(order_id.into()).build();
 
     let order_details = client
         .query_orders_info(&order_query)
@@ -63,13 +62,10 @@ async fn main() {
 
     info!("{:?}", order_details);
 
-    let edit_query = EditOrderRequest::builder(
-        new_order.tx_id.first().unwrap().clone(),
-        "5.0".to_string(),
-        "USDCUSD".to_string(),
-    )
-    .price("0.99".to_string())
-    .build();
+    let edit_query =
+        EditOrderRequest::builder(order_id.clone(), "5.0".to_string(), "USDCUSD".to_string())
+            .price("0.99".to_string())
+            .build();
 
     let edit = client
         .edit_order(&edit_query)
@@ -80,8 +76,8 @@ async fn main() {
 
     info!("{:?}", edit);
 
-    let cancel_request =
-        CancelOrderRequest::builder(IntOrString::String(edit.tx_id.clone())).build();
+    // edit.tx_id.into() uses a convenience impl From<String> for IntOrString
+    let cancel_request = CancelOrderRequest::builder(edit.tx_id.into()).build();
 
     let cancel = client
         .cancel_order(&cancel_request)

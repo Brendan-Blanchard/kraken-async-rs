@@ -17,7 +17,7 @@ async fn main() {
     let mut client = CoreKrakenClient::new(secrets_provider, nonce_provider);
 
     let request = TradableAssetPairsRequest::builder()
-        .pair(StringCSV::new(vec!["BTCUSD".to_string()]))
+        .pair("BTCUSD".into())
         .build();
 
     let response = client.get_tradable_asset_pairs(&request).await;
