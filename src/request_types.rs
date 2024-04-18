@@ -10,7 +10,7 @@ use std::fmt::{Display, Formatter};
 use to_query_params::{QueryParams, ToQueryParams};
 
 /// Wrapper type for submitting order cancels by Kraken id (String) or user-ref (Int).
-#[derive(Debug, Clone, Serialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum IntOrString {
     Int(i64),
@@ -45,7 +45,7 @@ impl Display for IntOrString {
 }
 
 /// Time to use when searching for closed orders by start and end timestamps.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CloseTime {
     Open,
     Close,
@@ -65,7 +65,7 @@ impl Display for CloseTime {
 /// Type of information to request for asset pairs.
 ///
 /// Defaults to Info, which is all info.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AssetPairInfo {
     Info,
     Leverage,
@@ -85,7 +85,7 @@ impl Display for AssetPairInfo {
 }
 
 /// All possible candlestick intervals for requesting OHLC data.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CandlestickInterval {
     Minute,
     Minutes5,
@@ -115,7 +115,7 @@ impl Display for CandlestickInterval {
 }
 
 /// Types of trades to filter for when requesting user's trade history.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TradeType {
     All,
     AnyPosition,
@@ -442,7 +442,7 @@ pub struct OrderRequest {
 ///
 /// This request is fully paginated by epoch time using the `start` and `end` parameters, in
 /// conjunction with the `offset` parameter.
-#[derive(Debug, Clone, QueryParams, Builder)]
+#[derive(Debug, Clone, QueryParams, Builder, PartialEq, Eq)]
 pub struct TradesHistoryRequest {
     #[query(rename = "type")]
     pub trade_type: Option<TradeType>,
