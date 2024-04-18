@@ -8,6 +8,7 @@
 - Added From<...> impls for StringCSV, OrderFlags, and IntOrString
     - These reduce things like `StringCSV::new(vec!["someTxId".to_string()])` to `"someTxId".into()`
 - Added example of querying an order to /examples
+- Updated dependencies, including `h2` for a security advisory, though it doesn't affect how it's used here
 
 ### v0.0.1
 
