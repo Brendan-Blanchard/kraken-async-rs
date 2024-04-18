@@ -13,7 +13,7 @@ use std::str::FromStr;
 /// A user's level of KYC verification with Kraken
 ///
 /// Determines rate limits for the user, as well as deposit, withdrawal, and banking limits.
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum VerificationTier {
     Intermediate,
@@ -21,7 +21,7 @@ pub enum VerificationTier {
 }
 
 /// Status of the exchange
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum SystemStatus {
     Online,
@@ -31,7 +31,7 @@ pub enum SystemStatus {
 }
 
 /// Status of a given asset pair for trading (e.g. BTC-USD, ATOM-USD)
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum TradableAssetStatus {
     Online,
@@ -42,7 +42,7 @@ pub enum TradableAssetStatus {
 }
 
 /// Status for an asset (e.g. ETH, ATOM, USDC)
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum AssetStatus {
     Enabled,
@@ -52,7 +52,7 @@ pub enum AssetStatus {
 }
 
 /// Order side
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum BuySell {
     Buy,
@@ -69,7 +69,7 @@ impl Display for BuySell {
 }
 
 /// Flags that can be applied to order requests.
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Copy)]
 pub enum OrderFlag {
     /// Post only order will be rejected if it would pay maker fees
     #[serde(rename = "post")]
@@ -116,7 +116,7 @@ impl FromStr for OrderFlag {
 }
 
 /// Whether a given [BidAsk] is a `Bid` or an `Ask`
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum BidOrAsk {
     Bid,
@@ -124,7 +124,7 @@ pub enum BidOrAsk {
 }
 
 /// Single-character enum for buy and sell
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 pub enum BuySellChar {
     #[serde(rename(deserialize = "b"))]
     Buy,
@@ -133,7 +133,7 @@ pub enum BuySellChar {
 }
 
 /// Single-character enum for market and limit orders
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 pub enum MarketLimitChar {
     #[serde(rename(deserialize = "m"))]
     Market,
@@ -142,7 +142,7 @@ pub enum MarketLimitChar {
 }
 
 /// Order type, e.g. `Market`, `Limit`, `StopLossLimit`
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum OrderType {
     Market,
@@ -156,7 +156,7 @@ pub enum OrderType {
 }
 
 /// Trade type, separate from [OrderType] due to different serialization semantics
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Copy)]
 pub enum TradeType {
     #[serde(rename = "market")]
     Market,
@@ -192,7 +192,7 @@ impl Display for OrderType {
 }
 
 /// Status of an order
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum OrderStatus {
     Pending,
@@ -203,7 +203,7 @@ pub enum OrderStatus {
 }
 
 /// Status of a position
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum PositionStatus {
     Open,
@@ -211,7 +211,7 @@ pub enum PositionStatus {
 }
 
 /// Type of ledger entry in user's ledger
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum LedgerEntryType {
     None,
@@ -262,7 +262,7 @@ impl Display for LedgerEntryType {
 }
 
 /// Status of a requested export report
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 pub enum ExportReportStatusType {
     Queued,
     Processing,
@@ -280,7 +280,7 @@ impl Display for ExportReportStatusType {
 }
 
 /// Status of an edit requested for an order
-#[derive(Debug, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum OrderEditStatus {
     Ok,
@@ -338,7 +338,7 @@ pub enum EarnFee {
 }
 
 /// Source of yield for a given earn strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum YieldSourceType {
     Staking,
@@ -347,7 +347,7 @@ pub enum YieldSourceType {
 }
 
 /// Type of compounding for a given strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum AutoCompoundType {
     Enabled,
@@ -356,7 +356,7 @@ pub enum AutoCompoundType {
 }
 
 /// Type of asset lock-up for a given earn strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum LockType {
     Flex,
@@ -365,7 +365,7 @@ pub enum LockType {
 }
 
 /// Kraken server time given in both unix timestamp and RFC1123
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct SystemTime {
     #[serde(rename = "unixtime")]
     pub unix_time: i64,
@@ -373,7 +373,7 @@ pub struct SystemTime {
 }
 
 /// Kraken server status, including an RFC3339 timestamp.
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct SystemStatusInfo {
     pub status: SystemStatus,
     pub timestamp: String,

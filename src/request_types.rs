@@ -137,7 +137,7 @@ impl Display for TradeType {
 }
 
 /// Wrapper type for a `Vec<OrderFlag>` that serializes to a comma-separated string.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OrderFlags(Vec<OrderFlag>);
 
 impl OrderFlags {
@@ -554,7 +554,7 @@ pub struct DeleteExportRequest {
 }
 
 /// A request to create a new spot order.
-#[derive(Debug, Clone, QueryParams, Builder)]
+#[derive(Debug, Clone, QueryParams, Builder, PartialEq, Eq)]
 pub struct AddOrderRequest {
     #[query(rename = "userref")]
     pub user_ref: Option<i64>,

@@ -8,7 +8,7 @@ use std::fmt::{Display, Formatter};
 
 /// Request send via websocket to add an order
 #[skip_serializing_none]
-#[derive(Debug, Serialize, PartialEq, Builder)]
+#[derive(Debug, Serialize, PartialEq, Eq, Builder)]
 pub struct AddOrderRequest {
     #[builder(required)]
     pub event: String,
