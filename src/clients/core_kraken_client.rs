@@ -128,14 +128,14 @@ impl KrakenClient for CoreKrakenClient {
         self.user_agent = Some(user_agent);
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn get_server_time(&mut self) -> Result<ResultErrorResponse<SystemTime>, ClientError> {
         let url = Url::from_str(&self.api_url(TIME_ENDPOINT))?;
         let body = self.body_from_url(Method::GET, &url, "".into()).await?;
         Ok(serde_json::from_str(&body)?)
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn get_system_status(
         &mut self,
     ) -> Result<ResultErrorResponse<SystemStatusInfo>, ClientError> {
@@ -144,7 +144,7 @@ impl KrakenClient for CoreKrakenClient {
         Ok(serde_json::from_str(&body)?)
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_asset_info(
         &mut self,
         request: &AssetInfoRequest,
@@ -152,7 +152,7 @@ impl KrakenClient for CoreKrakenClient {
         self.public_get(ASSET_INFO_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_tradable_asset_pairs(
         &mut self,
         request: &TradableAssetPairsRequest,
@@ -161,7 +161,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_ticker_information(
         &mut self,
         request: &TickerRequest,
@@ -169,7 +169,7 @@ impl KrakenClient for CoreKrakenClient {
         self.public_get(TICKER_INFO_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_ohlc(
         &mut self,
         request: &OHLCRequest,
@@ -177,7 +177,7 @@ impl KrakenClient for CoreKrakenClient {
         self.public_get(OHLC_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_orderbook(
         &mut self,
         request: &OrderbookRequest,
@@ -185,7 +185,7 @@ impl KrakenClient for CoreKrakenClient {
         self.public_get(ORDER_BOOK_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_recent_trades(
         &mut self,
         request: &RecentTradesRequest,
@@ -193,7 +193,7 @@ impl KrakenClient for CoreKrakenClient {
         self.public_get(RECENT_TRADES_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_recent_spreads(
         &mut self,
         request: &RecentSpreadsRequest,
@@ -201,7 +201,7 @@ impl KrakenClient for CoreKrakenClient {
         self.public_get(RECENT_SPREADS_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn get_account_balance(
         &mut self,
     ) -> Result<ResultErrorResponse<AccountBalances>, ClientError> {
@@ -209,7 +209,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn get_extended_balances(
         &mut self,
     ) -> Result<ResultErrorResponse<ExtendedBalances>, ClientError> {
@@ -217,7 +217,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn get_trade_balances(
         &mut self,
         request: &TradeBalanceRequest,
@@ -226,7 +226,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_open_orders(
         &mut self,
         request: &OpenOrdersRequest,
@@ -234,7 +234,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(OPEN_ORDERS_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_closed_orders(
         &mut self,
         request: &ClosedOrdersRequest,
@@ -243,7 +243,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn query_orders_info(
         &mut self,
         request: &OrderRequest,
@@ -251,7 +251,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(QUERY_ORDERS_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_trades_history(
         &mut self,
         request: &TradesHistoryRequest,
@@ -260,7 +260,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn query_trades_info(
         &mut self,
         request: &TradeInfoRequest,
@@ -268,7 +268,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(QUERY_TRADES_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_open_positions(
         &mut self,
         request: &OpenPositionsRequest,
@@ -277,7 +277,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_ledgers_info(
         &mut self,
         request: &LedgersInfoRequest,
@@ -285,7 +285,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(LEDGERS_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn query_ledgers(
         &mut self,
         request: &QueryLedgerRequest,
@@ -294,7 +294,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn get_trade_volume(
         &mut self,
         request: &TradeVolumeRequest,
@@ -302,7 +302,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(TRADE_VOLUME_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn request_export_report(
         &mut self,
         request: &ExportReportRequest,
@@ -310,7 +310,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(ADD_EXPORT_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_export_report_status(
         &mut self,
         request: &ExportReportStatusRequest,
@@ -319,7 +319,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn retrieve_export_report(
         &mut self,
         request: &RetrieveExportReportRequest,
@@ -328,7 +328,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn delete_export_report(
         &mut self,
         request: &DeleteExportRequest,
@@ -337,7 +337,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn add_order(
         &mut self,
         request: &AddOrderRequest,
@@ -345,7 +345,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(ADD_ORDER_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn add_order_batch(
         &mut self,
         request: &AddBatchedOrderRequest,
@@ -354,7 +354,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn edit_order(
         &mut self,
         request: &EditOrderRequest,
@@ -362,7 +362,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(EDIT_ORDER_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn cancel_order(
         &mut self,
         request: &CancelOrderRequest,
@@ -370,13 +370,13 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(CANCEL_ORDER_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn cancel_all_orders(&mut self) -> Result<ResultErrorResponse<CancelOrder>, ClientError> {
         self.private_form_post(CANCEL_ALL_ORDERS_ENDPOINT, &EmptyRequest::default())
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn cancel_all_orders_after(
         &mut self,
         request: &CancelAllOrdersAfterRequest,
@@ -385,7 +385,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn cancel_order_batch(
         &mut self,
         request: &CancelBatchOrdersRequest,
@@ -394,7 +394,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_deposit_methods(
         &mut self,
         request: &DepositMethodsRequest,
@@ -403,7 +403,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_deposit_addresses(
         &mut self,
         request: &DepositAddressesRequest,
@@ -412,7 +412,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_status_of_recent_deposits(
         &mut self,
         request: &StatusOfDepositWithdrawRequest,
@@ -421,7 +421,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_withdrawal_methods(
         &mut self,
         request: &WithdrawalMethodsRequest,
@@ -430,7 +430,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_withdrawal_addresses(
         &mut self,
         request: &WithdrawalAddressesRequest,
@@ -439,7 +439,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_withdrawal_info(
         &mut self,
         request: &WithdrawalInfoRequest,
@@ -448,7 +448,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn withdraw_funds(
         &mut self,
         request: &WithdrawFundsRequest,
@@ -456,7 +456,7 @@ impl KrakenClient for CoreKrakenClient {
         self.private_form_post(WITHDRAW_ENDPOINT, request).await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_status_of_recent_withdrawals(
         &mut self,
         request: &StatusOfDepositWithdrawRequest,
@@ -465,7 +465,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn request_withdrawal_cancellation(
         &mut self,
         request: &WithdrawCancelRequest,
@@ -474,7 +474,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn request_wallet_transfer(
         &mut self,
         request: &WalletTransferRequest,
@@ -483,7 +483,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn create_sub_account(
         &mut self,
         request: &CreateSubAccountRequest,
@@ -492,7 +492,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn account_transfer(
         &mut self,
         request: &AccountTransferRequest,
@@ -501,7 +501,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn allocate_earn_funds(
         &mut self,
         request: &AllocateEarnFundsRequest,
@@ -510,7 +510,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn deallocate_earn_funds(
         &mut self,
         request: &AllocateEarnFundsRequest,
@@ -519,7 +519,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_earn_allocation_status(
         &mut self,
         request: &EarnAllocationStatusRequest,
@@ -528,7 +528,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_earn_deallocation_status(
         &mut self,
         request: &EarnAllocationStatusRequest,
@@ -537,7 +537,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn list_earn_strategies(
         &mut self,
         request: &ListEarnStrategiesRequest,
@@ -546,7 +546,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn list_earn_allocations(
         &mut self,
         request: &ListEarnAllocationsRequest,
@@ -555,7 +555,7 @@ impl KrakenClient for CoreKrakenClient {
             .await
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_websockets_token(
         &mut self,
     ) -> Result<ResultErrorResponse<WebsocketToken>, ClientError> {
