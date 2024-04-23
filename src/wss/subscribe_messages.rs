@@ -4,7 +4,7 @@ use serde_with::skip_serializing_none;
 use std::fmt::{Display, Formatter};
 
 /// All available channels for subscription
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum SubscriptionName {
     Book,
@@ -38,7 +38,7 @@ impl Display for SubscriptionName {
 /// Not all fields apply to each subscription, see the individual `new_*` methods for constructing
 /// well-formed subscriptions for each channel.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Subscription {
     pub depth: Option<i64>,
     pub interval: Option<i64>,
@@ -149,7 +149,7 @@ impl Subscription {
 
 /// Message for unsubscribing from a given channel.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Unsubscription {
     pub depth: Option<i64>,
     pub interval: Option<i64>,
@@ -171,7 +171,7 @@ impl From<Subscription> for Unsubscription {
 
 /// Struct for subscribing to any websocket channel.
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SubscribeMessage {
     pub event: String,
     #[serde(rename = "reqid")]
@@ -197,7 +197,7 @@ impl SubscribeMessage {
 }
 
 /// A message to unsubscribe from the given channel and optionally for a specific pair.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UnsubscribeMessage {
     pub event: String,
     #[serde(rename = "reqid")]

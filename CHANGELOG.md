@@ -11,6 +11,7 @@
 - Updated dependencies, including `h2` for a security advisory, though it doesn't affect how it's used here
 - Add `err(Debug)` tracing to all `CoreKrakenClient` methods
 - Add `ret` tracing to any small responses and all trading endpoints in `CoreKrakenClient`
+- Add `Clone` to WSS un/subscribe message types
 
 ### v0.0.1
 
