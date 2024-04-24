@@ -62,6 +62,7 @@ type RawStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 ///     }
 /// }
 /// ```
+#[derive(Debug, Clone, Copy)]
 pub struct KrakenWSSClient<'a> {
     base_url: &'a str,
     auth_url: &'a str,
