@@ -12,6 +12,8 @@
 - Add `err(Debug)` tracing to all `CoreKrakenClient` methods
 - Add `ret` tracing to any small responses and all trading endpoints in `CoreKrakenClient`
 - Add `Clone` to WSS un/subscribe message types
+- Add `Debug`, `Clone`, `Copy` to `KrakenWSSClient`
+- Add `pub` to additional fields on structs in private and public WSS messages
 
 ### v0.0.1
 

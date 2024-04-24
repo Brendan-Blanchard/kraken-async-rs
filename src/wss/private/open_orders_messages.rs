@@ -123,30 +123,30 @@ impl RawOpenOrder {
 /// OpenOrder type containing the order's id
 #[derive(Debug, PartialEq)]
 pub struct OpenOrder {
-    order_id: String,
-    ref_id: Option<String>,
-    user_ref: Option<i64>,
-    status: Option<String>,
-    open_time: Option<String>,
-    start_time: Option<String>,
-    display_volume: Option<String>,
-    display_volume_remain: Option<String>,
-    expire_time: Option<String>,
-    contingent: Option<OrderContingent>,
-    order_description: Option<OrderDescription>,
-    last_updated: Option<String>,
-    volume: Option<String>,
-    executed_volume: Option<String>,
-    cost: Option<String>,
-    fee: Option<String>,
-    average_price: Option<String>,
-    stop_price: Option<String>,
-    limit_price: Option<String>,
-    misc: Option<String>,
-    order_flags: Option<String>,
-    time_in_force: Option<TimeInForce>,
-    cancel_reason: Option<String>,
-    rate_count: Option<String>,
+    pub order_id: String,
+    pub ref_id: Option<String>,
+    pub user_ref: Option<i64>,
+    pub status: Option<String>,
+    pub open_time: Option<String>,
+    pub start_time: Option<String>,
+    pub display_volume: Option<String>,
+    pub display_volume_remain: Option<String>,
+    pub expire_time: Option<String>,
+    pub contingent: Option<OrderContingent>,
+    pub order_description: Option<OrderDescription>,
+    pub last_updated: Option<String>,
+    pub volume: Option<String>,
+    pub executed_volume: Option<String>,
+    pub cost: Option<String>,
+    pub fee: Option<String>,
+    pub average_price: Option<String>,
+    pub stop_price: Option<String>,
+    pub limit_price: Option<String>,
+    pub misc: Option<String>,
+    pub order_flags: Option<String>,
+    pub time_in_force: Option<TimeInForce>,
+    pub cancel_reason: Option<String>,
+    pub rate_count: Option<String>,
 }
 
 impl<'de> Deserialize<'de> for OpenOrder {
@@ -183,12 +183,12 @@ impl<'de> Deserialize<'de> for OpenOrder {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct OrderContingent {
     #[serde(rename(deserialize = "ordertype"))]
-    order_type: OrderType,
-    price: String,
+    pub order_type: OrderType,
+    pub price: String,
     #[serde(rename(deserialize = "price2"))]
-    price_2: String,
+    pub price_2: String,
     #[serde(rename(deserialize = "oflags"))]
-    order_flags: Option<String>,
+    pub order_flags: Option<String>,
 }
 
 /// Details of an individual order
@@ -211,9 +211,9 @@ pub struct OrderDescription {
 /// Message for a status change of an order
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct OrderStatusMessage {
-    status_changes: Vec<OrderStatusChange>,
-    event: String,
-    sequence: Sequence,
+    pub status_changes: Vec<OrderStatusChange>,
+    pub event: String,
+    pub sequence: Sequence,
 }
 
 /// Order status change to deserialize to, missing order_id due to Kraken API design
@@ -254,15 +254,15 @@ impl RawOpenOrderStatusChange {
 /// Order status change containing the order's id and changes to status, fees, or volume executed
 #[derive(Debug, PartialEq)]
 pub struct OrderStatusChange {
-    order_id: String,
-    status: String,
-    user_ref: Option<i64>,
-    last_updated: Option<OffsetDateTime>,
-    volume_executed: Option<String>,
-    cost: Option<String>,
-    fee: Option<String>,
-    average_price: Option<String>,
-    cancel_reason: Option<String>,
+    pub order_id: String,
+    pub status: String,
+    pub user_ref: Option<i64>,
+    pub last_updated: Option<OffsetDateTime>,
+    pub volume_executed: Option<String>,
+    pub cost: Option<String>,
+    pub fee: Option<String>,
+    pub average_price: Option<String>,
+    pub cancel_reason: Option<String>,
 }
 
 impl<'de> Deserialize<'de> for OrderStatusChange {

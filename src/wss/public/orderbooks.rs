@@ -16,11 +16,11 @@ pub struct BidAsk {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct OrderbookMessage {
     #[serde(rename = "channelID")]
-    channel_id: i64,
-    orderbook: Orderbook,
+    pub channel_id: i64,
+    pub orderbook: Orderbook,
     #[serde(rename = "channelName")]
-    channel_name: String,
-    pair: String,
+    pub channel_name: String,
+    pub pair: String,
 }
 
 /// Orderbook containing a `Vec<BidAsk>` for each of bids and asks
