@@ -1,6 +1,6 @@
 //! OpenOrder message and sub-types
 use crate::request_types::TimeInForce;
-use crate::response_types::{BuySell, OrderType};
+use crate::response_types::{BuySell, OrderStatus, OrderType};
 use crate::wss::kraken_wss_types::Sequence;
 use serde::de::{MapAccess, Visitor};
 use serde::{de, Deserialize, Deserializer};
@@ -53,7 +53,7 @@ struct RawOpenOrder {
     ref_id: Option<String>,
     #[serde(rename(deserialize = "userref"))]
     user_ref: Option<i64>,
-    status: Option<String>,
+    status: Option<OrderStatus>,
     #[serde(rename(deserialize = "opentm"))]
     open_time: Option<String>,
     #[serde(rename(deserialize = "starttm"))]
@@ -126,7 +126,7 @@ pub struct OpenOrder {
     pub order_id: String,
     pub ref_id: Option<String>,
     pub user_ref: Option<i64>,
-    pub status: Option<String>,
+    pub status: Option<OrderStatus>,
     pub open_time: Option<String>,
     pub start_time: Option<String>,
     pub display_volume: Option<String>,
@@ -340,7 +340,7 @@ mod tests {
             order_id: "OSJN7R-5G4OK-T2KYTD".to_string(),
             ref_id: None,
             user_ref: Some(0),
-            status: Some("open".to_string()),
+            status: Some(OrderStatus::Open),
             open_time: Some("1697801466.817843".to_string()),
             start_time: None,
             display_volume: None,
@@ -384,7 +384,7 @@ mod tests {
             order_id: "OBA7Z7-XQVOQ-3NZRDS".to_string(),
             ref_id: None,
             user_ref: Some(0),
-            status: Some("pending".to_string()),
+            status: Some(OrderStatus::Pending),
             open_time: Some("1698761179.336974".to_string()),
             start_time: None,
             display_volume: None,
