@@ -192,7 +192,7 @@ pub struct OrderContingent {
 }
 
 /// Details of an individual order
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct OrderDescription {
     pub pair: String,
     pub position: Option<String>,
