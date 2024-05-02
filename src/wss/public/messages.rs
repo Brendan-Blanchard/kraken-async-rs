@@ -1,5 +1,7 @@
 //! All public messages for websockets
-use crate::response_types::{BuySellChar, LastTrade, MarketLimitChar, Ticker, TickerBidAsk};
+use crate::response_types::{
+    BuySellChar, LastTrade, MarketLimitChar, TickerBidAsk, TickerDecimal, TickerTrades,
+};
 use crate::wss::kraken_wss_types::{ErrorMessage, PingPong, SystemStatus};
 use crate::wss::parsing::{get_event_field, get_event_from_vec};
 use crate::wss::public::orderbooks::{Orderbook, OrderbookUpdateMessage};
@@ -85,17 +87,17 @@ pub struct WSSTickerInfo {
     #[serde(rename(deserialize = "c"))]
     pub closed: LastTrade,
     #[serde(rename(deserialize = "v"))]
-    pub volume: Ticker<String>,
+    pub volume: TickerDecimal,
     #[serde(rename(deserialize = "p"))]
-    pub vwap: Ticker<String>,
+    pub vwap: TickerDecimal,
     #[serde(rename(deserialize = "t"))]
-    pub trades: Ticker<i64>,
+    pub trades: TickerTrades,
     #[serde(rename(deserialize = "l"))]
-    pub low: Ticker<String>,
+    pub low: TickerDecimal,
     #[serde(rename(deserialize = "h"))]
-    pub high: Ticker<String>,
+    pub high: TickerDecimal,
     #[serde(rename(deserialize = "o"))]
-    pub open: Ticker<String>,
+    pub open: TickerDecimal,
 }
 
 impl<'de> Deserialize<'de> for PublicMessage {

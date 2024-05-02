@@ -1,5 +1,7 @@
 //! REST response types
 use crate::clients::errors::ClientError;
+use rust_decimal::serde::str as decimal;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_this_or_that::as_i64;
 use serde_tuple::Deserialize_tuple;
@@ -424,24 +426,33 @@ pub struct TradableAssetPair {
     pub fee_volume_currency: String,
     pub margin_call: i64,
     pub margin_stop: i64,
+    #[serde(with = "decimal")]
     #[serde(rename = "ordermin")]
-    pub order_min: String,
+    pub order_min: Decimal,
+    #[serde(with = "decimal")]
     #[serde(rename = "costmin")]
-    pub cost_min: String,
-    pub tick_size: String,
+    pub cost_min: Decimal,
+    #[serde(with = "decimal")]
+    pub tick_size: Decimal,
     pub status: TradableAssetStatus,
     pub long_position_limit: Option<i64>,
     pub short_position_limit: Option<i64>,
 }
 
+/// Ticker containing trade count data for the last 24 hours
+#[derive(Debug, Deserialize_tuple, PartialEq)]
+pub struct TickerTrades {
+    pub today: i64,
+    pub last_24_h: i64,
+}
+
 /// Ticker helper type to serve differently typed data for the last 24 hours.
 #[derive(Debug, Deserialize_tuple, PartialEq)]
-pub struct Ticker<T>
-where
-    T: for<'a> Deserialize<'a>,
-{
-    pub today: T,
-    pub last_24_h: T,
+pub struct TickerDecimal {
+    #[serde(with = "decimal")]
+    pub today: Decimal,
+    #[serde(with = "decimal")]
+    pub last_24_h: Decimal,
 }
 
 /// Best bid or ask
@@ -449,9 +460,12 @@ where
 /// Separate type needed for varying data format from REST API.
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct RestTickerBidAsk {
-    pub price: String,
-    pub whole_lot_volume: String,
-    pub lot_volume: String,
+    #[serde(with = "decimal")]
+    pub price: Decimal,
+    #[serde(with = "decimal")]
+    pub whole_lot_volume: Decimal,
+    #[serde(with = "decimal")]
+    pub lot_volume: Decimal,
 }
 
 /// Best bid or ask
@@ -459,17 +473,21 @@ pub struct RestTickerBidAsk {
 /// Separate type needed for different format from WSS API.
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct TickerBidAsk {
-    pub price: String,
+    #[serde(with = "decimal")]
+    pub price: Decimal,
     #[serde(deserialize_with = "as_i64")]
     pub whole_lot_volume: i64,
-    pub lot_volume: String,
+    #[serde(with = "decimal")]
+    pub lot_volume: Decimal,
 }
 
 /// Price and volume for the most recent trade
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct LastTrade {
-    pub price: String,
-    pub volume: String,
+    #[serde(with = "decimal")]
+    pub price: Decimal,
+    #[serde(with = "decimal")]
+    pub volume: Decimal,
 }
 
 /// Complete ticker information for an asset
@@ -482,29 +500,36 @@ pub struct RestTickerInfo {
     #[serde(rename(deserialize = "c"))]
     pub closed: LastTrade,
     #[serde(rename(deserialize = "v"))]
-    pub volume: Ticker<String>,
+    pub volume: TickerDecimal,
     #[serde(rename(deserialize = "p"))]
-    pub vwap: Ticker<String>,
+    pub vwap: TickerDecimal,
     #[serde(rename(deserialize = "t"))]
-    pub trades: Ticker<i64>,
+    pub trades: TickerTrades,
     #[serde(rename(deserialize = "l"))]
-    pub low: Ticker<String>,
+    pub low: TickerDecimal,
     #[serde(rename(deserialize = "h"))]
-    pub high: Ticker<String>,
+    pub high: TickerDecimal,
     #[serde(rename(deserialize = "o"))]
-    pub open: String,
+    #[serde(with = "decimal")]
+    pub open: Decimal,
 }
 
 /// Candlestick data for the given interval
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct OHLC {
     pub time: i64,
-    pub open: String,
-    pub high: String,
-    pub low: String,
-    pub close: String,
-    pub vwap: String,
-    pub volume: String,
+    #[serde(with = "decimal")]
+    pub open: Decimal,
+    #[serde(with = "decimal")]
+    pub high: Decimal,
+    #[serde(with = "decimal")]
+    pub low: Decimal,
+    #[serde(with = "decimal")]
+    pub close: Decimal,
+    #[serde(with = "decimal")]
+    pub vwap: Decimal,
+    #[serde(with = "decimal")]
+    pub volume: Decimal,
     pub count: i64,
 }
 
@@ -523,8 +548,10 @@ pub struct OhlcResponse {
 /// Identical data for bids and asks, only context determines if it's a bid or ask.
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct BidAsk {
-    pub price: String,
-    pub volume: String,
+    #[serde(with = "decimal")]
+    pub price: Decimal,
+    #[serde(with = "decimal")]
+    pub volume: Decimal,
     pub time: i64,
 }
 
@@ -540,8 +567,10 @@ pub struct Orderbook {
 /// The model is the same regardless of if request to be consolidated by taker
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct RecentTrade {
-    pub price: String,
-    pub volume: String,
+    #[serde(with = "decimal")]
+    pub price: Decimal,
+    #[serde(with = "decimal")]
+    pub volume: Decimal,
     pub time: f64,
     pub buy_sell: BuySellChar,
     pub market_limit: MarketLimitChar,
@@ -565,8 +594,10 @@ pub struct RecentTrades {
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct Spread {
     pub time: i64,
-    pub bid: String,
-    pub ask: String,
+    #[serde(with = "decimal")]
+    pub bid: Decimal,
+    #[serde(with = "decimal")]
+    pub ask: Decimal,
 }
 
 /// Spreads for one or many assets
@@ -588,9 +619,13 @@ pub type ExtendedBalances = HashMap<String, ExtendedBalance>;
 /// Detailed balance data, including holds and credit (if available)
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct ExtendedBalance {
-    pub balance: String,
-    pub hold_trade: String,
+    #[serde(with = "decimal")]
+    pub balance: Decimal,
+    #[serde(with = "decimal")]
+    pub hold_trade: Decimal,
+    // TODO: how to handle? rust_decimal::serde_str_option doesn't behave if field isn't present
     pub credit: Option<String>,
+    // TODO: how to handle? rust_decimal::serde_str_option doesn't behave if field isn't present
     pub credit_used: Option<String>,
 }
 

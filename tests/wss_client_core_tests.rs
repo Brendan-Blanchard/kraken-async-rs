@@ -4,7 +4,7 @@ mod resources;
 mod tests {
     use futures_util::StreamExt;
     use kraken_async_rs::response_types::{
-        BuySellChar, LastTrade, MarketLimitChar, Ticker, TickerBidAsk,
+        BuySellChar, LastTrade, MarketLimitChar, TickerBidAsk, TickerDecimal, TickerTrades,
     };
     use kraken_async_rs::wss::kraken_wss_client::KrakenWSSClient;
     use kraken_async_rs::wss::kraken_wss_types::{PingPong, Status, SystemStatus};
@@ -17,6 +17,7 @@ mod tests {
     use kraken_async_rs::wss::subscribe_messages::{
         SubscribeMessage, Subscription, UnsubscribeMessage,
     };
+    use rust_decimal_macros::dec;
     use serde_json::json;
     use std::time::Duration;
     use tokio::sync::mpsc;
@@ -148,42 +149,42 @@ mod tests {
                     channel_id: 340,
                     message: WSSTickerInfo {
                         asks: TickerBidAsk {
-                            price: "37080.20000".to_string(),
+                            price: dec!(37080.20000),
                             whole_lot_volume: 0,
-                            lot_volume: "0.49479977".to_string(),
+                            lot_volume: dec!(0.49479977),
                         },
                         bids: TickerBidAsk {
-                            price: "37080.10000".to_string(),
+                            price: dec!(37080.10000),
                             whole_lot_volume: 24,
-                            lot_volume: "24.49109974".to_string(),
+                            lot_volume: dec!(24.49109974),
                         },
                         closed: LastTrade {
-                            price: "37080.10000".to_string(),
-                            volume: "0.01268510".to_string(),
+                            price: dec!(37080.10000),
+                            volume: dec!(0.01268510),
                         },
-                        volume: Ticker {
-                            today: "537.03329406".to_string(),
-                            last_24_h: "1394.36071246".to_string(),
+                        volume: TickerDecimal {
+                            today: dec!(537.03329406),
+                            last_24_h: dec!(1394.36071246),
                         },
-                        vwap: Ticker {
-                            today: "37012.52371".to_string(),
-                            last_24_h: "37042.48940".to_string(),
+                        vwap: TickerDecimal {
+                            today: dec!(37012.52371),
+                            last_24_h: dec!(37042.48940),
                         },
-                        trades: Ticker {
+                        trades: TickerTrades {
                             today: 8495,
                             last_24_h: 21019,
                         },
-                        low: Ticker {
-                            today: "36727.30000".to_string(),
-                            last_24_h: "36658.00000".to_string(),
+                        low: TickerDecimal {
+                            today: dec!(36727.30000),
+                            last_24_h: dec!(36658.00000),
                         },
-                        high: Ticker {
-                            today: "37185.60000".to_string(),
-                            last_24_h: "37289.70000".to_string(),
+                        high: TickerDecimal {
+                            today: dec!(37185.60000),
+                            last_24_h: dec!(37289.70000),
                         },
-                        open: Ticker {
-                            today: "37139.90000".to_string(),
-                            last_24_h: "37160.10000".to_string(),
+                        open: TickerDecimal {
+                            today: dec!(37139.90000),
+                            last_24_h: dec!(37160.10000),
                         },
                     },
                     channel_name: "ticker".to_string(),

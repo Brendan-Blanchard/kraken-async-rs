@@ -132,12 +132,12 @@ let request = OrderbookRequest::builder("ETHUSD".to_string())
 ### Response Details
 
 A best-effort was made to adhere to the format of Kraken's responses, except for cases where it poses some pretty
-severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, such as decimal numbers
-remaining `Strings`, and the majority of `i64` and `f64` timestamps remaining as such. The goal was to provide a great
-base library for others to build from, without limiting downstream uses by parsing everything and reducing overall
-performance. If you're developing general-purpose trading algorithms, you should be writing them over a common
-abstraction that can do this parsing anyway. If you disagree or have parsing, formatting, or any other issues or
-blocked use cases, please reach out with a clear example of your issue!
+severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are parsed
+to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64` and `f64` 
+timestamps remaining as such. The goal was to provide a great base library for others to build from, without limiting 
+downstream uses by parsing everything and reducing overall performance. If you're developing general-purpose trading 
+algorithms, you should be writing them over a common abstraction that can do this parsing anyway. If you disagree or 
+have parsing, formatting, or any other issues or blocked use cases, please reach out with a clear example of your issue!
 
 ### Misc Details
 
