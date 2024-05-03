@@ -4,6 +4,7 @@ mod resources;
 
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 
+use rust_decimal_macros::dec;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -166,7 +167,7 @@ async fn test_get_withdrawal_info() {
     let request = WithdrawalInfoRequest::builder(
         "XBT".to_string(),
         "Greenlisted Address".to_string(),
-        "0.1".to_string(),
+        dec!(0.1),
     )
     .build();
 
@@ -194,9 +195,9 @@ async fn test_withdraw_funds() {
     let request = WithdrawFundsRequest::builder(
         "XBT".to_string(),
         "Greenlisted Address".to_string(),
-        "0.1".to_string(),
+        dec!(0.1),
     )
-    .max_fee("0.00001".to_string())
+    .max_fee(dec!(0.00001))
     .build();
 
     let mock_server = MockServer::start().await;
@@ -284,7 +285,7 @@ async fn test_request_wallet_transfer() {
         "XBT".to_string(),
         "Account One".to_string(),
         "Account Two".to_string(),
-        "0.25".to_string(),
+        dec!(0.25),
     )
     .build();
 

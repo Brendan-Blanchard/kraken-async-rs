@@ -1,5 +1,6 @@
 //! REST response types
 use crate::clients::errors::ClientError;
+use crate::request_types::TriggerType;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_this_or_that::as_i64;
@@ -678,7 +679,7 @@ pub struct Order {
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
     pub order_flags: Vec<OrderFlag>,
     pub trades: Option<Vec<String>>,
-    pub trigger: Option<String>,
+    pub trigger: Option<TriggerType>,
     pub reason: Option<String>,
 }
 
@@ -714,7 +715,7 @@ pub struct ClosedOrder {
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
     pub order_flags: Vec<OrderFlag>,
     pub trades: Option<Vec<String>>,
-    pub trigger: Option<String>,
+    pub trigger: Option<TriggerType>,
     pub reason: Option<String>,
 }
 

@@ -14,6 +14,7 @@ use kraken_async_rs::request_types::{
     AllocateEarnFundsRequest, EarnAllocationStatusRequest, ListEarnAllocationsRequest,
     ListEarnStrategiesRequest,
 };
+use rust_decimal_macros::dec;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use wiremock::matchers::{body_string_contains, header_exists, method, path};
@@ -23,8 +24,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 async fn test_allocate_earn_funds() {
     let secrets_provider = get_null_secrets_provider();
     let request =
-        AllocateEarnFundsRequest::builder("10.123".to_string(), "W38S2C-Y1E0R-DUFM2T".to_string())
-            .build();
+        AllocateEarnFundsRequest::builder(dec!(10.123), "W38S2C-Y1E0R-DUFM2T".to_string()).build();
 
     let mock_server = MockServer::start().await;
 
@@ -47,8 +47,7 @@ async fn test_allocate_earn_funds() {
 async fn test_deallocate_earn_funds() {
     let secrets_provider = get_null_secrets_provider();
     let request =
-        AllocateEarnFundsRequest::builder("10.123".to_string(), "W38S2C-Y1E0R-DUFM2T".to_string())
-            .build();
+        AllocateEarnFundsRequest::builder(dec!(10.123), "W38S2C-Y1E0R-DUFM2T".to_string()).build();
 
     let mock_server = MockServer::start().await;
 

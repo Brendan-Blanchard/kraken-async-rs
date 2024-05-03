@@ -17,6 +17,7 @@ use kraken_async_rs::request_types::{
     WithdrawalInfoRequest, WithdrawalMethodsRequest,
 };
 use kraken_async_rs::response_types::VerificationTier::{Intermediate, Pro};
+use rust_decimal_macros::dec;
 use std::time::Duration;
 
 #[tokio::test]
@@ -84,7 +85,7 @@ async fn test_get_withdrawal_info() {
     let request = WithdrawalInfoRequest::builder(
         "XBT".to_string(),
         "Greenlisted Address".to_string(),
-        "0.1".to_string(),
+        dec!(0.1),
     )
     .build();
 
@@ -99,9 +100,9 @@ async fn test_withdraw_funds() {
     let request = WithdrawFundsRequest::builder(
         "XBT".to_string(),
         "Greenlisted Address".to_string(),
-        "0.1".to_string(),
+        dec!(0.1),
     )
-    .max_fee("0.00001".to_string())
+    .max_fee(dec!(0.00001))
     .build();
 
     // 25 calls costs 2500, requiring 10s to replenish @ 50/s
@@ -145,7 +146,7 @@ async fn test_request_wallet_transfer() {
         "XBT".to_string(),
         "Account One".to_string(),
         "Account Two".to_string(),
-        "0.25".to_string(),
+        dec!(0.25),
     )
     .build();
 

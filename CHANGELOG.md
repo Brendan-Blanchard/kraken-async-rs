@@ -16,6 +16,7 @@
 - Add `Debug`, `Clone`, `Copy` to `KrakenWSSClient`
 - Add `pub` to additional fields on structs in private and public WSS messages
 - Change `OpenOrder` WSS type to use `OrderStatus` enum
+- Used `TriggerType` enum in additional places
 
 ### v0.0.1
 

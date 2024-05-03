@@ -20,6 +20,7 @@ use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use wiremock::matchers::{body_partial_json, body_string_contains, header_exists, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+use rust_decimal_macros::dec;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -31,11 +32,11 @@ async fn test_add_order() {
     let request = AddOrderRequest::builder(
         OrderType::Market,
         BuySell::Buy,
-        "5.0".to_string(),
+        dec!(5.0),
         "USDCUSD".to_string(),
     )
     .order_flags(order_flags)
-    .price("0.90".to_string())
+    .price(dec!(0.90))
     .build();
 
     let mock_server = MockServer::start().await;
@@ -62,14 +63,14 @@ async fn test_add_order() {
 #[tokio::test]
 async fn test_add_order_batch() {
     let secrets_provider = get_null_secrets_provider();
-    let order_1 = BatchedOrderRequest::builder(OrderType::Limit, BuySell::Buy, "5.1".to_string())
-        .price("0.9".to_string())
+    let order_1 = BatchedOrderRequest::builder(OrderType::Limit, BuySell::Buy, dec!(5.1))
+        .price(dec!(0.9))
         .start_time("0".to_string())
         .expire_time("+5".to_string())
         .build();
 
-    let order_2 = BatchedOrderRequest::builder(OrderType::Limit, BuySell::Sell, "5.2".to_string())
-        .price("0.9".to_string())
+    let order_2 = BatchedOrderRequest::builder(OrderType::Limit, BuySell::Sell, dec!(5.2))
+        .price(dec!(0.9))
         .order_flags(vec![OrderFlag::Post])
         .build();
 
@@ -105,10 +106,10 @@ async fn test_edit_order() {
     let secrets_provider = get_null_secrets_provider();
     let request = EditOrderRequest::builder(
         "7BD466-BKZVM-FT2E2L".to_string(),
-        "5.1".to_string(),
+        dec!(5.1),
         "USDCUSD".to_string(),
     )
-    .price("0.89".to_string())
+    .price(dec!(0.89))
     .user_ref(1234)
     .build();
 

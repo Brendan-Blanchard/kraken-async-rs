@@ -15,6 +15,7 @@ use kraken_async_rs::request_types::{
 };
 use kraken_async_rs::response_types::VerificationTier::{Intermediate, Pro};
 use kraken_async_rs::response_types::{AddOrder, BuySell, OrderFlag, OrderType, VerificationTier};
+use rust_decimal_macros::dec;
 use std::time::Duration;
 use tokio::time::{pause, Instant};
 
@@ -217,11 +218,11 @@ fn get_add_order_request() -> AddOrderRequest {
     AddOrderRequest::builder(
         OrderType::Market,
         BuySell::Buy,
-        "5.0".to_string(),
+        dec!(5.0),
         "USDCUSD".to_string(),
     )
     .order_flags(order_flags)
-    .price("0.90".to_string())
+    .price(dec!(0.90))
     .build()
 }
 
@@ -231,12 +232,12 @@ fn get_add_order_request_user_ref() -> AddOrderRequest {
     AddOrderRequest::builder(
         OrderType::Market,
         BuySell::Buy,
-        "5.0".to_string(),
+        dec!(5.0),
         "USDCUSD".to_string(),
     )
     .user_ref(42)
     .order_flags(order_flags)
-    .price("0.90".to_string())
+    .price(dec!(0.90))
     .build()
 }
 
@@ -244,8 +245,8 @@ fn get_batched_order_request(n_orders: u64) -> AddBatchedOrderRequest {
     let mut orders = Vec::new();
 
     for _ in 0..n_orders {
-        let order = BatchedOrderRequest::builder(OrderType::Limit, BuySell::Buy, "5.1".to_string())
-            .price("0.9".to_string())
+        let order = BatchedOrderRequest::builder(OrderType::Limit, BuySell::Buy, dec!(5.1))
+            .price(dec!(0.9))
             .start_time("0".to_string())
             .expire_time("+5".to_string())
             .build();
@@ -260,7 +261,7 @@ fn edit_from_order(order: &AddOrder) -> EditOrderRequest {
     let edit_request = EditOrderRequest {
         user_ref: None,
         tx_id: order.tx_id.first().unwrap().clone(),
-        volume: "".to_string(),
+        volume: dec!(0),
         display_volume: None,
         pair: "".to_string(),
         price: None,

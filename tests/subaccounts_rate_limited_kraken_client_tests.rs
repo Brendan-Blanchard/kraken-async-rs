@@ -10,6 +10,7 @@ use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProv
 use crate::resources::test_client::test_client_impl::TestRateLimitedClient;
 use kraken_async_rs::clients::rate_limited_kraken_client::RateLimitedKrakenClient;
 use kraken_async_rs::response_types::VerificationTier::{Intermediate, Pro};
+use rust_decimal_macros::dec;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::Mutex;
@@ -33,7 +34,7 @@ async fn test_account_transfer() {
 
     let request = AccountTransferRequest::builder(
         "BTC".to_string(),
-        "1031.2008".to_string(),
+        dec!(1031.2008),
         "SourceAccount".to_string(),
         "DestAccount".to_string(),
     )

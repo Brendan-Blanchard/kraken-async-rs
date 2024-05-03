@@ -13,6 +13,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 
+use rust_decimal_macros::dec;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -45,7 +46,7 @@ async fn test_account_transfer() {
     let secrets_provider = get_null_secrets_provider();
     let request = AccountTransferRequest::builder(
         "BTC".to_string(),
-        "1031.2008".to_string(),
+        dec!(1031.2008),
         "SourceAccount".to_string(),
         "DestAccount".to_string(),
     )

@@ -16,6 +16,7 @@ use tokio::time::{pause, Instant};
 
 use resources::test_client::test_client_impl::TestRateLimitedClient;
 
+use rust_decimal_macros::dec;
 use std::time::Duration;
 
 #[tokio::test]
@@ -23,8 +24,7 @@ async fn test_allocate_earn_funds() {
     pause();
 
     let request =
-        AllocateEarnFundsRequest::builder("10.123".to_string(), "W38S2C-Y1E0R-DUFM2T".to_string())
-            .build();
+        AllocateEarnFundsRequest::builder(dec!(10.123), "W38S2C-Y1E0R-DUFM2T".to_string()).build();
 
     // 24 calls costs 2400, requiring 4s to replenish @ 100/s
     test_rate_limited_endpoint!(allocate_earn_funds, 24, 4, 5, Pro, &request);
@@ -35,8 +35,7 @@ async fn test_deallocate_earn_funds() {
     pause();
 
     let request =
-        AllocateEarnFundsRequest::builder("10.123".to_string(), "W38S2C-Y1E0R-DUFM2T".to_string())
-            .build();
+        AllocateEarnFundsRequest::builder(dec!(10.123), "W38S2C-Y1E0R-DUFM2T".to_string()).build();
 
     // 24 calls costs 2400, requiring 8s to replenish @ 50/s
     test_rate_limited_endpoint!(deallocate_earn_funds, 24, 8, 9, Intermediate, &request);

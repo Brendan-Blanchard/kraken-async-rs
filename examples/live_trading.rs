@@ -6,6 +6,7 @@ use kraken_async_rs::request_types::{
 };
 use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use kraken_async_rs::secrets::secrets_provider::EnvSecretsProvider;
+use rust_decimal_macros::dec;
 use std::fs::File;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -30,10 +31,10 @@ async fn main() {
     let request = AddOrderRequest::builder(
         OrderType::Limit,
         BuySell::Buy,
-        "5.1234".into(),
+        dec!(5.1234),
         "USDCUSD".into(),
     )
-    .price("0.99".to_string())
+    .price(dec!(0.99))
     // individual OrderFlag variants have a From<OrderFlag> for OrderFlags conversion for convenience
     .order_flags(OrderFlag::Post.into())
     .build();
@@ -61,10 +62,9 @@ async fn main() {
 
     info!("{:?}", order_details);
 
-    let edit_query =
-        EditOrderRequest::builder(order_id.clone(), "5.0".to_string(), "USDCUSD".to_string())
-            .price("0.99".to_string())
-            .build();
+    let edit_query = EditOrderRequest::builder(order_id.clone(), dec!(5.0), "USDCUSD".to_string())
+        .price(dec!(0.99))
+        .build();
 
     let edit = client
         .edit_order(&edit_query)
