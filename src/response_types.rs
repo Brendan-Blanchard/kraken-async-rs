@@ -333,7 +333,7 @@ pub enum AccountTransferStatus {
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum EarnFee {
-    String(String),
+    Decimal(Decimal),
     Integer(i64),
     Float(f64),
 }
@@ -585,7 +585,7 @@ pub struct RecentSpreads {
 }
 
 /// Convenience type for asset: amount balances
-pub type AccountBalances = HashMap<String, String>;
+pub type AccountBalances = HashMap<String, Decimal>;
 
 /// Convenience type for asset: extended balances
 pub type ExtendedBalances = HashMap<String, ExtendedBalance>;
@@ -603,25 +603,25 @@ pub struct ExtendedBalance {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct TradeBalances {
     #[serde(rename(deserialize = "eb"))]
-    pub equivalent_balance: String,
+    pub equivalent_balance: Decimal,
     #[serde(rename(deserialize = "tb"))]
-    pub trade_balance: String,
+    pub trade_balance: Decimal,
     #[serde(rename(deserialize = "m"))]
-    pub margin: String,
+    pub margin: Decimal,
     #[serde(rename(deserialize = "n"))]
-    pub net_pnl_open: String,
+    pub net_pnl_open: Decimal,
     #[serde(rename(deserialize = "c"))]
-    pub cost_basis_open: String,
+    pub cost_basis_open: Decimal,
     #[serde(rename(deserialize = "v"))]
-    pub floating_valuation: String,
+    pub floating_valuation: Decimal,
     #[serde(rename(deserialize = "e"))]
-    pub equity: String,
+    pub equity: Decimal,
     #[serde(rename(deserialize = "mf"))]
-    pub free_margin: String,
+    pub free_margin: Decimal,
     #[serde(rename(deserialize = "ml"))]
-    pub margin_level: Option<String>,
+    pub margin_level: Option<Decimal>,
     #[serde(rename(deserialize = "uv"))]
-    pub unexecuted_value: Option<String>,
+    pub unexecuted_value: Option<Decimal>,
 }
 
 /// Details of individual order
@@ -632,8 +632,8 @@ pub struct OrderDescription {
     pub side: BuySell,
     #[serde(rename(deserialize = "ordertype"))]
     pub order_type: OrderType,
-    pub price: String,
-    pub price2: String,
+    pub price: Decimal,
+    pub price2: Decimal,
     pub leverage: String,
     pub order: String,
     pub close: String,
@@ -663,16 +663,16 @@ pub struct Order {
     pub close_time: Option<f64>,
     pub descr: OrderDescription,
     #[serde(rename(deserialize = "vol"))]
-    pub volume: String,
+    pub volume: Decimal,
     #[serde(rename(deserialize = "vol_exec"))]
-    pub volume_executed: String,
-    pub cost: String,
-    pub fee: String,
-    pub price: String,
+    pub volume_executed: Decimal,
+    pub cost: Decimal,
+    pub fee: Decimal,
+    pub price: Decimal,
     #[serde(rename = "stopprice")]
-    pub stop_price: String,
+    pub stop_price: Decimal,
     #[serde(rename = "limitprice")]
-    pub limit_price: String,
+    pub limit_price: Decimal,
     pub misc: String,
     #[serde(rename = "oflags")]
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
@@ -699,16 +699,16 @@ pub struct ClosedOrder {
     #[serde(rename = "closetm")]
     pub close_time: Option<f64>,
     #[serde(rename(deserialize = "vol"))]
-    pub volume: String,
+    pub volume: Decimal,
     #[serde(rename(deserialize = "vol_exec"))]
-    pub volume_executed: String,
-    pub cost: String,
-    pub fee: String,
-    pub price: String,
+    pub volume_executed: Decimal,
+    pub cost: Decimal,
+    pub fee: Decimal,
+    pub price: Decimal,
     #[serde(rename = "stopprice")]
-    pub stop_price: String,
+    pub stop_price: Decimal,
     #[serde(rename = "limitprice")]
-    pub limit_price: String,
+    pub limit_price: Decimal,
     pub misc: String,
     #[serde(rename = "oflags")]
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
@@ -740,12 +740,12 @@ pub struct Trade {
     pub side: BuySell,
     #[serde(rename = "ordertype")]
     pub order_type: TradeType,
-    pub price: String,
-    pub cost: String,
-    pub fee: String,
+    pub price: Decimal,
+    pub cost: Decimal,
+    pub fee: Decimal,
     #[serde(rename(deserialize = "vol"))]
-    pub volume: String,
-    pub margin: String,
+    pub volume: Decimal,
+    pub margin: Decimal,
     pub misc: String,
     pub ledgers: Option<Vec<String>>,
     pub maker: bool,
@@ -765,6 +765,7 @@ pub struct TradesHistory {
 pub type OpenPositions = HashMap<String, OpenPosition>;
 
 /// Details of an open margin position
+#[serde_as]
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct OpenPosition {
     #[serde(rename = "ordertxid")]
@@ -777,20 +778,22 @@ pub struct OpenPosition {
     pub side: BuySell,
     #[serde(rename = "ordertype")]
     pub order_type: OrderType,
-    pub cost: String,
-    pub fee: String,
+    pub cost: Decimal,
+    pub fee: Decimal,
     #[serde(rename(deserialize = "vol"))]
-    pub volume: String,
+    pub volume: Decimal,
     #[serde(rename(deserialize = "vol_closed"))]
-    pub volume_closed: String,
-    pub margin: String,
-    pub value: String,
-    pub net: String,
+    pub volume_closed: Decimal,
+    pub margin: Decimal,
+    pub value: Decimal,
+    pub net: Decimal,
     pub terms: String,
     #[serde(rename = "rollovertm")]
     pub rollover_time: String,
     pub misc: String,
-    pub oflags: String,
+    #[serde(rename = "oflags")]
+    #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
+    pub order_flags: Vec<OrderFlag>,
 }
 
 /// Entry in the user's ledger
@@ -805,9 +808,9 @@ pub struct LedgerEntry {
     #[serde(rename = "aclass")]
     pub asset_class: String,
     pub asset: String,
-    pub amount: String,
-    pub fee: String,
-    pub balance: String,
+    pub amount: Decimal,
+    pub fee: Decimal,
+    pub balance: Decimal,
 }
 
 /// Mapping of ledger id: ledger entry
@@ -823,17 +826,17 @@ pub struct LedgerInfo {
 /// Description of fee tier
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Fees {
-    pub fee: String,
+    pub fee: Decimal,
     #[serde(rename = "minfee")]
-    pub min_fee: String,
+    pub min_fee: Decimal,
     #[serde(rename = "maxfee")]
-    pub max_fee: String,
+    pub max_fee: Decimal,
     #[serde(rename = "nextfee")]
-    pub next_fee: Option<String>,
+    pub next_fee: Option<Decimal>,
     #[serde(rename = "nextvolume")]
-    pub next_volume: Option<String>,
+    pub next_volume: Option<Decimal>,
     #[serde(rename = "tiervolume")]
-    pub tier_volume: Option<String>,
+    pub tier_volume: Option<Decimal>,
 }
 
 /// Response type for TradeVolume
@@ -843,7 +846,7 @@ pub struct Fees {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct TradeVolume {
     pub currency: String,
-    pub volume: String,
+    pub volume: Decimal,
     pub fees: Option<HashMap<String, Fees>>,
     pub fees_maker: Option<HashMap<String, Fees>>,
 }
@@ -925,9 +928,9 @@ pub struct OrderEdit {
     pub tx_id: String,
     #[serde(rename = "originaltxid")]
     pub original_tx_id: String,
-    pub volume: String,
-    pub price: String,
-    pub price2: Option<String>,
+    pub volume: Decimal,
+    pub price: Decimal,
+    pub price2: Option<Decimal>,
     pub orders_cancelled: i64,
     pub descr: AddOrderDescription,
 }
@@ -953,19 +956,19 @@ pub struct CancelAllOrdersAfter {
 pub struct DepositMethod {
     pub method: String,
     pub limit: BoolOrString,
-    pub fee: Option<String>,
-    pub address_setup_fee: Option<String>,
+    pub fee: Option<Decimal>,
+    pub address_setup_fee: Option<Decimal>,
     pub gen_address: Option<bool>,
-    pub minimum: String,
+    pub minimum: Decimal,
 }
 
-/// Description of a withdraw method
+/// Description of a withdrawal method
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct WithdrawMethod {
     pub asset: String,
     pub method: String,
     pub network: Option<String>,
-    pub minimum: String,
+    pub minimum: Decimal,
 }
 
 /// Description of a deposit address
@@ -1019,8 +1022,8 @@ pub struct DepositWithdrawal {
     #[serde(rename = "txid")]
     pub tx_id: String,
     pub info: String,
-    pub amount: String,
-    pub fee: String,
+    pub amount: Decimal,
+    pub fee: Decimal,
     pub time: i64,
     pub status: TransferStatus,
     #[serde(rename = "status-prop")]
@@ -1033,8 +1036,8 @@ pub struct DepositWithdrawal {
 pub struct Withdrawal {
     pub method: String,
     pub limit: BoolOrString,
-    pub fee: String,
-    pub amount: String,
+    pub fee: Decimal,
+    pub amount: Decimal,
 }
 
 /// Response type containing only a ref id for confirmation
@@ -1077,8 +1080,8 @@ pub struct EarnStrategy {
     pub deallocation_fee: EarnFee,
     pub id: String,
     pub lock_type: LockTypeDetail,
-    pub user_cap: Option<String>,
-    pub user_min_allocation: Option<String>,
+    pub user_cap: Option<Decimal>,
+    pub user_min_allocation: Option<Decimal>,
     pub yield_source: YieldSource,
 }
 
@@ -1107,8 +1110,8 @@ pub struct BondingDetail {
 /// Bracketed estimate for a strategy's APR
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct AprEstimate {
-    pub low: String,
-    pub high: String,
+    pub low: Decimal,
+    pub high: Decimal,
 }
 
 /// Wrapper type for compounding nature of a strategy
@@ -1131,8 +1134,8 @@ pub struct YieldSource {
 pub struct EarnAllocations {
     pub converted_asset: String,
     pub items: Vec<EarnAllocation>,
-    pub total_allocated: String,
-    pub total_rewarded: String,
+    pub total_allocated: Decimal,
+    pub total_rewarded: Decimal,
 }
 
 /// Description of an allocation to an earn strategy
@@ -1158,10 +1161,10 @@ pub struct AmountAllocated {
 /// State of a single allocation to a strategy
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct AllocationState {
-    pub allocation_count: String,
+    pub allocation_count: i64,
     pub allocations: Vec<Allocation>,
-    pub converted: String,
-    pub native: String,
+    pub converted: Decimal,
+    pub native: Decimal,
 }
 
 /// Description of assets allocated to a strategy
@@ -1169,8 +1172,8 @@ pub struct AllocationState {
 pub struct Allocation {
     pub created_at: String,
     pub expires: String,
-    pub converted: String,
-    pub native: String,
+    pub converted: Decimal,
+    pub native: Decimal,
 }
 
 /// Description of the payout for a particular allocation
@@ -1185,8 +1188,8 @@ pub struct Payout {
 /// Amount earned by an allocation in the requested and native assets
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct EarnAmount {
-    pub converted: String,
-    pub native: String,
+    pub converted: Decimal,
+    pub native: Decimal,
 }
 
 /// Response type for GetWebSocketsToken

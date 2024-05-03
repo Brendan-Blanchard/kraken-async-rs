@@ -28,6 +28,7 @@ use kraken_async_rs::response_types::{
     TradesInfo, VerificationTier, WebsocketToken, WithdrawMethod, Withdrawal, WithdrawalAddress,
 };
 use kraken_async_rs::secrets::secrets_provider::SecretsProvider;
+use rust_decimal_macros::dec;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -295,8 +296,8 @@ impl KrakenClient for TestClient {
                 status: OrderEditStatus::Ok,
                 tx_id: self.get_unique_id(),
                 original_tx_id: request.tx_id.clone(),
-                volume: "".to_string(),
-                price: "".to_string(),
+                volume: dec!(0),
+                price: dec!(0),
                 price2: None,
                 orders_cancelled: 0,
                 descr: AddOrderDescription {
