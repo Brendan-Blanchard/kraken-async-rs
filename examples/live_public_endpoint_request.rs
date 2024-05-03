@@ -2,7 +2,7 @@ use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::http_response_types::ResultErrorResponse;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
-use kraken_async_rs::request_types::{StringCSV, TradableAssetPairsRequest};
+use kraken_async_rs::request_types::TradableAssetPairsRequest;
 use kraken_async_rs::secrets::secrets_provider::StaticSecretsProvider;
 use std::sync::Arc;
 use tokio::sync::Mutex;
