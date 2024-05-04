@@ -132,8 +132,8 @@ mod tests {
                 PublicMessage::Trade(Message {
                     channel_id: 337,
                     message: vec![PublicTrade {
-                        price: "37080.10000".to_string(),
-                        volume: "0.00015891".to_string(),
+                        price: dec!(37080.10000),
+                        volume: dec!(0.00015891),
                         time: "1699797222.188887".to_string(),
                         side: BuySellChar::Sell,
                         order_type: MarketLimitChar::Market,
@@ -198,12 +198,12 @@ mod tests {
                     message: OHLC {
                         time: "1699797181.803577".to_string(),
                         end_time: "1699797240.000000".to_string(),
-                        open: "37080.20000".to_string(),
-                        high: "37080.20000".to_string(),
-                        low: "37080.20000".to_string(),
-                        close: "37080.20000".to_string(),
-                        vwap: "37080.20000".to_string(),
-                        volume: "0.01032369".to_string(),
+                        open: dec!(37080.20000),
+                        high: dec!(37080.20000),
+                        low: dec!(37080.20000),
+                        close: dec!(37080.20000),
+                        vwap: dec!(37080.20000),
+                        volume: dec!(0.01032369),
                         count: 2,
                     },
                     channel_name: "ohlc-1".to_string(),
@@ -215,11 +215,11 @@ mod tests {
                 PublicMessage::Spread(Message {
                     channel_id: 341,
                     message: Spread {
-                        bid: "37080.10000".to_string(),
-                        ask: "37080.20000".to_string(),
+                        bid: dec!(37080.10000),
+                        ask: dec!(37080.20000),
                         timestamp: "1699797184.943422".to_string(),
-                        bid_volume: "21.82608437".to_string(),
-                        ask_volume: "0.50775187".to_string(),
+                        bid_volume: dec!(21.82608437),
+                        ask_volume: dec!(0.50775187),
                     },
                     channel_name: "spread".to_string(),
                     pair: "XBT/USD".to_string(),
@@ -232,35 +232,35 @@ mod tests {
                     message: Orderbook {
                         asks: vec![
                             BidAsk {
-                                price: "37080.20000".to_string(),
-                                volume: "0.44907155".to_string(),
+                                price: dec!(37080.20000),
+                                volume: dec!(0.44907155),
                                 time: "1699797211.976902".to_string(),
                             },
                             BidAsk {
-                                price: "37080.50000".to_string(),
-                                volume: "0.01086516".to_string(),
+                                price: dec!(37080.50000),
+                                volume: dec!(0.01086516),
                                 time: "1699797210.264751".to_string(),
                             },
                             BidAsk {
-                                price: "37096.10000".to_string(),
-                                volume: "0.00100000".to_string(),
+                                price: dec!(37096.10000),
+                                volume: dec!(0.00100000),
                                 time: "1699797210.168531".to_string(),
                             },
                         ],
                         bids: vec![
                             BidAsk {
-                                price: "37080.10000".to_string(),
-                                volume: "24.49109974".to_string(),
+                                price: dec!(37080.10000),
+                                volume: dec!(24.49109974),
                                 time: "1699797200.242011".to_string(),
                             },
                             BidAsk {
-                                price: "37079.90000".to_string(),
-                                volume: "0.08764809".to_string(),
+                                price: dec!(37079.90000),
+                                volume: dec!(0.08764809),
                                 time: "1699797196.230889".to_string(),
                             },
                             BidAsk {
-                                price: "37079.80000".to_string(),
-                                volume: "0.02789714".to_string(),
+                                price: dec!(37079.80000),
+                                volume: dec!(0.02789714),
                                 time: "1699797179.654731".to_string(),
                             },
                         ],
@@ -275,14 +275,14 @@ mod tests {
                     channel_id: 336,
                     bids: vec![
                         BidAskUpdate {
-                            price: "37079.40000".to_string(),
-                            volume: "0.36000000".to_string(),
+                            price: dec!(37079.40000),
+                            volume: dec!(0.36000000),
                             timestamp: "1699797212.921034".to_string(),
                             update_type: None,
                         },
                         BidAskUpdate {
-                            price: "37080.10000".to_string(),
-                            volume: "24.89569974".to_string(),
+                            price: dec!(37080.10000),
+                            volume: dec!(24.89569974),
                             timestamp: "1699797212.921050".to_string(),
                             update_type: None,
                         },
@@ -300,14 +300,14 @@ mod tests {
                     bids: vec![],
                     asks: vec![
                         BidAskUpdate {
-                            price: "37109.60000".to_string(),
-                            volume: "0.00000000".to_string(),
+                            price: dec!(37109.60000),
+                            volume: dec!(0.00000000),
                             timestamp: "1699797213.027747".to_string(),
                             update_type: None,
                         },
                         BidAskUpdate {
-                            price: "37110.40000".to_string(),
-                            volume: "2.69466902".to_string(),
+                            price: dec!(37110.40000),
+                            volume: dec!(2.69466902),
                             timestamp: "1699797200.313276".to_string(),
                             update_type: Some("r".to_string()),
                         },

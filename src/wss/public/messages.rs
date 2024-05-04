@@ -6,6 +6,7 @@ use crate::wss::kraken_wss_types::{ErrorMessage, PingPong, SystemStatus};
 use crate::wss::parsing::{get_event_field, get_event_from_vec};
 use crate::wss::public::orderbooks::{Orderbook, OrderbookUpdateMessage};
 use crate::wss::subscribe_messages::SubscriptionStatus;
+use rust_decimal::Decimal;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
@@ -44,8 +45,8 @@ where
 /// Publicly available trade message
 #[derive(Debug, PartialEq, Deserialize_tuple)]
 pub struct PublicTrade {
-    pub price: String,
-    pub volume: String,
+    pub price: Decimal,
+    pub volume: Decimal,
     pub time: String,
     pub side: BuySellChar,
     #[serde(rename = "orderType")]
@@ -58,23 +59,23 @@ pub struct PublicTrade {
 pub struct OHLC {
     pub time: String,
     pub end_time: String,
-    pub open: String,
-    pub high: String,
-    pub low: String,
-    pub close: String,
-    pub vwap: String,
-    pub volume: String,
+    pub open: Decimal,
+    pub high: Decimal,
+    pub low: Decimal,
+    pub close: Decimal,
+    pub vwap: Decimal,
+    pub volume: Decimal,
     pub count: i64,
 }
 
 /// Best bid and ask and volumes at the recorded timestamp
 #[derive(Debug, PartialEq, Deserialize_tuple)]
 pub struct Spread {
-    pub bid: String,
-    pub ask: String,
+    pub bid: Decimal,
+    pub ask: Decimal,
     pub timestamp: String,
-    pub bid_volume: String,
-    pub ask_volume: String,
+    pub bid_volume: Decimal,
+    pub ask_volume: Decimal,
 }
 
 /// Last-24h and current ticker stats

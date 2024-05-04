@@ -1,4 +1,5 @@
 use crate::response_types::BidOrAsk;
+use rust_decimal::Decimal;
 use serde::de::{MapAccess, SeqAccess, Visitor};
 use serde::{de, Deserialize, Deserializer};
 use serde_tuple::Deserialize_tuple;
@@ -7,8 +8,8 @@ use std::fmt::Formatter;
 /// A bid or ask, depending on context
 #[derive(Debug, Deserialize_tuple, PartialEq)]
 pub struct BidAsk {
-    pub price: String,
-    pub volume: String,
+    pub price: Decimal,
+    pub volume: Decimal,
     pub time: String,
 }
 
@@ -35,8 +36,8 @@ pub struct Orderbook {
 /// Update to a price point for bids or asks
 #[derive(Debug, PartialEq)]
 pub struct BidAskUpdate {
-    pub price: String,
-    pub volume: String,
+    pub price: Decimal,
+    pub volume: Decimal,
     pub timestamp: String,
     pub update_type: Option<String>,
 }
@@ -321,6 +322,7 @@ impl<'de> Deserialize<'de> for BidAskUpdate {
 mod tests {
     use super::*;
     use crate::response_types::BidOrAsk::{Ask, Bid};
+    use rust_decimal_macros::dec;
 
     const BID_ASK_UPDATE: &str = "[\"34236.30000\",\"0.20206679\",\"1698231193.410190\"]";
     const BID_ASK_UPDATE_REPUBLISH: &str =
@@ -350,8 +352,8 @@ mod tests {
     #[test]
     fn test_deserializing_update() {
         let expected_bid_ask_update: BidAskUpdate = BidAskUpdate {
-            price: "34236.30000".to_string(),
-            volume: "0.20206679".to_string(),
+            price: dec!(34236.30000),
+            volume: dec!(0.20206679),
             timestamp: "1698231193.410190".to_string(),
             update_type: None,
         };
@@ -365,8 +367,8 @@ mod tests {
     #[test]
     fn test_deserializing_update_republish() {
         let expected_bid_ask_update: BidAskUpdate = BidAskUpdate {
-            price: "34210.00000".to_string(),
-            volume: "2.23575055".to_string(),
+            price: dec!(34210.00000),
+            volume: dec!(2.23575055),
             timestamp: "1698230978.434643".to_string(),
             update_type: Some("r".to_string()),
         };
@@ -381,8 +383,8 @@ mod tests {
         let expected_bids_update = BidAskUpdates {
             side: Bid,
             updates: vec![BidAskUpdate {
-                price: "34211.00000".to_string(),
-                volume: "2.92303645".to_string(),
+                price: dec!(34211.00000),
+                volume: dec!(2.92303645),
                 timestamp: "1698230979.415494".to_string(),
                 update_type: None,
             }],
@@ -399,8 +401,8 @@ mod tests {
         let expected_asks_update = BidAskUpdates {
             side: Ask,
             updates: vec![BidAskUpdate {
-                price: "34240.10000".to_string(),
-                volume: "0.36250000".to_string(),
+                price: dec!(34240.10000),
+                volume: dec!(0.36250000),
                 timestamp: "1698230979.497975".to_string(),
                 update_type: None,
             }],
@@ -417,8 +419,8 @@ mod tests {
         let expected_asks_update = BidAskUpdates {
             side: Bid,
             updates: vec![BidAskUpdate {
-                price: "34211.00000".to_string(),
-                volume: "2.92303645".to_string(),
+                price: dec!(34211.00000),
+                volume: dec!(2.92303645),
                 timestamp: "1698230979.415494".to_string(),
                 update_type: None,
             }],
@@ -436,8 +438,8 @@ mod tests {
             channel_id: 336,
             bids: vec![],
             asks: vec![BidAskUpdate {
-                price: "34240.10000".to_string(),
-                volume: "0.36250000".to_string(),
+                price: dec!(34240.10000),
+                volume: dec!(0.36250000),
                 timestamp: "1698230979.497975".to_string(),
                 update_type: None,
             }],
@@ -456,8 +458,8 @@ mod tests {
         let expected_message = OrderbookUpdateMessage {
             channel_id: 336,
             bids: vec![BidAskUpdate {
-                price: "34211.00000".to_string(),
-                volume: "2.92303645".to_string(),
+                price: dec!(34211.00000),
+                volume: dec!(2.92303645),
                 timestamp: "1698230979.415494".to_string(),
                 update_type: None,
             }],
@@ -478,21 +480,21 @@ mod tests {
             channel_id: 336,
             bids: vec![
                 BidAskUpdate {
-                    price: "34239.90000".to_string(),
-                    volume: "0.24117192".to_string(),
+                    price: dec!(34239.90000),
+                    volume: dec!(0.24117192),
                     timestamp: "1698231193.409849".to_string(),
                     update_type: None,
                 },
                 BidAskUpdate {
-                    price: "34208.40000".to_string(),
-                    volume: "0.36250000".to_string(),
+                    price: dec!(34208.40000),
+                    volume: dec!(0.36250000),
                     timestamp: "1698231193.221649".to_string(),
                     update_type: Some("r".into()),
                 },
             ],
             asks: vec![BidAskUpdate {
-                price: "34236.30000".to_string(),
-                volume: "0.20206679".to_string(),
+                price: dec!(34236.30000),
+                volume: dec!(0.20206679),
                 timestamp: "1698231193.410190".to_string(),
                 update_type: None,
             }],
