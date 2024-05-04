@@ -1,7 +1,7 @@
 use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
-use kraken_async_rs::request_types::{OrderRequest};
+use kraken_async_rs::request_types::OrderRequest;
 use kraken_async_rs::secrets::secrets_provider::EnvSecretsProvider;
 use std::fs::File;
 use std::sync::Arc;
