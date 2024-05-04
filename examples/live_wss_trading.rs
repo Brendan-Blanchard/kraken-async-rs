@@ -2,11 +2,12 @@ use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::TimeInForce;
-use kraken_async_rs::response_types::{BuySell, OrderType};
+use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use kraken_async_rs::secrets::secrets_provider::EnvSecretsProvider;
 use kraken_async_rs::wss::kraken_wss_client::{KrakenMessageStream, KrakenWSSClient};
 use kraken_async_rs::wss::private::messages::PrivateMessage;
 use kraken_async_rs::wss::private::trading_messages::AddOrderRequest;
+use rust_decimal_macros::dec;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::Mutex;
@@ -40,10 +41,10 @@ async fn main() {
         OrderType::Limit,
         BuySell::Buy,
         "USDC/USD".to_string(),
-        "10.00".to_string(),
+        dec!(10.00),
     )
-    .price("0.90".to_string())
-    .order_flags("post".to_string())
+    .price(dec!(0.90))
+    .order_flags(vec![OrderFlag::Post])
     .expire_time("+5".to_string())
     .time_in_force(TimeInForce::GTD)
     .validate("true".to_string())

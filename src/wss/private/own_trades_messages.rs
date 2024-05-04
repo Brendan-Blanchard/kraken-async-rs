@@ -1,6 +1,7 @@
 //! OwnTrade messages (a user's trade stream)
 use crate::response_types::{BuySell, OrderType};
 use crate::wss::kraken_wss_types::Sequence;
+use rust_decimal::Decimal;
 use serde::de::{MapAccess, Visitor};
 use serde::{de, Deserialize, Deserializer};
 use serde_tuple::Deserialize_tuple;
@@ -24,12 +25,12 @@ struct RawOwnTrade {
     trade_type: BuySell,
     #[serde(rename(deserialize = "ordertype"))]
     order_type: OrderType,
-    price: String,
-    cost: String,
-    fee: String,
+    price: Decimal,
+    cost: Decimal,
+    fee: Decimal,
     #[serde(rename(deserialize = "vol"))]
-    volume: String,
-    margin: String,
+    volume: Decimal,
+    margin: Decimal,
     #[serde(rename(deserialize = "userref"))]
     user_ref: Option<String>,
 }
@@ -64,11 +65,11 @@ pub struct OwnTrade {
     pub time: OffsetDateTime,
     pub trade_type: BuySell,
     pub order_type: OrderType,
-    pub price: String,
-    pub cost: String,
-    pub fee: String,
-    pub volume: String,
-    pub margin: String,
+    pub price: Decimal,
+    pub cost: Decimal,
+    pub fee: Decimal,
+    pub volume: Decimal,
+    pub margin: Decimal,
     pub user_ref: Option<String>,
 }
 
@@ -130,6 +131,7 @@ impl<'de> Deserialize<'de> for OwnTrade {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rust_decimal_macros::dec;
     use time::macros::datetime;
 
     const OWN_TRADE: &str = "{\
@@ -148,11 +150,11 @@ mod tests {
             time: datetime!(2023-09-28 20:22:49.208424 UTC),
             trade_type: BuySell::Sell,
             order_type: OrderType::Limit,
-            price: "1.00010000".to_string(),
-            cost: "181.24812300".to_string(),
-            fee: "0.36249625".to_string(),
-            volume: "181.23000000".to_string(),
-            margin: "0.00000000".to_string(),
+            price: dec!(1.0001),
+            cost: dec!(181.248123),
+            fee: dec!(0.36249625),
+            volume: dec!(181.23),
+            margin: dec!(0),
             user_ref: None,
         };
 

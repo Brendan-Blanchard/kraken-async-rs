@@ -1,12 +1,18 @@
 //! Trading requests and responses
 use crate::request_types::TimeInForce;
-use crate::response_types::{BuySell, OrderType};
+use crate::response_types::{BuySell, OrderFlag, OrderType};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use serde_with::formats::CommaSeparator;
+use serde_with::formats::Strict;
+use serde_with::serde_as;
 use serde_with::skip_serializing_none;
+use serde_with::StringWithSeparator;
 use simple_builder::Builder;
 use std::fmt::{Display, Formatter};
 
 /// Request send via websocket to add an order
+#[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize, PartialEq, Eq, Builder)]
 pub struct AddOrderRequest {
@@ -23,16 +29,17 @@ pub struct AddOrderRequest {
     #[builder(required)]
     pub pair: String,
     #[builder(required)]
-    pub volume: String,
+    pub volume: Decimal,
     #[serde(rename = "reqid")]
     pub req_id: Option<i64>,
-    pub price: Option<String>,
+    pub price: Option<Decimal>,
     #[serde(rename = "price2")]
-    pub price_2: Option<String>,
+    pub price_2: Option<Decimal>,
     pub leverage: Option<i64>,
     pub reduce_only: Option<bool>,
     #[serde(rename = "oflags")]
-    pub order_flags: Option<String>,
+    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, OrderFlag>>")]
+    pub order_flags: Option<Vec<OrderFlag>>,
     #[serde(rename = "starttm")]
     pub start_time: Option<String>,
     #[serde(rename = "expiretm")]
@@ -44,9 +51,9 @@ pub struct AddOrderRequest {
     #[serde(rename = "close[ordertype]")]
     pub close_order_type: Option<OrderType>,
     #[serde(rename = "close[price]")]
-    pub close_price: Option<String>,
+    pub close_price: Option<Decimal>,
     #[serde(rename = "close[price2]")]
-    pub close_price_2: Option<String>,
+    pub close_price_2: Option<Decimal>,
     #[serde(rename = "timeinforce")]
     pub time_in_force: Option<TimeInForce>,
 }
@@ -83,6 +90,7 @@ pub struct AddOrderResponse {
 }
 
 /// Request for editing an existing order
+#[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize, PartialEq, Builder)]
 pub struct EditOrderRequest {
@@ -96,13 +104,14 @@ pub struct EditOrderRequest {
     pub req_id: Option<i64>,
     #[builder(required)]
     pub pair: String,
-    pub price: Option<String>,
+    pub price: Option<Decimal>,
     #[serde(rename = "price2")]
-    pub price_2: Option<String>,
+    pub price_2: Option<Decimal>,
     #[builder(required)]
-    pub volume: String,
+    pub volume: Decimal,
     #[serde(rename = "oflags")]
-    pub order_flags: Option<String>,
+    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, OrderFlag>>")]
+    pub order_flags: Option<Vec<OrderFlag>>,
     #[serde(rename = "newuserref")]
     pub new_user_ref: Option<String>,
     pub validate: Option<String>,
