@@ -4,7 +4,6 @@ use crate::response_types::{BuySell, OrderFlag, OrderType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::formats::CommaSeparator;
-use serde_with::formats::Strict;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
 use serde_with::StringWithSeparator;
