@@ -1,12 +1,15 @@
 //! OpenOrder message and sub-types
 use crate::request_types::TimeInForce;
-use crate::response_types::{BuySell, OrderStatus, OrderType};
+use crate::response_types::{BuySell, OrderFlag, OrderStatus, OrderType};
 use crate::wss::kraken_wss_types::Sequence;
+use rust_decimal::Decimal;
 use serde::de::{MapAccess, Visitor};
 use serde::{de, Deserialize, Deserializer};
 use serde_tuple::Deserialize_tuple;
+use serde_with::formats::CommaSeparator;
 use serde_with::formats::Strict;
-use serde_with::TimestampSecondsWithFrac;
+use serde_with::StringWithSeparator;
+use serde_with::{serde_as, TimestampSecondsWithFrac};
 use std::fmt::Formatter;
 use time::OffsetDateTime;
 
@@ -47,6 +50,7 @@ pub struct OpenOrdersMessage {
 }
 
 /// Type to deserialize to, missing the order_id field (Kraken API design)
+#[serde_as]
 #[derive(Debug, Deserialize, PartialEq)]
 struct RawOpenOrder {
     #[serde(rename(deserialize = "refid"))]
@@ -58,8 +62,8 @@ struct RawOpenOrder {
     open_time: Option<String>,
     #[serde(rename(deserialize = "starttm"))]
     start_time: Option<String>,
-    display_volume: Option<String>,
-    display_volume_remain: Option<String>,
+    display_volume: Option<Decimal>,
+    display_volume_remain: Option<Decimal>,
     #[serde(rename(deserialize = "expiretm"))]
     expire_time: Option<String>,
     contingent: Option<OrderContingent>,
@@ -68,20 +72,21 @@ struct RawOpenOrder {
     #[serde(rename(deserialize = "lastupdated"))]
     last_updated: Option<String>,
     #[serde(rename(deserialize = "vol"))]
-    volume: Option<String>,
+    volume: Option<Decimal>,
     #[serde(rename(deserialize = "vol_exec"))]
-    executed_volume: Option<String>,
-    cost: Option<String>,
-    fee: Option<String>,
+    executed_volume: Option<Decimal>,
+    cost: Option<Decimal>,
+    fee: Option<Decimal>,
     #[serde(rename(deserialize = "avg_price"))]
-    average_price: Option<String>,
+    average_price: Option<Decimal>,
     #[serde(rename(deserialize = "stopprice"))]
-    stop_price: Option<String>,
+    stop_price: Option<Decimal>,
     #[serde(rename(deserialize = "limitprice"))]
-    limit_price: Option<String>,
+    limit_price: Option<Decimal>,
     misc: Option<String>,
-    #[serde(rename(deserialize = "oflags"))]
-    order_flags: Option<String>,
+    #[serde(rename = "oflags")]
+    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, OrderFlag>>")]
+    pub order_flags: Option<Vec<OrderFlag>>,
     #[serde(rename(deserialize = "timeinforce"))]
     time_in_force: Option<TimeInForce>,
     cancel_reason: Option<String>,
@@ -129,21 +134,21 @@ pub struct OpenOrder {
     pub status: Option<OrderStatus>,
     pub open_time: Option<String>,
     pub start_time: Option<String>,
-    pub display_volume: Option<String>,
-    pub display_volume_remain: Option<String>,
+    pub display_volume: Option<Decimal>,
+    pub display_volume_remain: Option<Decimal>,
     pub expire_time: Option<String>,
     pub contingent: Option<OrderContingent>,
     pub order_description: Option<OrderDescription>,
     pub last_updated: Option<String>,
-    pub volume: Option<String>,
-    pub executed_volume: Option<String>,
-    pub cost: Option<String>,
-    pub fee: Option<String>,
-    pub average_price: Option<String>,
-    pub stop_price: Option<String>,
-    pub limit_price: Option<String>,
+    pub volume: Option<Decimal>,
+    pub executed_volume: Option<Decimal>,
+    pub cost: Option<Decimal>,
+    pub fee: Option<Decimal>,
+    pub average_price: Option<Decimal>,
+    pub stop_price: Option<Decimal>,
+    pub limit_price: Option<Decimal>,
     pub misc: Option<String>,
-    pub order_flags: Option<String>,
+    pub order_flags: Option<Vec<OrderFlag>>,
     pub time_in_force: Option<TimeInForce>,
     pub cancel_reason: Option<String>,
     pub rate_count: Option<String>,
@@ -180,15 +185,17 @@ impl<'de> Deserialize<'de> for OpenOrder {
 }
 
 /// Contingent leg of an order, e.g. a stop-limit or take-profit
+#[serde_as]
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct OrderContingent {
     #[serde(rename(deserialize = "ordertype"))]
     pub order_type: OrderType,
-    pub price: String,
+    pub price: Decimal,
     #[serde(rename(deserialize = "price2"))]
-    pub price_2: String,
-    #[serde(rename(deserialize = "oflags"))]
-    pub order_flags: Option<String>,
+    pub price_2: Decimal,
+    #[serde(rename = "oflags")]
+    #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
+    pub order_flags: Vec<OrderFlag>,
 }
 
 /// Details of an individual order
@@ -200,10 +207,10 @@ pub struct OrderDescription {
     pub side: BuySell,
     #[serde(rename(deserialize = "ordertype"))]
     pub order_type: OrderType,
-    pub price: String,
+    pub price: Decimal,
     #[serde(rename(deserialize = "price2"))]
-    pub price_2: Option<String>,
-    pub leverage: Option<String>,
+    pub price_2: Option<Decimal>,
+    pub leverage: Option<Decimal>,
     pub order: String,
     pub close: Option<String>,
 }
@@ -227,11 +234,11 @@ struct RawOpenOrderStatusChange {
     #[serde_as(as = "Option<TimestampSecondsWithFrac<String, Strict>>")]
     last_updated: Option<OffsetDateTime>,
     #[serde(rename = "vol_exec")]
-    volume_executed: Option<String>,
-    cost: Option<String>,
-    fee: Option<String>,
+    volume_executed: Option<Decimal>,
+    cost: Option<Decimal>,
+    fee: Option<Decimal>,
     #[serde(rename = "avg_price")]
-    average_price: Option<String>,
+    average_price: Option<Decimal>,
     cancel_reason: Option<String>,
 }
 
@@ -258,10 +265,10 @@ pub struct OrderStatusChange {
     pub status: String,
     pub user_ref: Option<i64>,
     pub last_updated: Option<OffsetDateTime>,
-    pub volume_executed: Option<String>,
-    pub cost: Option<String>,
-    pub fee: Option<String>,
-    pub average_price: Option<String>,
+    pub volume_executed: Option<Decimal>,
+    pub cost: Option<Decimal>,
+    pub fee: Option<Decimal>,
+    pub average_price: Option<Decimal>,
     pub cancel_reason: Option<String>,
 }
 
@@ -306,6 +313,7 @@ impl<'de> Deserialize<'de> for OrderStatusChange {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rust_decimal_macros::dec;
     use time::macros::datetime;
 
     const OPEN_ORDER: &str = "{\
@@ -352,22 +360,22 @@ mod tests {
                 position: None,
                 side: BuySell::Sell,
                 order_type: OrderType::Limit,
-                price: "1.00150000".to_string(),
-                price_2: Some("0.00000000".to_string()),
+                price: dec!(1.0015),
+                price_2: Some(dec!(0)),
                 leverage: None,
                 order: "sell 106.53408600 USDC/USD @ limit 1.00150000".to_string(),
                 close: None,
             }),
             last_updated: None,
-            volume: Some("106.53408600".to_string()),
-            executed_volume: Some("0.00000000".to_string()),
-            cost: Some("0.00000000".to_string()),
-            fee: Some("0.00000000".to_string()),
-            average_price: Some("0.00000000".to_string()),
-            stop_price: Some("0.00000000".to_string()),
-            limit_price: Some("0.00000000".to_string()),
+            volume: Some(dec!(106.53408600)),
+            executed_volume: Some(dec!(0)),
+            cost: Some(dec!(0)),
+            fee: Some(dec!(0)),
+            average_price: Some(dec!(0)),
+            stop_price: Some(dec!(0)),
+            limit_price: Some(dec!(0)),
             misc: Some("".to_string()),
-            order_flags: Some("fcib,post".to_string()),
+            order_flags: Some(vec![OrderFlag::FeesInBase, OrderFlag::Post]),
             time_in_force: Some(TimeInForce::GTC),
             cancel_reason: None,
             rate_count: None,
@@ -396,23 +404,23 @@ mod tests {
                 position: None,
                 side: BuySell::Buy,
                 order_type: OrderType::TakeProfitLimit,
-                price: "0.99000000".to_string(),
-                price_2: Some("0.99100000".to_string()),
+                price: dec!(0.990),
+                price_2: Some(dec!(0.991)),
                 leverage: None,
                 order: "buy 5.00000000 USDC/USD @ take-profit-limit 0.99000000, limit 0.99100000"
                     .to_string(),
                 close: None,
             }),
             last_updated: None,
-            volume: Some("5.00000000".to_string()),
-            executed_volume: Some("0.00000000".to_string()),
-            cost: Some("0.00000000".to_string()),
-            fee: Some("0.00000000".to_string()),
-            average_price: Some("0.00000000".to_string()),
-            stop_price: Some("0.00000000".to_string()),
-            limit_price: Some("0.00000000".to_string()),
+            volume: Some(dec!(5)),
+            executed_volume: Some(dec!(0)),
+            cost: Some(dec!(0)),
+            fee: Some(dec!(0)),
+            average_price: Some(dec!(0)),
+            stop_price: Some(dec!(0)),
+            limit_price: Some(dec!(0)),
             misc: Some("".to_string()),
-            order_flags: Some("fciq".to_string()),
+            order_flags: Some(vec![OrderFlag::FeesInQuote]),
             time_in_force: Some(TimeInForce::GTC),
             cancel_reason: None,
             rate_count: None,
@@ -448,10 +456,10 @@ mod tests {
             order_id: "OBA7Z7-XQVOQ-3NZRDS".to_string(),
             user_ref: Some(0),
             last_updated: Some(datetime!(2023-10-31 14:28:06.39107 UTC)),
-            volume_executed: Some("0.00000000".to_string()),
-            cost: Some("0.00000000".to_string()),
-            fee: Some("0.00000000".to_string()),
-            average_price: Some("0.00000000".to_string()),
+            volume_executed: Some(dec!(0)),
+            cost: Some(dec!(0)),
+            fee: Some(dec!(0)),
+            average_price: Some(dec!(0)),
             status: "canceled".to_string(),
             cancel_reason: Some("User requested".to_string()),
         };
