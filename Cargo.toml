@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://github.com/Brendan-Blanchard/kraken-async-rs"
 keywords = ["tokio", "async", "kraken", "trading", "crypto"]
 categories = ["asynchronous", "finance", "api-bindings"]
-exclude = [".idea", ".gitignore", ".github", ".env"]
+exclude = [".idea", ".gitignore", ".github", ".env", "*.log", "scripts"]
 
 [dependencies]
 base64 = "0.22.0"
