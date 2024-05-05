@@ -7,7 +7,12 @@ A complete[^4] wrapper of the Kraken Pro trading API, written in asynchronous Ru
 It's not expected that you'll be able to use Kraken-Async-Rs without consulting
 the [Kraken API](https://docs.kraken.com/rest/#section/General-Usage)
 and [Websocket](https://docs.kraken.com/websockets/#overview)
-documentation. There are many details and interdependencies[^2] to each request that are not documented or enforced in
+documentation. Going forward, you should reference the new API docs:
+[Kraken REST API](https://docs.kraken.com/api/docs/rest-api/get-server-time),
+[Kraken Websockets V1](https://docs.kraken.com/api/docs/websocket-v1/addorder),
+and [Kraken Websockets V2](https://docs.kraken.com/api/docs/websocket-v2/add_order).
+
+There are many details and interdependencies[^2] to each request that are not documented or enforced in
 the library since they're outside this library's control and subject to change.
 
 ### Example: Calling a Public Endpoint
@@ -132,11 +137,13 @@ let request = OrderbookRequest::builder("ETHUSD".to_string())
 ### Response Details
 
 A best-effort was made to adhere to the format of Kraken's responses, except for cases where it poses some pretty
-severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are parsed
-to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64` and `f64` 
-timestamps remaining as such. The goal was to provide a great base library for others to build from, without limiting 
-downstream uses by parsing everything and reducing overall performance. If you're developing general-purpose trading 
-algorithms, you should be writing them over a common abstraction that can do this parsing anyway. If you disagree or 
+severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are
+parsed
+to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64`
+and `f64`
+timestamps remain as such. The goal was to provide a great base library for others to build from, without limiting
+downstream uses by parsing everything and reducing overall performance. If you're developing general-purpose trading
+algorithms, you should be writing them over a common abstraction that can do this parsing anyway. If you disagree or
 have parsing, formatting, or any other issues or blocked use cases, please reach out with a clear example of your issue!
 
 ### Misc Details
@@ -147,8 +154,8 @@ have parsing, formatting, or any other issues or blocked use cases, please reach
 ### Stability and Versioning
 
 I've released the initial version as 0.0.1 because I'm quite confident any initial revisions will be breaking changes.
-In particular, there's additional work I'd like to do in error handling for "valid" errors from Kraken, e.g. 500s when
-the matching engine is offline for maintenance.
+Version 0.0.2 releases many fixes and required breaking changes. It's been left as 0.0.2 since v0.1.0 will include the
+Kraken V2 Websockets API, which will have breaking changes to existing enums.
 
 ### Contributions
 
