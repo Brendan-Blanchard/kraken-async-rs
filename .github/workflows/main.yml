@@ -52,7 +52,7 @@ jobs:
         run: |
           cargo tarpaulin --out xml --verbose --workspace
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Brendan-Blanchard/kraken-async-rs
