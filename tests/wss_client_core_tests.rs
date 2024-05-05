@@ -22,6 +22,7 @@ mod tests {
     use std::time::Duration;
     use tokio::sync::mpsc;
     use tokio::time::timeout;
+    use tokio_tungstenite::tungstenite::Message as WSMessage;
     use ws_mock::matchers::JsonExact;
     use ws_mock::ws_mock_server::{WsMock, WsMockServer};
 
@@ -326,7 +327,7 @@ mod tests {
         let server = WsMockServer::start().await;
         let url = server.uri().await;
 
-        let (mpsc_send, mpsc_recv) = mpsc::channel::<String>(32);
+        let (mpsc_send, mpsc_recv) = mpsc::channel::<WSMessage>(32);
 
         WsMock::new()
             .forward_from_channel(mpsc_recv)
@@ -338,7 +339,10 @@ mod tests {
         let mut message_stream = client.connect().await.unwrap();
 
         for (raw_message, expected_parsed_message) in test_cases {
-            mpsc_send.send(raw_message.to_string()).await.unwrap();
+            mpsc_send
+                .send(WSMessage::Text(raw_message.to_string()))
+                .await
+                .unwrap();
 
             let message = timeout(Duration::from_millis(100), message_stream.next())
                 .await
