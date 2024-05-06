@@ -1,10 +1,7 @@
-use crate::request_types::TimeInForce;
-use crate::response_types::{BuySell, OrderFlag, OrderType};
+use crate::request_types::{SelfTradePrevention, TimeInForce, TriggerType};
+use crate::response_types::{BuySell, OrderType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use serde_with::formats::CommaSeparator;
-use serde_with::serde_as;
-use serde_with::StringWithSeparator;
 
 #[derive(Debug, Eq, PartialEq, Clone, Deserialize)]
 pub enum AddOrderStatus {
@@ -12,70 +9,87 @@ pub enum AddOrderStatus {
     Err,
 }
 
-/// Enum representing various ways of specifying a real or relative price
-#[derive(Debug, Eq, PartialEq, Clone, Serialize)]
-pub enum Price {
-    /// Real price as a decimal value, e.g. `dec!(65123.20)`
-    Decimal(Decimal),
-    /// Relative price, specified as a String
-    ///
-    /// +5.1 - the price should be 5.1 (in quote currency) greater than the last traded price
-    /// -5.1 - the price should be 5.1 (in quote currency) less than the last traded price
-    /// #5.1 - the price should be 5.1 (in quote currency) less than or greater than the last traded price (set depending on the direction of the order)
-    /// +1.2% - the price should be 1.2% greater than the last traded price
-    Relative(String),
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum FeePreference {
+    Base,
+    Quote,
 }
 
-// TODO: impl From<Decimal> for Price
-// TODO: impl From<String> for Price
+/// Type of price given in the `limit_price` field
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
+pub enum PriceType {
+    /// Static or real price, e.g. 65123.29 for BTC/USD
+    #[serde(rename = "static")]
+    Static,
+    /// Percent different from the previous price, e.g. -5.0 (%)
+    #[serde(rename = "pct")]
+    Percent,
+    /// Quote/notional difference from the last traded price, e.g. -500, 150, etc
+    #[serde(rename = "quote")]
+    Quote,
+}
 
-#[serde_as]
-#[derive(Debug, Serialize)]
-pub struct AddOrderRequest {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TriggerParams {
+    pub reference: Option<TriggerType>,
+    pub price: Decimal,
+    pub price_type: Option<PriceType>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ConditionalParams {
+    pub order_type: Option<OrderType>,
+    pub limit_price: Option<Decimal>,
+    pub limit_price_type: Option<PriceType>,
+    pub trigger_price: Option<Decimal>,
+    pub trigger_price_type: Option<PriceType>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AddOrderParams {
     pub event: String,
-    #[serde(rename = "ordertype")]
     pub order_type: OrderType,
-    #[serde(rename = "type")]
     pub side: BuySell,
-    pub pair: String,
-    pub price: Price,
-    #[serde(rename = "price2")]
-    pub price_2: Price,
-    pub volume: Decimal,
-    pub reduce_only: Option<bool>,
-    #[serde(rename = "oflags")]
-    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, OrderFlag>>")]
-    pub order_flags: Option<Vec<OrderFlag>>,
-    #[serde(rename = "starttm")]
-    pub start_time: Option<String>,
-    #[serde(rename = "expiretm")]
+    pub symbol: String,
+    pub limit_price: Option<Decimal>,
+    pub triggers: Option<TriggerParams>,
+    pub time_in_force: Option<TimeInForce>,
+    pub margin: Option<bool>,
+    pub post_only: Option<bool>,
+    pub effective_time: Option<String>, // RFC3339
     pub expire_time: Option<String>,
-    pub deadline: String,
-    #[serde(rename = "userref")]
-    pub user_ref: String,
-    pub validate: String, // TODO: maybe bool? docs say String...
-    #[serde(rename = "timeinforce")]
-    pub time_in_force: TimeInForce,
-    #[serde(rename = "close[ordertype]")]
-    pub close_order_type: OrderType,
-    #[serde(rename = "close[price2]")]
-    pub close_price: Price,
-    #[serde(rename = "close[price2]")]
-    pub close_price_2: Price,
-    #[serde(rename = "reqid")]
-    pub req_id: i64,
+    pub deadline: Option<String>,
+    #[serde(rename = "order_userref")]
+    pub order_user_ref: Option<i64>,
+    pub conditional: Option<ConditionalParams>,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
+    pub fee_preference: Option<FeePreference>,
+    #[serde(rename = "no_mpp")]
+    pub no_market_price_protection: Option<bool>,
+    pub stp_type: Option<SelfTradePrevention>,
+    #[serde(rename = "cash_order_qty")]
+    pub cash_order_quantity: Option<Decimal>,
+    pub validate: Option<bool>,
     pub token: String,
 }
 
 #[derive(Debug, Deserialize)]
+pub struct OrderResult {
+    pub order_id: String,
+    #[serde(rename = "order_userref")]
+    pub order_user_ref: String,
+    pub warning: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct AddOrderResponse {
-    pub event: String,
-    #[serde(rename = "txid")]
-    pub tx_id: String,
-    pub descr: String,
-    pub status: AddOrderStatus,
-    #[serde(rename = "reqid")]
+    pub method: String,
+    pub result: Option<OrderResult>,
+    pub error: Option<String>,
+    pub success: bool,
     pub req_id: i64,
-    #[serde(rename = "errorMessage")]
-    pub error_message: String,
+    pub time_in: String,
+    pub time_out: String,
 }

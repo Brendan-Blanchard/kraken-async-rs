@@ -229,7 +229,8 @@ impl Display for TriggerType {
 }
 
 /// Strategy for exchange to take when handling a self-crossing order.
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum SelfTradePrevention {
     CancelNewest,
     CancelOldest,
