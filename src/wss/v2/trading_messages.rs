@@ -30,6 +30,17 @@ pub enum PriceType {
     Quote,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct OrderResponse<T> {
+    pub method: String,
+    pub result: Option<T>,
+    pub error: Option<String>,
+    pub success: bool,
+    pub req_id: i64,
+    pub time_in: String,
+    pub time_out: String,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TriggerParams {
     pub reference: Option<TriggerType>,
@@ -76,20 +87,77 @@ pub struct AddOrderParams {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct OrderResult {
+pub struct AddOrderResult {
     pub order_id: String,
     #[serde(rename = "order_userref")]
     pub order_user_ref: String,
     pub warning: Vec<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EditOrderParams {
+    pub deadline: String,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
+    pub fee_preference: Option<FeePreference>,
+    pub limit_price: Option<Decimal>,
+    #[serde(rename = "no_mpp")]
+    pub no_market_price_protection: Option<bool>,
+    pub order_id: String,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Option<Decimal>,
+    #[serde(rename = "order_userref")]
+    pub order_user_ref: Option<i64>,
+    pub post_only: Option<bool>,
+    pub reduce_only: Option<bool>,
+    pub symbol: String,
+    pub triggers: Option<TriggerParams>,
+    pub validate: Option<bool>,
+}
+
 #[derive(Debug, Deserialize)]
-pub struct AddOrderResponse {
-    pub method: String,
-    pub result: Option<OrderResult>,
-    pub error: Option<String>,
-    pub success: bool,
-    pub req_id: i64,
-    pub time_in: String,
-    pub time_out: String,
+pub struct EditOrderResult {
+    pub order_id: String,
+    pub original_order_id: String,
+    pub warning: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CancelOrderParams {
+    pub order_id: Vec<String>,
+    #[serde(rename = "order_userref")]
+    pub order_user_ref: Option<i64>,
+    pub token: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CancelOrderResult {
+    pub order_id: String,
+    pub warning: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CancelAllOrdersParams {
+    pub token: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CancelAllOrdersResult {
+    pub count: i64,
+    pub warning: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CancelOnDisconnectParams {
+    pub timeout: i64,
+    pub token: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CancelOnDisconnectResult {
+    #[serde(rename = "currentTime")]
+    pub current_time: String,
+    #[serde(rename = "triggerTime")]
+    pub trigger_time: String,
+    pub warning: Vec<String>,
 }
