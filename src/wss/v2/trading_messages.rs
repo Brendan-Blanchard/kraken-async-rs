@@ -1,4 +1,4 @@
-use crate::request_types::{SelfTradePrevention, TimeInForce, TriggerType};
+use crate::request_types::{IntOrString, SelfTradePrevention, TimeInForce, TriggerType};
 use crate::response_types::{BuySell, OrderType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -59,15 +59,18 @@ pub struct ConditionalParams {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AddOrderParams {
-    pub event: String,
     pub order_type: OrderType,
     pub side: BuySell,
     pub symbol: String,
     pub limit_price: Option<Decimal>,
+    pub limit_price_type: Option<PriceType>,
     pub triggers: Option<TriggerParams>,
     pub time_in_force: Option<TimeInForce>,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Decimal,
     pub margin: Option<bool>,
     pub post_only: Option<bool>,
+    pub reduce_only: Option<bool>,
     pub effective_time: Option<String>, // RFC3339
     pub expire_time: Option<String>,
     pub deadline: Option<String>,
@@ -143,7 +146,7 @@ pub struct CancelAllOrdersParams {
 
 #[derive(Debug, Deserialize)]
 pub struct CancelAllOrdersResult {
-    pub count: i64,
+    pub count: i32,
     pub warning: Vec<String>,
 }
 
@@ -159,5 +162,56 @@ pub struct CancelOnDisconnectResult {
     pub current_time: String,
     #[serde(rename = "triggerTime")]
     pub trigger_time: String,
+    pub warning: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BatchOrder {
+    pub order_type: OrderType,
+    pub side: BuySell,
+    pub limit_price: Option<Decimal>,
+    pub limit_price_type: Option<PriceType>,
+    pub triggers: Option<TriggerParams>,
+    pub time_in_force: Option<TimeInForce>,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Decimal,
+    pub margin: Option<bool>,
+    pub post_only: Option<bool>,
+    pub reduce_only: Option<bool>,
+    pub effective_time: Option<String>, // RFC3339
+    pub expire_time: Option<String>,
+    #[serde(rename = "order_userref")]
+    pub order_user_ref: Option<i64>,
+    pub conditional: Option<ConditionalParams>,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
+    pub fee_preference: Option<FeePreference>,
+    #[serde(rename = "no_mpp")]
+    pub no_market_price_protection: Option<bool>,
+    pub stp_type: Option<SelfTradePrevention>,
+    #[serde(rename = "cash_order_qty")]
+    pub cash_order_quantity: Option<Decimal>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BatchOrderParams {
+    pub deadline: Option<String>,
+    pub symbol: String,
+    pub validate: Option<bool>,
+    pub token: String,
+    pub orders: Vec<BatchOrder>,
+}
+
+pub type BatchOrderResult = Vec<AddOrderResult>;
+
+#[derive(Debug, Serialize)]
+pub struct BatchCancelParams {
+    orders: Vec<IntOrString>,
+    token: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct BatchCancelResult {
+    pub count: i32,
     pub warning: Vec<String>,
 }
