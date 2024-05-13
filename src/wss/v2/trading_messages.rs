@@ -1,4 +1,4 @@
-use crate::request_types::{IntOrString, SelfTradePrevention, TimeInForce, TriggerType};
+use crate::request_types::{IntOrString, SelfTradePrevention, TimeInForceV2, TriggerType};
 use crate::response_types::{BuySell, OrderType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -65,7 +65,7 @@ pub struct AddOrderParams {
     pub limit_price: Option<Decimal>,
     pub limit_price_type: Option<PriceType>,
     pub triggers: Option<TriggerParams>,
-    pub time_in_force: Option<TimeInForce>,
+    pub time_in_force: Option<TimeInForceV2>,
     #[serde(rename = "order_qty")]
     pub order_quantity: Decimal,
     pub margin: Option<bool>,
@@ -172,7 +172,7 @@ pub struct BatchOrder {
     pub limit_price: Option<Decimal>,
     pub limit_price_type: Option<PriceType>,
     pub triggers: Option<TriggerParams>,
-    pub time_in_force: Option<TimeInForce>,
+    pub time_in_force: Option<TimeInForceV2>,
     #[serde(rename = "order_qty")]
     pub order_quantity: Decimal,
     pub margin: Option<bool>,
