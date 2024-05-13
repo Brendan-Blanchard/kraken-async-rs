@@ -253,6 +253,7 @@ impl Display for SelfTradePrevention {
 /// Immediate or Cancel (aka Fill or Kill)
 /// Good 'til Date (must come with an expiration time in the request)
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
+#[serde(rename_all = "lowercase")]
 pub enum TimeInForce {
     GTC,
     IOC,

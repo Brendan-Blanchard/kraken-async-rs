@@ -208,11 +208,32 @@ pub enum OrderStatus {
     Expired,
 }
 
+/// Status of an order
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum OrderStatusV2 {
+    PendingNew,
+    New,
+    PartiallyFilled,
+    Filled,
+    Canceled,
+    Expired,
+}
+
 /// Status of a position
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum PositionStatus {
     Open,
+    Closed,
+}
+
+/// Status of a position
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum PositionStatusV2 {
+    Open,
+    Closing,
     Closed,
 }
 

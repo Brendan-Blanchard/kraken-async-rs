@@ -43,9 +43,9 @@ pub struct OrderResponse<T> {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TriggerParams {
-    pub reference: Option<TriggerType>,
     pub price: Decimal,
     pub price_type: Option<PriceType>,
+    pub reference: Option<TriggerType>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -206,8 +206,8 @@ pub type BatchOrderResult = Vec<AddOrderResult>;
 
 #[derive(Debug, Serialize)]
 pub struct BatchCancelParams {
-    orders: Vec<IntOrString>,
-    token: String,
+    pub orders: Vec<IntOrString>,
+    pub token: String,
 }
 
 #[derive(Debug, Deserialize)]
