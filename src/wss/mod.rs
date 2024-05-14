@@ -14,4 +14,4 @@ mod parsing;
 pub mod private;
 pub mod public;
 pub mod subscribe_messages;
-mod v2;
+pub mod v2;
