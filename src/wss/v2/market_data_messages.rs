@@ -1,4 +1,4 @@
-use crate::response_types::BuySell;
+use crate::response_types::{BuySell, SystemStatus};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
@@ -21,6 +21,30 @@ pub enum OrderbookEvent {
 pub enum MarketLimit {
     Market,
     Limit,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum AssetStatus {
+    DepositOnly,
+    Disabled,
+    Enabled,
+    FundingTemporarilyDisabled,
+    WithdrawalOnly,
+    WorkInProgress,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum PairStatus {
+    CancelOnly,
+    Delisted,
+    LimitOnly,
+    Maintenance,
+    Online,
+    PostOnly,
+    ReduceOnly,
+    WorkInProgress,
 }
 
 #[derive(Debug, Serialize)]
@@ -202,4 +226,54 @@ pub struct Trade {
     pub timestamp: String,
 }
 
-// TODO: Instruments channel, subscriptions and responses
+#[derive(Debug, Serialize)]
+pub struct InstrumentsSubscription {
+    pub channel: String,
+    pub snapshot: Option<bool>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct InstrumentsSubscriptionResponse {
+    pub channel: String,
+    pub snapshot: Option<bool>,
+    pub warnings: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Asset {
+    pub id: String,
+    pub margin_rate: Decimal,
+    pub precision: i64,
+    pub precision_display: i64,
+    pub status: AssetStatus,
+    pub borrowable: bool,
+    pub collateral_value: Decimal,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Pair {
+    pub base: String,
+    pub cost_min: String,
+    pub cost_precision: String,
+    pub has_index: bool,
+    pub margin_initial: Decimal,
+    pub marginable: bool,
+    pub position_limit_long: i64,
+    pub position_limit_short: i64,
+    pub price_increment: Decimal,
+    pub price_precision: i64,
+    #[serde(rename = "qty_increment")]
+    pub quantity_increment: Decimal,
+    #[serde(rename = "qty_min")]
+    pub quantity_min: Decimal,
+    #[serde(rename = "qty_precision")]
+    pub quantity_precision: i64,
+    pub status: PairStatus,
+    pub symbol: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Instruments {
+    pub assets: Vec<Asset>,
+    pub pairs: Vec<Pair>,
+}
