@@ -1,6 +1,7 @@
-use crate::response_types::{BuySell, SystemStatus};
+use crate::response_types::BuySell;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, skip_serializing_none};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
@@ -18,6 +19,7 @@ pub enum OrderbookEvent {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "lowercase")]
 pub enum MarketLimit {
     Market,
     Limit,
@@ -47,6 +49,8 @@ pub enum PairStatus {
     WorkInProgress,
 }
 
+#[serde_as]
+#[skip_serializing_none]
 #[derive(Debug, Serialize)]
 pub struct TickerSubscription {
     pub channel: String,
@@ -79,6 +83,8 @@ pub struct Ticker {
     pub vwap: Decimal,
 }
 
+#[serde_as]
+#[skip_serializing_none]
 #[derive(Debug, Serialize)]
 pub struct BookSubscription {
     pub channel: String,
@@ -106,30 +112,21 @@ pub struct BidAsk {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Orderbook {
+    pub symbol: String,
+    pub checksum: i64,
     pub bids: Vec<BidAsk>,
     pub asks: Vec<BidAsk>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct OrderbookSnapshot {
-    pub channel: String,
-    #[serde(rename = "type")]
-    pub message_type: String,
-    pub data: [Orderbook; 1],
-    pub checksum: i64,
-    pub symbol: String,
-}
-
-#[derive(Debug, Deserialize)]
 pub struct OrderbookUpdate {
-    pub channel: String,
-    #[serde(rename = "type")]
-    pub message_type: String,
-    pub data: [Orderbook; 1],
-    pub checksum: i64,
     pub symbol: String,
+    pub checksum: i64,
     pub timestamp: String,
+    pub bids: Vec<BidAsk>,
+    pub asks: Vec<BidAsk>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -175,6 +172,8 @@ pub struct L3BidAskUpdate {
     pub timestamp: String,
 }
 
+#[serde_as]
+#[skip_serializing_none]
 #[derive(Debug, Serialize)]
 pub struct CandlesSubscription {
     pub channel: String,
@@ -206,6 +205,8 @@ pub struct Candle {
     pub interval: i32,
 }
 
+#[serde_as]
+#[skip_serializing_none]
 #[derive(Debug, Serialize)]
 pub struct TradesSubscription {
     pub channel: String,
@@ -226,6 +227,8 @@ pub struct Trade {
     pub timestamp: String,
 }
 
+#[serde_as]
+#[skip_serializing_none]
 #[derive(Debug, Serialize)]
 pub struct InstrumentsSubscription {
     pub channel: String,
