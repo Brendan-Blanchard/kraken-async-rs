@@ -1,10 +1,6 @@
 use crate::request_types::{TimeInForce, TriggerType};
-use crate::response_types::{
-    BuySell, OrderStatus, OrderStatusV2, OrderType, PositionStatus, PositionStatusV2,
-};
-use crate::wss::v2::trading_messages::{
-    ConditionalParams, FeePreference, PriceType, TriggerParams,
-};
+use crate::response_types::{BuySell, OrderStatusV2, OrderType, PositionStatusV2};
+use crate::wss::v2::trading_messages::{ConditionalParams, PriceType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
@@ -82,11 +78,11 @@ pub struct ExecutionSubscriptionParams {
     pub snapshot: Option<bool>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct SubscriptionResult {
     pub channel: String,
     #[serde(rename = "maxratecount")]
-    pub max_rate_count: Option<i64>, // TODO: not present on Balances ack, but that's fine to share?
+    pub max_rate_count: Option<i64>,
     pub snapshot: Option<bool>,
     pub warnings: Option<Vec<String>>,
 }

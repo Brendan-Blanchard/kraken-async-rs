@@ -67,7 +67,7 @@ pub struct TickerSubscriptionResponse {
     pub warnings: Option<Vec<String>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Ticker {
     pub ask: Decimal,
     pub ask_qty: Decimal,
@@ -104,14 +104,14 @@ pub struct BookSubscriptionResponse {
     pub warnings: Option<Vec<String>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct BidAsk {
     pub price: Decimal,
     #[serde(rename = "qty")]
     pub quantity: Decimal,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Orderbook {
     pub symbol: String,
@@ -120,7 +120,7 @@ pub struct Orderbook {
     pub asks: Vec<BidAsk>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct OrderbookUpdate {
     pub symbol: String,
     pub checksum: i64,
@@ -129,7 +129,7 @@ pub struct OrderbookUpdate {
     pub asks: Vec<BidAsk>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct L3BidAsk {
     pub order_id: String,
     pub limit_price: Decimal,
@@ -138,7 +138,7 @@ pub struct L3BidAsk {
     pub timestamp: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct L3Orderbook {
     pub symbol: String,
     pub bids: Vec<L3BidAsk>,
@@ -146,7 +146,7 @@ pub struct L3Orderbook {
     pub checksum: i64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct L3OrderbookUpdateMessage {
     pub channel: String,
     #[serde(rename = "type")]
@@ -154,7 +154,7 @@ pub struct L3OrderbookUpdateMessage {
     pub data: [L3Orderbook; 1],
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct L3OrderbookUpdate {
     pub symbol: String,
     pub bids: Vec<L3BidAskUpdate>,
@@ -162,7 +162,7 @@ pub struct L3OrderbookUpdate {
     pub checksum: i64,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct L3BidAskUpdate {
     pub event: OrderbookEvent,
     pub order_id: String,
@@ -191,7 +191,7 @@ pub struct SubscriptionResponse {
     pub warnings: Option<Vec<String>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Candle {
     pub symbol: String,
     pub open: Decimal,
@@ -214,7 +214,7 @@ pub struct TradesSubscription {
     pub snapshot: Option<bool>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Trade {
     pub symbol: String,
     pub side: BuySell,

@@ -30,17 +30,6 @@ pub enum PriceType {
     Quote,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct OrderResponse<T> {
-    pub method: String,
-    pub result: Option<T>,
-    pub error: Option<String>,
-    pub success: bool,
-    pub req_id: i64,
-    pub time_in: String,
-    pub time_out: String,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TriggerParams {
     pub price: Decimal,
