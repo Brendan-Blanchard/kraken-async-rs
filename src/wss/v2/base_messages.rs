@@ -1,12 +1,12 @@
 use crate::wss::v2::admin_messages::{Heartbeat, StatusUpdate};
 use crate::wss::v2::market_data_messages::{
-    L3Orderbook, L3OrderbookUpdate, Orderbook, OrderbookUpdate, Ticker, Trade,
+    Instruments, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook, OrderbookUpdate, Ticker, Trade,
 };
 use crate::wss::v2::user_data_messages::SubscriptionResult;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum PublicMessage {
     Status(Response<Vec<StatusUpdate>>),
@@ -14,8 +14,11 @@ pub enum PublicMessage {
     Ticker(Response<Vec<Ticker>>),
     BookSnapshot(Response<Vec<Orderbook>>),
     BookUpdate(Response<Vec<OrderbookUpdate>>),
+    Ohlc(Response<Vec<Ohlc>>),
+    Instrument(Response<Instruments>),
     Subscription(ResultResponse<SubscriptionResult>),
     Heartbeat(Heartbeat),
+    Pong(ResultResponse<Pong>),
     Error(String),
 }
 
@@ -27,6 +30,7 @@ pub enum PrivateMessage {
     L3Update(Response<Vec<L3OrderbookUpdate>>),
     Subscription(ResultResponse<SubscriptionResult>),
     Heartbeat(Heartbeat),
+    Pong(ResultResponse<Pong>),
     Error(String),
 }
 
@@ -38,6 +42,17 @@ where
     pub method: String,
     pub params: T,
     pub req_id: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Ping {
+    pub method: String,
+    pub req_id: i64,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct Pong {
+    pub warning: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

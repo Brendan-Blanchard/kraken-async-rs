@@ -59,14 +59,6 @@ pub struct TickerSubscription {
     pub snapshot: Option<bool>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct TickerSubscriptionResponse {
-    pub channel: String,
-    pub symbol: String,
-    pub snapshot: Option<bool>,
-    pub warnings: Option<Vec<String>>,
-}
-
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Ticker {
     pub ask: Decimal,
@@ -93,15 +85,6 @@ pub struct BookSubscription {
     pub snapshot: Option<bool>,
     /// only needed for L3 subscription
     pub token: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct BookSubscriptionResponse {
-    pub channel: String,
-    pub symbol: String,
-    pub depth: i32,
-    pub snapshot: Option<bool>,
-    pub warnings: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -175,24 +158,23 @@ pub struct L3BidAskUpdate {
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct CandlesSubscription {
+pub struct OhlcSubscription {
     pub channel: String,
     pub symbol: Vec<String>,
     pub interval: i32,
     pub snapshot: Option<bool>,
 }
 
-// TODO: applies to several, like Candles and Trades, maybe MarketDataSubscription?
 #[derive(Debug, Deserialize)]
 pub struct SubscriptionResponse {
     pub channel: String,
-    pub symbol: String,
+    pub symbol: Option<String>,
     pub snapshot: Option<bool>,
     pub warnings: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
-pub struct Candle {
+pub struct Ohlc {
     pub symbol: String,
     pub open: Decimal,
     pub high: Decimal,
@@ -235,17 +217,10 @@ pub struct InstrumentsSubscription {
     pub snapshot: Option<bool>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct InstrumentsSubscriptionResponse {
-    pub channel: String,
-    pub snapshot: Option<bool>,
-    pub warnings: Option<Vec<String>>,
-}
-
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Asset {
     pub id: String,
-    pub margin_rate: Decimal,
+    pub margin_rate: Option<Decimal>,
     pub precision: i64,
     pub precision_display: i64,
     pub status: AssetStatus,
@@ -253,16 +228,17 @@ pub struct Asset {
     pub collateral_value: Decimal,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Pair {
     pub base: String,
-    pub cost_min: String,
-    pub cost_precision: String,
+    pub quote: String,
+    pub cost_min: Decimal,
+    pub cost_precision: i64,
     pub has_index: bool,
-    pub margin_initial: Decimal,
+    pub margin_initial: Option<Decimal>,
     pub marginable: bool,
-    pub position_limit_long: i64,
-    pub position_limit_short: i64,
+    pub position_limit_long: Option<i64>,
+    pub position_limit_short: Option<i64>,
     pub price_increment: Decimal,
     pub price_precision: i64,
     #[serde(rename = "qty_increment")]
@@ -275,8 +251,59 @@ pub struct Pair {
     pub symbol: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Instruments {
     pub assets: Vec<Asset>,
     pub pairs: Vec<Pair>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rust_decimal_macros::dec;
+
+    #[test]
+    fn test_deserialize_asset() {
+        let raw = r#"{"id":"XLM","status":"enabled","precision":8,"precision_display":5,"borrowable":true,"collateral_value":0.00,"margin_rate":0.020000}"#;
+        let expected = Asset {
+            id: "XLM".to_string(),
+            margin_rate: Some(dec!(0.02)),
+            precision: 8,
+            precision_display: 5,
+            status: AssetStatus::Enabled,
+            borrowable: true,
+            collateral_value: dec!(0),
+        };
+
+        let deserialized = serde_json::from_str::<Asset>(raw).unwrap();
+
+        assert_eq!(expected, deserialized);
+    }
+
+    #[test]
+    fn test_deserialize_pair() {
+        let raw = r#"{"symbol":"ETH/BTC","base":"ETH","quote":"BTC","status":"online","qty_precision":8,"qty_increment":0.00000001,"price_precision":5,"cost_precision":10,"marginable":true,"has_index":true,"cost_min":0.00002,"margin_initial":0.20,"position_limit_long":1000,"position_limit_short":600,"tick_size":0.00001,"price_increment":0.00001,"qty_min":0.00200000}"#;
+        let expected = Pair {
+            base: "ETH".to_string(),
+            quote: "BTC".to_string(),
+            cost_min: dec!(0.00002),
+            cost_precision: 10,
+            has_index: true,
+            margin_initial: Some(dec!(0.2)),
+            marginable: true,
+            position_limit_long: Some(1000),
+            position_limit_short: Some(600),
+            price_increment: dec!(0.00001),
+            price_precision: 5,
+            quantity_increment: dec!(0.00000001),
+            quantity_min: dec!(0.002),
+            quantity_precision: 8,
+            status: PairStatus::Online,
+            symbol: "ETH/BTC".to_string(),
+        };
+
+        let deserialized = serde_json::from_str::<Pair>(raw).unwrap();
+
+        assert_eq!(expected, deserialized);
+    }
 }
