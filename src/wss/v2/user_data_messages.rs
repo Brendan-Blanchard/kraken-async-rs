@@ -81,6 +81,7 @@ pub struct ExecutionSubscription {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct SubscriptionResult {
     pub channel: String,
     #[serde(rename = "maxratecount")]
