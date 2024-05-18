@@ -2,7 +2,7 @@ use crate::wss::v2::admin_messages::{Heartbeat, StatusUpdate};
 use crate::wss::v2::market_data_messages::{
     Instruments, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook, OrderbookUpdate, Ticker, Trade,
 };
-use crate::wss::v2::user_data_messages::SubscriptionResult;
+use crate::wss::v2::user_data_messages::{Balance, ExecutionResult, SubscriptionResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
@@ -28,6 +28,8 @@ pub enum PrivateMessage {
     Status(Response<Vec<StatusUpdate>>),
     L3Snapshot(Response<Vec<L3Orderbook>>),
     L3Update(Response<Vec<L3OrderbookUpdate>>),
+    Execution(Response<Vec<ExecutionResult>>),
+    Balance(Response<Vec<Balance>>),
     Subscription(ResultResponse<SubscriptionResult>),
     Heartbeat(Heartbeat),
     Pong(ResultResponse<Pong>),

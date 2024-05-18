@@ -37,7 +37,7 @@ pub struct TriggerParams {
     pub reference: Option<TriggerType>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ConditionalParams {
     pub order_type: Option<OrderType>,
     pub limit_price: Option<Decimal>,
