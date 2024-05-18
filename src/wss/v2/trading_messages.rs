@@ -86,6 +86,7 @@ pub struct AddOrderParams {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct AddOrderResult {
     pub order_id: String,
     #[serde(rename = "order_userref")]
@@ -116,24 +117,28 @@ pub struct EditOrderParams {
     pub symbol: String,
     pub triggers: Option<TriggerParams>,
     pub validate: Option<bool>,
+    pub token: String,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct EditOrderResult {
     pub order_id: String,
     pub original_order_id: String,
-    pub warning: Vec<String>,
+    pub warning: Option<Vec<String>>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CancelOrderParams {
-    pub order_id: Vec<String>,
+    pub order_id: Option<Vec<String>>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<Vec<String>>,
     #[serde(rename = "order_userref")]
-    pub order_user_ref: Option<i64>,
+    pub order_user_ref: Option<Vec<i64>>,
     pub token: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct CancelOrderResult {
     pub order_id: String,
     pub warning: Vec<String>,

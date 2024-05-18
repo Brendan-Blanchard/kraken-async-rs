@@ -2,7 +2,7 @@ use crate::wss::v2::admin_messages::{Heartbeat, StatusUpdate};
 use crate::wss::v2::market_data_messages::{
     Instruments, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook, OrderbookUpdate, Ticker, Trade,
 };
-use crate::wss::v2::trading_messages::{AddOrderResult, EditOrderResult};
+use crate::wss::v2::trading_messages::{AddOrderResult, CancelOrderResult, EditOrderResult};
 use crate::wss::v2::user_data_messages::{Balance, ExecutionResult, SubscriptionResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -27,12 +27,13 @@ pub enum PublicMessage {
 #[serde(untagged)]
 pub enum PrivateMessage {
     Status(Response<Vec<StatusUpdate>>),
-    AddOrder(ResultResponse<AddOrderResult>),
-    EditOrder(ResultResponse<EditOrderResult>),
-    L3Snapshot(Response<Vec<L3Orderbook>>),
-    L3Update(Response<Vec<L3OrderbookUpdate>>),
     Execution(Response<Vec<ExecutionResult>>),
     Balance(Response<Vec<Balance>>),
+    AddOrder(ResultResponse<AddOrderResult>),
+    EditOrder(ResultResponse<EditOrderResult>),
+    CancelOrder(ResultResponse<CancelOrderResult>),
+    L3Snapshot(Response<Vec<L3Orderbook>>),
+    L3Update(Response<Vec<L3OrderbookUpdate>>),
     Subscription(ResultResponse<SubscriptionResult>),
     Heartbeat(Heartbeat),
     Pong(ResultResponse<Pong>),
