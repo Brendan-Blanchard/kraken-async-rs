@@ -3,7 +3,7 @@ use crate::wss::v2::market_data_messages::{
     Instruments, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook, OrderbookUpdate, Ticker, Trade,
 };
 use crate::wss::v2::trading_messages::{
-    AddOrderResult, BatchCancelResponse, BatchCancelResult, CancelAllOrdersResult,
+    AddOrderResult, BatchCancelResponse, CancelAllOrdersResult,
     CancelOnDisconnectResult, CancelOrderResult, EditOrderResult,
 };
 use crate::wss::v2::user_data_messages::{Balance, ExecutionResult, SubscriptionResult};
