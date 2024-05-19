@@ -2,7 +2,10 @@ use crate::wss::v2::admin_messages::{Heartbeat, StatusUpdate};
 use crate::wss::v2::market_data_messages::{
     Instruments, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook, OrderbookUpdate, Ticker, Trade,
 };
-use crate::wss::v2::trading_messages::{AddOrderResult, CancelOrderResult, EditOrderResult};
+use crate::wss::v2::trading_messages::{
+    AddOrderResult, BatchCancelResponse, BatchCancelResult, CancelAllOrdersResult,
+    CancelOnDisconnectResult, CancelOrderResult, EditOrderResult,
+};
 use crate::wss::v2::user_data_messages::{Balance, ExecutionResult, SubscriptionResult};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -32,6 +35,10 @@ pub enum PrivateMessage {
     AddOrder(ResultResponse<AddOrderResult>),
     EditOrder(ResultResponse<EditOrderResult>),
     CancelOrder(ResultResponse<CancelOrderResult>),
+    CancelAllOrders(ResultResponse<CancelAllOrdersResult>),
+    CancelOnDisconnect(ResultResponse<CancelOnDisconnectResult>),
+    BatchOrder(ResultResponse<Vec<AddOrderResult>>),
+    BatchCancel(BatchCancelResponse),
     L3Snapshot(Response<Vec<L3Orderbook>>),
     L3Update(Response<Vec<L3OrderbookUpdate>>),
     Subscription(ResultResponse<SubscriptionResult>),
@@ -70,6 +77,7 @@ pub struct Response<T> {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct ResultResponse<T> {
     pub method: String,
     pub result: Option<T>,

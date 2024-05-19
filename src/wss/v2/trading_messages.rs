@@ -149,10 +149,10 @@ pub struct CancelAllOrdersParams {
     pub token: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct CancelAllOrdersResult {
     pub count: i32,
-    pub warning: Vec<String>,
+    pub warning: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -161,15 +161,16 @@ pub struct CancelOnDisconnectParams {
     pub token: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct CancelOnDisconnectResult {
     #[serde(rename = "currentTime")]
     pub current_time: String,
     #[serde(rename = "triggerTime")]
     pub trigger_time: String,
-    pub warning: Vec<String>,
+    pub warning: Option<Vec<String>>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BatchOrder {
     pub order_type: OrderType,
@@ -202,6 +203,7 @@ pub struct BatchOrder {
     pub cash_order_quantity: Option<Decimal>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BatchOrderParams {
     pub deadline: Option<String>,
@@ -211,16 +213,25 @@ pub struct BatchOrderParams {
     pub orders: Vec<BatchOrder>,
 }
 
-pub type BatchOrderResult = Vec<AddOrderResult>;
-
 #[derive(Debug, Serialize)]
 pub struct BatchCancelParams {
     pub orders: Vec<IntOrString>,
     pub token: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct BatchCancelResult {
     pub count: i32,
-    pub warning: Vec<String>,
+    pub warning: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct BatchCancelResponse {
+    pub method: String,
+    pub orders_cancelled: i64,
+    pub error: Option<String>,
+    pub success: bool,
+    pub req_id: i64,
+    pub time_in: String,
+    pub time_out: String,
 }
