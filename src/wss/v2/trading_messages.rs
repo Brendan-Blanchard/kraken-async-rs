@@ -141,7 +141,7 @@ pub struct CancelOrderParams {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct CancelOrderResult {
     pub order_id: String,
-    pub warning: Vec<String>,
+    pub warning: Option<Vec<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -227,7 +227,6 @@ pub struct BatchCancelResult {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct BatchCancelResponse {
-    pub method: String,
     pub orders_cancelled: i64,
     pub error: Option<String>,
     pub success: bool,

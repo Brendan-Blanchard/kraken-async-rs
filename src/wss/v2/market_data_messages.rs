@@ -88,6 +88,13 @@ pub struct BookSubscription {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
+#[serde(untagged)]
+pub enum L2 {
+    Orderbook(Vec<Orderbook>),
+    Update(Vec<OrderbookUpdate>),
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct BidAsk {
     pub price: Decimal,
     #[serde(rename = "qty")]
@@ -113,12 +120,10 @@ pub struct OrderbookUpdate {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
-pub struct L3BidAsk {
-    pub order_id: String,
-    pub limit_price: Decimal,
-    #[serde(rename = "order_qty")]
-    pub order_quantity: Decimal,
-    pub timestamp: String,
+#[serde(untagged)]
+pub enum L3 {
+    Orderbook(Vec<L3Orderbook>),
+    Update(Vec<L3OrderbookUpdate>),
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -130,19 +135,20 @@ pub struct L3Orderbook {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
-pub struct L3OrderbookUpdateMessage {
-    pub channel: String,
-    #[serde(rename = "type")]
-    pub message_type: String,
-    pub data: [L3Orderbook; 1],
-}
-
-#[derive(Debug, Deserialize, PartialEq)]
 pub struct L3OrderbookUpdate {
     pub symbol: String,
     pub bids: Vec<L3BidAskUpdate>,
     pub asks: Vec<L3BidAskUpdate>,
     pub checksum: i64,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct L3BidAsk {
+    pub order_id: String,
+    pub limit_price: Decimal,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Decimal,
+    pub timestamp: String,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -171,6 +177,36 @@ pub struct SubscriptionResponse {
     pub symbol: Option<String>,
     pub snapshot: Option<bool>,
     pub warnings: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct TradeSubscriptionResponse {
+    pub symbol: Option<String>,
+    pub snapshot: Option<bool>,
+    pub warnings: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct OhlcSubscriptionResponse {
+    pub symbol: Option<String>,
+    pub snapshot: Option<bool>,
+    pub interval: i64,
+    pub warnings: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct BookSubscriptionResponse {
+    pub symbol: String,
+    pub depth: Option<i32>,
+    pub snapshot: Option<bool>,
+    pub warnings: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct TickerSubscriptionResponse {
+    pub symbol: String,
+    pub event_trigger: Option<EventTrigger>,
+    pub snapshot: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

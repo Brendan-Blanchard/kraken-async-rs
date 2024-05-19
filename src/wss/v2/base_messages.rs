@@ -1,50 +1,70 @@
-use crate::wss::v2::admin_messages::{Heartbeat, StatusUpdate};
-use crate::wss::v2::market_data_messages::{
-    Instruments, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook, OrderbookUpdate, Ticker, Trade,
-};
+use crate::wss::v2::admin_messages::StatusUpdate;
+use crate::wss::v2::market_data_messages::{Instruments, Ohlc, Ticker, Trade, L2, L3};
 use crate::wss::v2::trading_messages::{
-    AddOrderResult, BatchCancelResponse, CancelAllOrdersResult,
-    CancelOnDisconnectResult, CancelOrderResult, EditOrderResult,
+    AddOrderResult, BatchCancelResponse, CancelAllOrdersResult, CancelOnDisconnectResult,
+    CancelOrderResult, EditOrderResult,
 };
 use crate::wss::v2::user_data_messages::{Balance, ExecutionResult, SubscriptionResult};
 use serde::{Deserialize, Serialize};
+use serde_json::Value::Null;
 use std::fmt::Debug;
 
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
-pub enum PublicMessage {
-    Status(Response<Vec<StatusUpdate>>),
-    Trade(Response<Vec<Trade>>),
-    Ticker(Response<Vec<Ticker>>),
-    BookSnapshot(Response<Vec<Orderbook>>),
-    BookUpdate(Response<Vec<OrderbookUpdate>>),
-    Ohlc(Response<Vec<Ohlc>>),
-    Instrument(Response<Instruments>),
-    Subscription(ResultResponse<SubscriptionResult>),
-    Heartbeat(Heartbeat),
-    Pong(ResultResponse<Pong>),
+pub enum WssMessage {
+    Channel(ChannelMessage),
+    Method(MethodMessage),
     Error(String),
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
-#[serde(untagged)]
-pub enum PrivateMessage {
-    Status(Response<Vec<StatusUpdate>>),
-    Execution(Response<Vec<ExecutionResult>>),
-    Balance(Response<Vec<Balance>>),
+#[serde(tag = "method")]
+pub enum MethodMessage {
+    #[serde(rename = "add_order")]
     AddOrder(ResultResponse<AddOrderResult>),
+    #[serde(rename = "edit_order")]
     EditOrder(ResultResponse<EditOrderResult>),
+    #[serde(rename = "cancel_order")]
     CancelOrder(ResultResponse<CancelOrderResult>),
+    #[serde(rename = "cancel_all")]
     CancelAllOrders(ResultResponse<CancelAllOrdersResult>),
+    #[serde(rename = "cancel_all_orders_after")]
     CancelOnDisconnect(ResultResponse<CancelOnDisconnectResult>),
+    #[serde(rename = "batch_add")]
     BatchOrder(ResultResponse<Vec<AddOrderResult>>),
-    BatchCancel(BatchCancelResponse),
-    L3Snapshot(Response<Vec<L3Orderbook>>),
-    L3Update(Response<Vec<L3OrderbookUpdate>>),
+    #[serde(rename = "batch_cancel")]
+    BatchCancel(BatchCancelResponse), // TODO: could maybe #flatten around this to get all on ResultResponse<_>? Then simplify entire structure
+    #[serde(rename = "subscribe")]
     Subscription(ResultResponse<SubscriptionResult>),
-    Heartbeat(Heartbeat),
-    Pong(ResultResponse<Pong>),
-    Error(String),
+    #[serde(alias = "ping")]
+    Ping(ResultResponse<Option<()>>),
+    #[serde(rename = "pong")]
+    Pong(PongResponse),
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(tag = "channel")]
+pub enum ChannelMessage {
+    #[serde(rename = "heartbeat")]
+    Heartbeat,
+    #[serde(rename = "status")]
+    Status(Response<Vec<StatusUpdate>>),
+    #[serde(rename = "executions")]
+    Execution(Response<Vec<ExecutionResult>>),
+    #[serde(rename = "balances")]
+    Balance(Response<Vec<Balance>>),
+    #[serde(rename = "trade")]
+    Trade(Response<Vec<Trade>>),
+    #[serde(rename = "ticker")]
+    Ticker(Response<Vec<Ticker>>),
+    #[serde(rename = "ohlc")]
+    Ohlc(Response<Vec<Ohlc>>),
+    #[serde(rename = "instrument")]
+    Instrument(Response<Instruments>),
+    #[serde(rename = "book")]
+    Orderbook(Response<L2>),
+    #[serde(rename = "level3")]
+    L3(Response<L3>),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -53,14 +73,15 @@ where
     T: Debug,
 {
     pub method: String,
+    #[serde(skip_serializing_if = "is_none")]
     pub params: T,
     pub req_id: i64,
 }
 
-#[derive(Debug, Serialize)]
-pub struct Ping {
-    pub method: String,
-    pub req_id: i64,
+// this is required to not serialize None for generic type parameters
+//  (skip_serializing_none fails there)
+fn is_none<T: Serialize>(t: T) -> bool {
+    serde_json::to_value(t).unwrap_or(Null).is_null()
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -70,19 +91,24 @@ pub struct Pong {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Response<T> {
-    pub channel: String,
-    #[serde(rename = "type")]
-    pub message_type: String,
     pub data: T,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct ResultResponse<T> {
-    pub method: String,
     pub result: Option<T>,
     pub error: Option<String>,
     pub success: bool,
+    pub req_id: i64,
+    pub time_in: String,
+    pub time_out: String,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct PongResponse {
+    pub error: Option<String>,
     pub req_id: i64,
     pub time_in: String,
     pub time_out: String,
@@ -92,26 +118,30 @@ pub struct ResultResponse<T> {
 mod tests {
     use crate::response_types::SystemStatus;
     use crate::wss::v2::admin_messages::StatusUpdate;
-    use crate::wss::v2::base_messages::{PrivateMessage, Response};
+    use crate::wss::v2::base_messages::{ChannelMessage, Response, WssMessage};
     use serde_json::Number;
     use std::str::FromStr;
 
     #[test]
     fn test_deserializing_private_status_update() {
         let message = r#"{"channel":"status","data":[{"api_version":"v2","connection_id":18266300427528990701,"system":"online","version":"2.0.4"}],"type":"update"}"#;
-        let expected = PrivateMessage::Status(Response {
-            channel: "status".to_string(),
-            message_type: "update".to_string(),
+        let expected = WssMessage::Channel(ChannelMessage::Status(Response {
             data: vec![StatusUpdate {
                 api_version: "v2".to_string(),
                 connection_id: Number::from_str("18266300427528990701").unwrap(),
                 system: SystemStatus::Online,
                 version: "2.0.4".to_string(),
             }],
-        });
+        }));
 
-        let parsed = serde_json::from_str::<PrivateMessage>(message).unwrap();
+        let parsed = serde_json::from_str::<WssMessage>(message).unwrap();
 
         assert_eq!(expected, parsed);
+    }
+
+    #[test]
+    fn test_deserializing_l2_update() {
+        let raw = r#"{"channel":"book","type":"update","data":[{"symbol":"BTC/USD","bids":[],"asks":[{"price":66732.5,"qty":5.48256063}],"checksum":2855135483,"timestamp":"2024-05-19T16:32:26.777454Z"}]}"#;
+        let parsed = serde_json::from_str::<ChannelMessage>(raw).unwrap();
     }
 }
