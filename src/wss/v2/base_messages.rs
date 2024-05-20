@@ -5,8 +5,9 @@ use crate::wss::v2::trading_messages::{
     CancelOrderResult, EditOrderResult,
 };
 use crate::wss::v2::user_data_messages::{Balance, ExecutionResult, SubscriptionResult};
-use serde::{Deserialize, Serialize};
+use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_json::Value::Null;
+use std::collections::VecDeque;
 use std::fmt::Debug;
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -48,7 +49,7 @@ pub enum ChannelMessage {
     #[serde(rename = "heartbeat")]
     Heartbeat,
     #[serde(rename = "status")]
-    Status(Response<Vec<StatusUpdate>>),
+    Status(SingleResponse<StatusUpdate>),
     #[serde(rename = "executions")]
     Execution(Response<Vec<ExecutionResult>>),
     #[serde(rename = "balances")]
@@ -56,15 +57,15 @@ pub enum ChannelMessage {
     #[serde(rename = "trade")]
     Trade(Response<Vec<Trade>>),
     #[serde(rename = "ticker")]
-    Ticker(Response<Vec<Ticker>>),
+    Ticker(SingleResponse<Vec<Ticker>>),
     #[serde(rename = "ohlc")]
     Ohlc(Response<Vec<Ohlc>>),
     #[serde(rename = "instrument")]
     Instrument(Response<Instruments>),
     #[serde(rename = "book")]
-    Orderbook(Response<L2>),
+    Orderbook(SingleResponse<L2>),
     #[serde(rename = "level3")]
-    L3(Response<L3>),
+    L3(SingleResponse<L3>),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -95,6 +96,25 @@ pub struct Response<T> {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
+pub struct SingleResponse<T>
+where
+    T: for<'a> Deserialize<'a>,
+{
+    #[serde(deserialize_with = "flatten_vec")]
+    pub data: T,
+}
+
+fn flatten_vec<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: for<'a> Deserialize<'a>,
+{
+    let mut vec: VecDeque<T> = de::Deserialize::deserialize(deserializer)?;
+    vec.pop_front()
+        .ok_or(de::Error::custom("Expected Vec with at least one element"))
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct ResultResponse<T> {
     pub result: Option<T>,
@@ -118,20 +138,20 @@ pub struct PongResponse {
 mod tests {
     use crate::response_types::SystemStatus;
     use crate::wss::v2::admin_messages::StatusUpdate;
-    use crate::wss::v2::base_messages::{ChannelMessage, Response, WssMessage};
+    use crate::wss::v2::base_messages::{ChannelMessage, SingleResponse, WssMessage};
     use serde_json::Number;
     use std::str::FromStr;
 
     #[test]
-    fn test_deserializing_private_status_update() {
+    fn test_deserializing_status_update() {
         let message = r#"{"channel":"status","data":[{"api_version":"v2","connection_id":18266300427528990701,"system":"online","version":"2.0.4"}],"type":"update"}"#;
-        let expected = WssMessage::Channel(ChannelMessage::Status(Response {
-            data: vec![StatusUpdate {
+        let expected = WssMessage::Channel(ChannelMessage::Status(SingleResponse {
+            data: StatusUpdate {
                 api_version: "v2".to_string(),
                 connection_id: Number::from_str("18266300427528990701").unwrap(),
                 system: SystemStatus::Online,
                 version: "2.0.4".to_string(),
-            }],
+            },
         }));
 
         let parsed = serde_json::from_str::<WssMessage>(message).unwrap();

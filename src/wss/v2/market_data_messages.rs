@@ -90,8 +90,8 @@ pub struct BookSubscription {
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum L2 {
-    Orderbook(Vec<Orderbook>),
-    Update(Vec<OrderbookUpdate>),
+    Orderbook(Orderbook),
+    Update(OrderbookUpdate),
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -122,8 +122,8 @@ pub struct OrderbookUpdate {
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum L3 {
-    Orderbook(Vec<L3Orderbook>),
-    Update(Vec<L3OrderbookUpdate>),
+    Orderbook(L3Orderbook),
+    Update(L3OrderbookUpdate),
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -143,6 +143,7 @@ pub struct L3OrderbookUpdate {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct L3BidAsk {
     pub order_id: String,
     pub limit_price: Decimal,
@@ -296,6 +297,7 @@ pub struct Instruments {
 #[cfg(test)]
 mod tests {
     use super::*;
+    
     use rust_decimal_macros::dec;
 
     #[test]
