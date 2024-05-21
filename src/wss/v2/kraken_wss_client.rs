@@ -20,31 +20,31 @@ const WS_KRAKEN_AUTH: &str = "wss://ws-auth.kraken.com/v2";
 type RawStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
 /// A client for connecting to Kraken websockets via the V2 protocol.
-#[derive(Debug, Clone, Copy)]
-pub struct KrakenWSSClient<'a> {
-    base_url: &'a str,
-    auth_url: &'a str,
+#[derive(Debug, Clone)]
+pub struct KrakenWSSClient {
+    base_url: String,
+    auth_url: String,
 }
 
-impl<'a> Default for KrakenWSSClient<'a> {
+impl Default for KrakenWSSClient {
     fn default() -> Self {
         KrakenWSSClient::new()
     }
 }
 
-impl<'a> KrakenWSSClient<'a> {
+impl KrakenWSSClient {
     /// Create a client using the default Kraken URLs.
-    pub fn new() -> KrakenWSSClient<'a> {
+    pub fn new() -> KrakenWSSClient {
         KrakenWSSClient {
-            base_url: WS_KRAKEN,
-            auth_url: WS_KRAKEN_AUTH,
+            base_url: WS_KRAKEN.to_string(),
+            auth_url: WS_KRAKEN_AUTH.to_string(),
         }
     }
 
     /// Create a client with custom URLs.
     ///
     /// This is most useful for use with a proxy, or for testing.
-    pub fn new_with_urls(base_url: &'a str, auth_url: &'a str) -> KrakenWSSClient<'a> {
+    pub fn new_with_urls(base_url: String, auth_url: String) -> KrakenWSSClient {
         KrakenWSSClient { base_url, auth_url }
     }
 
@@ -54,7 +54,7 @@ impl<'a> KrakenWSSClient<'a> {
     where
         T: for<'d> Deserialize<'d>,
     {
-        self._connect(self.base_url).await
+        self._connect(&self.base_url.clone()).await
     }
 
     /// Connect to the Kraken private websocket channel, returning a [`Result`] containing a
@@ -63,7 +63,7 @@ impl<'a> KrakenWSSClient<'a> {
     where
         T: for<'d> Deserialize<'d>,
     {
-        self._connect(self.auth_url).await
+        self._connect(&self.auth_url.clone()).await
     }
 
     #[tracing::instrument(skip(self))]
@@ -177,7 +177,8 @@ mod tests {
     fn test_wss_client_new_with_urls() {
         let mock_url = "https://trades.com";
         let mock_auth_url = "https://auth.trades.com";
-        let client = KrakenWSSClient::new_with_urls(mock_url, mock_auth_url);
+        let client =
+            KrakenWSSClient::new_with_urls(mock_url.to_string(), mock_auth_url.to_string());
         assert_eq!(mock_url, client.base_url);
         assert_eq!(mock_auth_url, client.auth_url);
     }
