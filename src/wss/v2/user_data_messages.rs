@@ -102,7 +102,8 @@ pub struct ExecutionsSubscriptionResult {
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(tag = "channel")]
 pub enum SubscriptionResult {
-    #[serde(alias = "level3")]
+    #[serde(rename = "level3")]
+    L3(BookSubscriptionResponse),
     #[serde(rename = "book")]
     Book(BookSubscriptionResponse),
     #[serde(rename = "ticker")]

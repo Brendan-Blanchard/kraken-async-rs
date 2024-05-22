@@ -1,5 +1,4 @@
 use crate::response_types::BuySell;
-use crate::wss::v2::user_data_messages::SubscriptionResult::Book;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, skip_serializing_none};
@@ -112,7 +111,7 @@ impl BookSubscription {
 
     pub fn new_l3(symbol: Vec<String>, token: String) -> Self {
         BookSubscription {
-            channel: "book".to_string(),
+            channel: "level3".to_string(),
             symbol,
             depth: None,
             snapshot: None,

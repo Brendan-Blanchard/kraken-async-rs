@@ -115,6 +115,59 @@ mod book_subscription {
     }
 }
 
+mod l3_subscription {
+    use super::*;
+    use kraken_async_rs::wss::v2::market_data_messages::{
+        BookSubscription, BookSubscriptionResponse,
+    };
+
+    fn get_expected_l3_subscription() -> Value {
+        json!({"method":"subscribe","params":{"channel":"level3","symbol":["BTC/USD"],"snapshot":true,"token":"someToken"},"req_id":99})
+    }
+
+    fn get_l3_subscription_response() -> String {
+        r#"{"method":"subscribe","req_id":99,"result":{"channel":"level3","snapshot":true,"symbol":"BTC/USD"},"success":true,"time_in":"2024-05-19T18:51:30.701627Z","time_out":"2024-05-19T18:51:30.708403Z"}"#.to_string()
+    }
+
+    fn get_expected_l3_message() -> WssMessage {
+        WssMessage::Method(MethodMessage::Subscription(ResultResponse {
+            result: Some(SubscriptionResult::L3(BookSubscriptionResponse {
+                symbol: "BTC/USD".to_string(),
+                snapshot: Some(true),
+                depth: None,
+                warnings: None,
+            })),
+            error: None,
+            success: true,
+            req_id: 99,
+            time_in: "2024-05-19T18:51:30.701627Z".to_string(),
+            time_out: "2024-05-19T18:51:30.708403Z".to_string(),
+        }))
+    }
+
+    #[tokio::test]
+    async fn test_l3_subscription() {
+        let mut book_params =
+            BookSubscription::new_l3(vec!["BTC/USD".into()], "someToken".to_string());
+        book_params.snapshot = Some(true);
+
+        let subscription = Message {
+            method: "subscribe".to_string(),
+            params: book_params,
+            req_id: 99,
+        };
+
+        CallResponseTest::builder()
+            .match_on(get_expected_l3_subscription())
+            .respond_with(get_l3_subscription_response())
+            .send(subscription)
+            .expect(get_expected_l3_message())
+            .build()
+            .test()
+            .await;
+    }
+}
+
 #[derive(Debug, Builder)]
 struct CallResponseTest<T>
 where
