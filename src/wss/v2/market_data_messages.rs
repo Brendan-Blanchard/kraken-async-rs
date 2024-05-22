@@ -1,4 +1,5 @@
 use crate::response_types::BuySell;
+use crate::wss::v2::user_data_messages::SubscriptionResult::Book;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, skip_serializing_none};
@@ -59,6 +60,17 @@ pub struct TickerSubscription {
     pub snapshot: Option<bool>,
 }
 
+impl TickerSubscription {
+    pub fn new(symbol: Vec<String>) -> Self {
+        TickerSubscription {
+            channel: "ticker".to_string(),
+            symbol,
+            event_trigger: None,
+            snapshot: None,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Ticker {
     pub ask: Decimal,
@@ -85,6 +97,28 @@ pub struct BookSubscription {
     pub snapshot: Option<bool>,
     /// only needed for L3 subscription
     pub token: Option<String>,
+}
+
+impl BookSubscription {
+    pub fn new(symbol: Vec<String>) -> Self {
+        BookSubscription {
+            channel: "book".to_string(),
+            symbol,
+            depth: None,
+            snapshot: None,
+            token: None,
+        }
+    }
+
+    pub fn new_l3(symbol: Vec<String>, token: String) -> Self {
+        BookSubscription {
+            channel: "book".to_string(),
+            symbol,
+            depth: None,
+            snapshot: None,
+            token: Some(token),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -297,7 +331,7 @@ pub struct Instruments {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     use rust_decimal_macros::dec;
 
     #[test]
