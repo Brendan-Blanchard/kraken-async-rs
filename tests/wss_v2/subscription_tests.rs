@@ -1,19 +1,10 @@
-use crate::wss_v2::shared::WssTestState;
-use futures_util::StreamExt;
+use crate::wss_v2::shared::CallResponseTest;
 use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, ResultResponse, WssMessage};
 use kraken_async_rs::wss::v2::market_data_messages::{
     EventTrigger, TickerSubscription, TickerSubscriptionResponse,
 };
 use kraken_async_rs::wss::v2::user_data_messages::SubscriptionResult;
-use serde::Serialize;
 use serde_json::{json, Value};
-use simple_builder::Builder;
-use std::fmt::Debug;
-use std::time::Duration;
-use tokio::time::timeout;
-use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
-use ws_mock::matchers::JsonExact;
-use ws_mock::ws_mock_server::WsMock;
 
 mod ticker_subscription {
     use super::*;
@@ -316,50 +307,5 @@ mod instruments_subscription {
             .build()
             .test()
             .await;
-    }
-}
-
-#[derive(Debug, Builder)]
-struct CallResponseTest<T>
-where
-    T: Debug + Serialize,
-{
-    match_on: Option<Value>,
-    respond_with: Option<String>,
-    send: Option<Message<T>>,
-    expect: Option<WssMessage>,
-}
-
-impl<T> CallResponseTest<T>
-where
-    T: Debug + Serialize,
-{
-    pub async fn test(&mut self) {
-        assert!(self.match_on.is_some());
-        assert!(self.respond_with.is_some());
-        assert!(self.send.is_some());
-        assert!(self.expect.is_some());
-
-        let mut test_state = WssTestState::new().await;
-
-        WsMock::new()
-            .matcher(JsonExact::new(self.match_on.take().unwrap()))
-            .expect(1)
-            .respond_with(TungsteniteMessage::Text(self.respond_with.take().unwrap()))
-            .mount(&test_state.mock_server)
-            .await;
-
-        let mut stream = test_state.ws_client.connect::<WssMessage>().await.unwrap();
-
-        stream.send(&self.send.take().unwrap()).await.unwrap();
-
-        let result = timeout(Duration::from_secs(3), stream.next()).await;
-
-        test_state.mock_server.verify().await;
-
-        let response = result.unwrap().unwrap().unwrap();
-
-        println!("{:?}", response);
-        assert_eq!(self.expect.take().unwrap(), response);
     }
 }
