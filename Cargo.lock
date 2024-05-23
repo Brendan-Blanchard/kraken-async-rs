@@ -2334,9 +2334,9 @@ dependencies = [
 
 [[package]]
 name = "ws-mock"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79baf1fbba5087946a4791d1e1fcc373cc1b8a7a712d8992fe3da0c07820a98e"
+checksum = "a470c003fafa9fda44d485299d838bac79b4a77d63b81790e68785c42deaef4e"
 dependencies = [
  "futures-util",
  "serde_json",
