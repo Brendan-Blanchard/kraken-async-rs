@@ -308,6 +308,15 @@ pub struct InstrumentsSubscription {
     pub snapshot: Option<bool>,
 }
 
+impl InstrumentsSubscription {
+    pub fn new(snapshot: bool) -> Self {
+        InstrumentsSubscription {
+            channel: "instrument".to_string(),
+            snapshot: Some(snapshot),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Asset {
     pub id: String,

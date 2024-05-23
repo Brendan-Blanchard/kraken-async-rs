@@ -171,7 +171,7 @@ mod l3_subscription {
 mod ohlc_subscription {
     use super::*;
     use kraken_async_rs::wss::v2::market_data_messages::{
-        BookSubscription, BookSubscriptionResponse, OhlcSubscription, OhlcSubscriptionResponse,
+        OhlcSubscription, OhlcSubscriptionResponse,
     };
 
     fn get_expected_ohlc_subscription() -> Value {
@@ -200,7 +200,7 @@ mod ohlc_subscription {
 
     #[tokio::test]
     async fn test_ohlc_subscription() {
-        let mut ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
+        let ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
 
         let subscription = Message {
             method: "subscribe".to_string(),
@@ -222,7 +222,6 @@ mod ohlc_subscription {
 mod trade_subscription {
     use super::*;
     use kraken_async_rs::wss::v2::market_data_messages::{
-        BookSubscription, BookSubscriptionResponse, OhlcSubscription, OhlcSubscriptionResponse,
         TradeSubscriptionResponse, TradesSubscription,
     };
 
@@ -251,7 +250,7 @@ mod trade_subscription {
 
     #[tokio::test]
     async fn test_trade_subscription() {
-        let mut trade_params = TradesSubscription::new(vec!["BTC/USD".into()]);
+        let trade_params = TradesSubscription::new(vec!["BTC/USD".into()]);
 
         let subscription = Message {
             method: "subscribe".to_string(),
@@ -264,6 +263,56 @@ mod trade_subscription {
             .respond_with(get_trade_subscription_response())
             .send(subscription)
             .expect(get_expected_trade_message())
+            .build()
+            .test()
+            .await;
+    }
+}
+
+mod instruments_subscription {
+    use super::*;
+    use kraken_async_rs::wss::v2::market_data_messages::InstrumentsSubscription;
+    use kraken_async_rs::wss::v2::user_data_messages::InstrumentSubscriptionResult;
+
+    fn get_expected_instruments_subscription() -> Value {
+        json!({"method":"subscribe","params":{"channel":"instrument","snapshot":true},"req_id":0})
+    }
+
+    fn get_instruments_subscription_response() -> String {
+        r#"{"method":"subscribe","req_id":0,"result":{"channel":"instrument","snapshot":true,"warnings":["tick_size is deprecated, use price_increment"]},"success":true,"time_in":"2024-05-19T19:44:43.264430Z","time_out":"2024-05-19T19:44:43.264464Z"}"#.to_string()
+    }
+
+    fn get_expected_instruments_message() -> WssMessage {
+        WssMessage::Method(MethodMessage::Subscription(ResultResponse {
+            result: Some(SubscriptionResult::Instrument(
+                InstrumentSubscriptionResult {
+                    snapshot: Some(true),
+                    warnings: Some(vec!["tick_size is deprecated, use price_increment".into()]),
+                },
+            )),
+            error: None,
+            success: true,
+            req_id: 0,
+            time_in: "2024-05-19T19:44:43.264430Z".to_string(),
+            time_out: "2024-05-19T19:44:43.264464Z".to_string(),
+        }))
+    }
+
+    #[tokio::test]
+    async fn test_instruments_subscription() {
+        let instruments_params = InstrumentsSubscription::new(true);
+
+        let subscription = Message {
+            method: "subscribe".to_string(),
+            params: instruments_params,
+            req_id: 0,
+        };
+
+        CallResponseTest::builder()
+            .match_on(get_expected_instruments_subscription())
+            .respond_with(get_instruments_subscription_response())
+            .send(subscription)
+            .expect(get_expected_instruments_message())
             .build()
             .test()
             .await;
