@@ -1,6 +1,33 @@
-use crate::wss_v2::shared::CallResponseTest;
-use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, WssMessage};
-use serde_json::{json, Value};
+use crate::wss_v2::shared::{CallResponseTest, ParseIncomingTest};
+use kraken_async_rs::response_types::SystemStatus;
+use kraken_async_rs::wss::v2::admin_messages::StatusUpdate;
+use kraken_async_rs::wss::v2::base_messages::ChannelMessage::{Heartbeat, Status};
+use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, SingleResponse, WssMessage};
+use serde_json::{json, Number, Value};
+use std::str::FromStr;
+
+#[tokio::test]
+async fn test_admin_messages() {
+    let heartbeat = r#"{"channel":"heartbeat"}"#.to_string();
+    let status_update = r#"{"channel":"status","data":[{"api_version":"v2","connection_id":12393906104898154338,"system":"online","version":"2.0.4"}],"type":"update"}"#.to_string();
+
+    let status_message = WssMessage::Channel(Status(SingleResponse {
+        data: StatusUpdate {
+            api_version: "v2".to_string(),
+            connection_id: Number::from_str("12393906104898154338").unwrap(),
+            system: SystemStatus::Online,
+            version: "2.0.4".to_string(),
+        },
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(heartbeat)
+        .expect_message(WssMessage::Channel(Heartbeat))
+        .with_incoming(status_update)
+        .expect_message(status_message)
+        .test()
+        .await;
+}
 
 mod ping_pong {
     use super::*;

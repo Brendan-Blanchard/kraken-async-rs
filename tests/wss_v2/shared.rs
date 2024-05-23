@@ -6,6 +6,7 @@ use serde_json::Value;
 use simple_builder::Builder;
 use std::fmt::Debug;
 use std::time::Duration;
+use tokio::sync::mpsc;
 use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
 use ws_mock::matchers::JsonExact;
@@ -70,5 +71,64 @@ where
 
         println!("{:?}", response);
         assert_eq!(self.expect.take().unwrap(), response);
+    }
+}
+
+#[derive(Debug)]
+pub struct ParseIncomingTest {
+    incoming_messages: Vec<String>,
+    expected_messages: Vec<WssMessage>,
+}
+
+impl ParseIncomingTest {
+    pub fn new() -> Self {
+        ParseIncomingTest {
+            incoming_messages: Vec::new(),
+            expected_messages: Vec::new(),
+        }
+    }
+
+    pub fn with_incoming(mut self, message: String) -> Self {
+        self.incoming_messages.push(message);
+        self
+    }
+
+    pub fn expect_message(mut self, message: WssMessage) -> Self {
+        self.expected_messages.push(message);
+        self
+    }
+
+    pub async fn test(self) {
+        assert_eq!(self.incoming_messages.len(), self.expected_messages.len());
+
+        let mut test_state = WssTestState::new().await;
+
+        let (mpsc_send, mpsc_recv) = mpsc::channel::<tokio_tungstenite::tungstenite::Message>(8);
+
+        WsMock::new()
+            .forward_from_channel(mpsc_recv)
+            .mount(&test_state.mock_server)
+            .await;
+
+        let mut stream = test_state.ws_client.connect::<WssMessage>().await.unwrap();
+
+        for (message, expected) in self
+            .incoming_messages
+            .into_iter()
+            .zip(self.expected_messages.iter())
+        {
+            mpsc_send
+                .send(TungsteniteMessage::Text(message))
+                .await
+                .unwrap();
+
+            let result = timeout(Duration::from_secs(1), stream.next())
+                .await
+                .unwrap()
+                .unwrap()
+                .unwrap();
+
+            assert_eq!(*expected, result);
+        }
     }
 }
