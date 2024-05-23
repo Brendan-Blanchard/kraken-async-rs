@@ -277,6 +277,16 @@ pub struct TradesSubscription {
     pub snapshot: Option<bool>,
 }
 
+impl TradesSubscription {
+    pub fn new(symbols: Vec<String>) -> Self {
+        TradesSubscription {
+            channel: "trade".to_string(),
+            symbol: symbols,
+            snapshot: None,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Trade {
     pub symbol: String,

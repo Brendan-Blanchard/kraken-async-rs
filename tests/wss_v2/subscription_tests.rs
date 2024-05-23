@@ -219,6 +219,57 @@ mod ohlc_subscription {
     }
 }
 
+mod trade_subscription {
+    use super::*;
+    use kraken_async_rs::wss::v2::market_data_messages::{
+        BookSubscription, BookSubscriptionResponse, OhlcSubscription, OhlcSubscriptionResponse,
+        TradeSubscriptionResponse, TradesSubscription,
+    };
+
+    fn get_expected_trade_subscription() -> Value {
+        json!({"method":"subscribe","params":{"channel":"trade","symbol":["BTC/USD"]},"req_id":0})
+    }
+
+    fn get_trade_subscription_response() -> String {
+        r#"{"method":"subscribe","req_id":0,"result":{"channel":"trade","snapshot":true,"symbol":"BTC/USD"},"success":true,"time_in":"2024-05-19T19:11:23.034030Z","time_out":"2024-05-19T19:11:23.034073Z"}"#.to_string()
+    }
+
+    fn get_expected_trade_message() -> WssMessage {
+        WssMessage::Method(MethodMessage::Subscription(ResultResponse {
+            result: Some(SubscriptionResult::Trade(TradeSubscriptionResponse {
+                symbol: Some("BTC/USD".to_string()),
+                snapshot: Some(true),
+                warnings: None,
+            })),
+            error: None,
+            success: true,
+            req_id: 0,
+            time_in: "2024-05-19T19:11:23.034030Z".to_string(),
+            time_out: "2024-05-19T19:11:23.034073Z".to_string(),
+        }))
+    }
+
+    #[tokio::test]
+    async fn test_trade_subscription() {
+        let mut trade_params = TradesSubscription::new(vec!["BTC/USD".into()]);
+
+        let subscription = Message {
+            method: "subscribe".to_string(),
+            params: trade_params,
+            req_id: 0,
+        };
+
+        CallResponseTest::builder()
+            .match_on(get_expected_trade_subscription())
+            .respond_with(get_trade_subscription_response())
+            .send(subscription)
+            .expect(get_expected_trade_message())
+            .build()
+            .test()
+            .await;
+    }
+}
+
 #[derive(Debug, Builder)]
 struct CallResponseTest<T>
 where
