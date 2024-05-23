@@ -168,6 +168,57 @@ mod l3_subscription {
     }
 }
 
+mod ohlc_subscription {
+    use super::*;
+    use kraken_async_rs::wss::v2::market_data_messages::{
+        BookSubscription, BookSubscriptionResponse, OhlcSubscription, OhlcSubscriptionResponse,
+    };
+
+    fn get_expected_ohlc_subscription() -> Value {
+        json!({"method":"subscribe","params":{"channel":"ohlc","symbol":["ETH/USD"],"interval":60},"req_id":121})
+    }
+
+    fn get_ohlc_subscription_response() -> String {
+        r#"{"method":"subscribe","req_id":121,"result":{"channel":"ohlc","interval":60,"snapshot":true,"symbol":"ETH/USD","warnings":["timestamp is deprecated, use interval_begin"]},"success":true,"time_in":"2024-05-19T19:06:57.002983Z","time_out":"2024-05-19T19:06:57.003037Z"}"#.to_string()
+    }
+
+    fn get_expected_ohlc_message() -> WssMessage {
+        WssMessage::Method(MethodMessage::Subscription(ResultResponse {
+            result: Some(SubscriptionResult::Ohlc(OhlcSubscriptionResponse {
+                symbol: Some("ETH/USD".to_string()),
+                snapshot: Some(true),
+                warnings: Some(vec!["timestamp is deprecated, use interval_begin".into()]),
+                interval: 60,
+            })),
+            error: None,
+            success: true,
+            req_id: 121,
+            time_in: "2024-05-19T19:06:57.002983Z".to_string(),
+            time_out: "2024-05-19T19:06:57.003037Z".to_string(),
+        }))
+    }
+
+    #[tokio::test]
+    async fn test_ohlc_subscription() {
+        let mut ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
+
+        let subscription = Message {
+            method: "subscribe".to_string(),
+            params: ohlc_params,
+            req_id: 121,
+        };
+
+        CallResponseTest::builder()
+            .match_on(get_expected_ohlc_subscription())
+            .respond_with(get_ohlc_subscription_response())
+            .send(subscription)
+            .expect(get_expected_ohlc_message())
+            .build()
+            .test()
+            .await;
+    }
+}
+
 #[derive(Debug, Builder)]
 struct CallResponseTest<T>
 where

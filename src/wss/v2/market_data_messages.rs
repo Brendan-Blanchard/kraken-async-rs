@@ -205,6 +205,17 @@ pub struct OhlcSubscription {
     pub snapshot: Option<bool>,
 }
 
+impl OhlcSubscription {
+    pub fn new(symbols: Vec<String>, interval: i32) -> Self {
+        OhlcSubscription {
+            channel: "ohlc".to_string(),
+            symbol: symbols,
+            interval,
+            snapshot: None,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct SubscriptionResponse {
     pub channel: String,
