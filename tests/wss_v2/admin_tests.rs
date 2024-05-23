@@ -1,0 +1,45 @@
+use crate::wss_v2::shared::CallResponseTest;
+use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, WssMessage};
+use serde_json::{json, Value};
+
+mod ping_pong {
+    use super::*;
+    use kraken_async_rs::wss::v2::base_messages::PongResponse;
+
+    fn get_expected_ping() -> Value {
+        json!({"method":"ping","req_id":1})
+    }
+
+    fn get_pong() -> String {
+        r#"{"method":"pong","req_id":1,"time_in":"2024-05-20T11:08:49.272922Z","time_out":"2024-05-20T11:08:49.272940Z"}"#.to_string()
+    }
+
+    fn get_expected_pong_message() -> WssMessage {
+        WssMessage::Method(MethodMessage::Pong(PongResponse {
+            error: None,
+            req_id: 1,
+            time_in: "2024-05-20T11:08:49.272922Z".to_string(),
+            time_out: "2024-05-20T11:08:49.272940Z".to_string(),
+        }))
+    }
+
+    #[tokio::test]
+    async fn test_ping_pong() {
+        let ping: Option<()> = None;
+
+        let message = Message {
+            method: "ping".to_string(),
+            params: ping,
+            req_id: 1,
+        };
+
+        CallResponseTest::builder()
+            .match_on(get_expected_ping())
+            .respond_with(get_pong())
+            .send(message)
+            .expect(get_expected_pong_message())
+            .build()
+            .test()
+            .await;
+    }
+}
