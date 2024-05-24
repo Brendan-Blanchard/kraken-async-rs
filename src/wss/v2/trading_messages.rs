@@ -97,7 +97,7 @@ pub struct AddOrderResult {
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EditOrderParams {
-    pub deadline: String,
+    pub deadline: Option<String>,
     #[serde(with = "float_option")]
     #[serde(rename = "display_qty")]
     pub display_quantity: Option<Decimal>,
