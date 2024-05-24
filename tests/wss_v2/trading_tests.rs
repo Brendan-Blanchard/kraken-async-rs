@@ -4,9 +4,10 @@ use kraken_async_rs::response_types::{BuySell, OrderType};
 use kraken_async_rs::wss::v2::base_messages::MethodMessage::{AddOrder, CancelOrder, EditOrder};
 use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, ResultResponse, WssMessage};
 use kraken_async_rs::wss::v2::trading_messages::{
-    AddOrderParams, AddOrderResult, CancelAllOrdersParams, CancelAllOrdersResult,
-    CancelOnDisconnectParams, CancelOnDisconnectResult, CancelOrderParams, CancelOrderResult,
-    EditOrderParams, EditOrderResult, FeePreference,
+    AddOrderParams, AddOrderResult, BatchCancelParams, BatchCancelResponse, BatchOrder,
+    BatchOrderParams, CancelAllOrdersParams, CancelAllOrdersResult, CancelOnDisconnectParams,
+    CancelOnDisconnectResult, CancelOrderParams, CancelOrderResult, EditOrderParams,
+    EditOrderResult, FeePreference,
 };
 use rust_decimal_macros::dec;
 use serde_json::json;
@@ -220,6 +221,131 @@ async fn test_cancel_on_disconnect() {
     let message = Message {
         method: "cancel_all_orders_after".to_string(),
         params: cancel_on_disconnect,
+        req_id: 0,
+    };
+
+    CallResponseTest::builder()
+        .match_on(expected_request)
+        .respond_with(response)
+        .send(message)
+        .expect(expected_response)
+        .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_batch_add() {
+    let expected_request = json!({"method":"batch_add","params":{"symbol":"USDC/USD","token":"myToken","orders":[{"order_type":"limit","side":"buy","limit_price":0.99,"order_qty":5.0,"post_only":true,"fee_preference":"quote"},{"order_type":"limit","side":"buy","limit_price":0.95,"order_qty":5.0,"post_only":true,"fee_preference":"base"}]},"req_id":0});
+    let response = r#"{"method":"batch_add","req_id":0,"result":[{"order_id":"JQDNTT-MZEIZ-OZKUDD"},{"order_id":"X67GEK-3VQWM-HPNQ89"}],"success":true,"time_in":"2024-05-19T19:23:21.134538Z","time_out":"2024-05-19T19:23:21.141229Z"}"#.to_string();
+    let expected_response = WssMessage::Method(MethodMessage::BatchOrder(ResultResponse {
+        result: Some(vec![
+            AddOrderResult {
+                order_id: "JQDNTT-MZEIZ-OZKUDD".to_string(),
+                order_user_ref: None,
+                warning: None,
+            },
+            AddOrderResult {
+                order_id: "X67GEK-3VQWM-HPNQ89".to_string(),
+                order_user_ref: None,
+                warning: None,
+            },
+        ]),
+        error: None,
+        success: true,
+        req_id: 0,
+        time_in: "2024-05-19T19:23:21.134538Z".to_string(),
+        time_out: "2024-05-19T19:23:21.141229Z".to_string(),
+    }));
+
+    let batch_add = BatchOrderParams {
+        deadline: None,
+        symbol: "USDC/USD".to_string(),
+        token: "myToken".to_string(),
+        validate: None,
+        orders: vec![
+            BatchOrder {
+                order_type: OrderType::Limit,
+                side: BuySell::Buy,
+                limit_price: Some(dec!(0.99)),
+                limit_price_type: None,
+                triggers: None,
+                time_in_force: None,
+                order_quantity: dec!(5.0),
+                margin: None,
+                post_only: Some(true),
+                reduce_only: None,
+                effective_time: None,
+                expire_time: None,
+                order_user_ref: None,
+                conditional: None,
+                display_quantity: None,
+                fee_preference: Some(FeePreference::Quote),
+                no_market_price_protection: None,
+                stp_type: None,
+                cash_order_quantity: None,
+            },
+            BatchOrder {
+                order_type: OrderType::Limit,
+                side: BuySell::Buy,
+                limit_price: Some(dec!(0.95)),
+                limit_price_type: None,
+                triggers: None,
+                time_in_force: None,
+                order_quantity: dec!(5.0),
+                margin: None,
+                post_only: Some(true),
+                reduce_only: None,
+                effective_time: None,
+                expire_time: None,
+                order_user_ref: None,
+                conditional: None,
+                display_quantity: None,
+                fee_preference: Some(FeePreference::Base),
+                no_market_price_protection: None,
+                stp_type: None,
+                cash_order_quantity: None,
+            },
+        ],
+    };
+
+    let message = Message {
+        method: "batch_add".to_string(),
+        params: batch_add,
+        req_id: 0,
+    };
+
+    CallResponseTest::builder()
+        .match_on(expected_request)
+        .respond_with(response)
+        .send(message)
+        .expect(expected_response)
+        .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_batch_cancel() {
+    let expected_request = json!({"method":"batch_cancel","params":{"orders":["IY8YF6-Y6LCR-AMZD7P","XR6VND-GLY6K-DL33TB"],"token":"theirToken"},"req_id":0});
+    let response = r#"{"method":"batch_cancel","orders_cancelled":2,"req_id":0,"success":true,"time_in":"2024-05-19T19:29:58.063754Z","time_out":"2024-05-19T19:29:58.071569Z"}"#.to_string();
+    let expected_response = WssMessage::Method(MethodMessage::BatchCancel(BatchCancelResponse {
+        orders_cancelled: 2,
+        error: None,
+        success: true,
+        req_id: 0,
+        time_in: "2024-05-19T19:29:58.063754Z".to_string(),
+        time_out: "2024-05-19T19:29:58.071569Z".to_string(),
+    }));
+
+    let batch_cancel = BatchCancelParams {
+        orders: vec!["IY8YF6-Y6LCR-AMZD7P".into(), "XR6VND-GLY6K-DL33TB".into()],
+        token: "theirToken".to_string(),
+    };
+
+    let message = Message {
+        method: "batch_cancel".to_string(),
+        params: batch_cancel,
         req_id: 0,
     };
 

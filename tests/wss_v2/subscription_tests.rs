@@ -8,9 +8,9 @@ use serde_json::{json, Value};
 
 mod execution_subscription {
     use super::*;
-    use kraken_async_rs::wss::v2::market_data_messages::InstrumentsSubscription;
+
     use kraken_async_rs::wss::v2::user_data_messages::{
-        ExecutionSubscription, ExecutionsSubscriptionResult, InstrumentSubscriptionResult,
+        ExecutionSubscription, ExecutionsSubscriptionResult,
     };
 
     fn get_expected_execution_subscription() -> Value {
@@ -68,10 +68,9 @@ mod execution_subscription {
 
 mod balances_subscription {
     use super::*;
-    use kraken_async_rs::wss::v2::market_data_messages::InstrumentsSubscription;
+
     use kraken_async_rs::wss::v2::user_data_messages::{
-        BalanceSubscriptionResult, BalancesSubscription, ExecutionSubscription,
-        ExecutionsSubscriptionResult, InstrumentSubscriptionResult,
+        BalanceSubscriptionResult, BalancesSubscription,
     };
 
     fn get_expected_balances_subscription() -> Value {
