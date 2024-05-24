@@ -84,6 +84,18 @@ pub struct ExecutionSubscription {
     pub snapshot: Option<bool>,
 }
 
+impl ExecutionSubscription {
+    pub fn new(token: String) -> Self {
+        ExecutionSubscription {
+            channel: "executions".to_string(),
+            token,
+            snapshot_trades: None,
+            rate_counter: None,
+            snapshot: None,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct InstrumentSubscriptionResult {
@@ -95,6 +107,12 @@ pub struct InstrumentSubscriptionResult {
 pub struct ExecutionsSubscriptionResult {
     #[serde(rename = "maxratecount")]
     pub max_rate_count: Option<i64>,
+    pub snapshot: Option<bool>,
+    pub warnings: Option<Vec<String>>,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct BalanceSubscriptionResult {
     pub snapshot: Option<bool>,
     pub warnings: Option<Vec<String>>,
 }
@@ -114,6 +132,8 @@ pub enum SubscriptionResult {
     Trade(TradeSubscriptionResponse),
     #[serde(rename = "executions")]
     Execution(ExecutionsSubscriptionResult),
+    #[serde(rename = "balances")]
+    Balance(BalanceSubscriptionResult),
     #[serde(rename = "instrument")]
     Instrument(InstrumentSubscriptionResult),
 }
@@ -204,6 +224,16 @@ pub struct BalancesSubscription {
     pub channel: String,
     pub token: String,
     pub snapshot: Option<bool>,
+}
+
+impl BalancesSubscription {
+    pub fn new(token: String) -> Self {
+        BalancesSubscription {
+            channel: "balances".to_string(),
+            token,
+            snapshot: None,
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

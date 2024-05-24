@@ -6,6 +6,118 @@ use kraken_async_rs::wss::v2::market_data_messages::{
 use kraken_async_rs::wss::v2::user_data_messages::SubscriptionResult;
 use serde_json::{json, Value};
 
+mod execution_subscription {
+    use super::*;
+    use kraken_async_rs::wss::v2::market_data_messages::InstrumentsSubscription;
+    use kraken_async_rs::wss::v2::user_data_messages::{
+        ExecutionSubscription, ExecutionsSubscriptionResult, InstrumentSubscriptionResult,
+    };
+
+    fn get_expected_execution_subscription() -> Value {
+        json!({"method":"subscribe","params":{"channel":"executions","token":"someToken","snapshot_trades":true,"snapshot":true},"req_id":0})
+    }
+
+    fn get_execution_subscription_response() -> String {
+        r#"{"method":"subscribe","req_id":0,"result":{"channel":"executions","maxratecount":180,"snapshot":true,"warnings":["cancel_reason is deprecated, use reason","stop_price is deprecated, use triggers.price","trigger is deprecated use triggers.reference","triggered_price is deprecated use triggers.last_price"]},"success":true,"time_in":"2024-05-19T19:30:36.343170Z","time_out":"2024-05-19T19:30:36.350083Z"}"#.to_string()
+    }
+
+    fn get_expected_execution_message() -> WssMessage {
+        WssMessage::Method(MethodMessage::Subscription(ResultResponse {
+            result: Some(SubscriptionResult::Execution(
+                ExecutionsSubscriptionResult {
+                    max_rate_count: Some(180),
+                    snapshot: Some(true),
+                    warnings: Some(vec![
+                        "cancel_reason is deprecated, use reason".into(),
+                        "stop_price is deprecated, use triggers.price".into(),
+                        "trigger is deprecated use triggers.reference".into(),
+                        "triggered_price is deprecated use triggers.last_price".into(),
+                    ]),
+                },
+            )),
+            error: None,
+            success: true,
+            req_id: 0,
+            time_in: "2024-05-19T19:30:36.343170Z".to_string(),
+            time_out: "2024-05-19T19:30:36.350083Z".to_string(),
+        }))
+    }
+
+    #[tokio::test]
+    async fn test_execution_subscription() {
+        let mut execution_params = ExecutionSubscription::new("someToken".into());
+        execution_params.snapshot = Some(true);
+        execution_params.snapshot_trades = Some(true);
+
+        let subscription = Message {
+            method: "subscribe".to_string(),
+            params: execution_params,
+            req_id: 0,
+        };
+
+        CallResponseTest::builder()
+            .match_on(get_expected_execution_subscription())
+            .respond_with(get_execution_subscription_response())
+            .send(subscription)
+            .expect(get_expected_execution_message())
+            .build()
+            .test()
+            .await;
+    }
+}
+
+mod balances_subscription {
+    use super::*;
+    use kraken_async_rs::wss::v2::market_data_messages::InstrumentsSubscription;
+    use kraken_async_rs::wss::v2::user_data_messages::{
+        BalanceSubscriptionResult, BalancesSubscription, ExecutionSubscription,
+        ExecutionsSubscriptionResult, InstrumentSubscriptionResult,
+    };
+
+    fn get_expected_balances_subscription() -> Value {
+        json!({"method":"subscribe","params":{"channel":"balances","token":"anotherToken","snapshot":true},"req_id":10312008})
+    }
+
+    fn get_balances_subscription_response() -> String {
+        r#"{"method":"subscribe","req_id":10312008,"result":{"channel":"balances","snapshot":true},"success":true,"time_in":"2024-05-19T16:25:28.289124Z","time_out":"2024-05-19T16:25:28.293750Z"}"#.to_string()
+    }
+
+    fn get_expected_balances_message() -> WssMessage {
+        WssMessage::Method(MethodMessage::Subscription(ResultResponse {
+            result: Some(SubscriptionResult::Balance(BalanceSubscriptionResult {
+                snapshot: Some(true),
+                warnings: None,
+            })),
+            error: None,
+            success: true,
+            req_id: 10312008,
+            time_in: "2024-05-19T16:25:28.289124Z".to_string(),
+            time_out: "2024-05-19T16:25:28.293750Z".to_string(),
+        }))
+    }
+
+    #[tokio::test]
+    async fn test_balances_subscription() {
+        let mut balances_params = BalancesSubscription::new("anotherToken".into());
+        balances_params.snapshot = Some(true);
+
+        let subscription = Message {
+            method: "subscribe".to_string(),
+            params: balances_params,
+            req_id: 10312008,
+        };
+
+        CallResponseTest::builder()
+            .match_on(get_expected_balances_subscription())
+            .respond_with(get_balances_subscription_response())
+            .send(subscription)
+            .expect(get_expected_balances_message())
+            .build()
+            .test()
+            .await;
+    }
+}
+
 mod ticker_subscription {
     use super::*;
 
