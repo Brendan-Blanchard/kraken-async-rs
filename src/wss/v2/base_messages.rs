@@ -93,6 +93,7 @@ pub struct Pong {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Response<T> {
     pub data: T,
+    pub sequence: i64,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

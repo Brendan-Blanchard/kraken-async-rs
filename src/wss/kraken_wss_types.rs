@@ -48,7 +48,7 @@ pub struct SystemStatus {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Sequence {
-    sequence: i64,
+    pub sequence: i64,
 }
 
 /// Error message type

@@ -196,6 +196,7 @@ pub struct ExecutionResult {
     #[serde(rename = "fee_usd_equiv")]
     pub fee_usd_equivalent: Option<Decimal>,
     pub limit_price: Option<Decimal>,
+    pub limit_price_type: Option<PriceType>,
     pub margin: Option<bool>,
     #[serde(rename = "no_mpp")]
     pub no_market_price_protection: Option<bool>,
@@ -290,6 +291,7 @@ mod tests {
             fee_preference: None,
             fee_usd_equivalent: Some(dec!(0.05083)),
             limit_price: None,
+            limit_price_type: None,
             margin: None,
             no_market_price_protection: None,
             order_ref_id: None,
@@ -336,6 +338,7 @@ mod tests {
             fee_preference: None,
             fee_usd_equivalent: None,
             limit_price: None,
+            limit_price_type: None,
             margin: None,
             no_market_price_protection: None,
             order_ref_id: None,
