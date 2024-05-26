@@ -79,6 +79,19 @@ where
     pub req_id: i64,
 }
 
+impl<T> Message<T>
+where
+    T: Debug,
+{
+    pub fn new_subscription(params: T, req_id: i64) -> Self {
+        Message {
+            method: "subscribe".to_string(),
+            params,
+            req_id,
+        }
+    }
+}
+
 // this is required to not serialize None for generic type parameters
 //  (skip_serializing_none fails there)
 fn is_none<T: Serialize>(t: T) -> bool {

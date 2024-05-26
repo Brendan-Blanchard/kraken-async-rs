@@ -49,11 +49,7 @@ mod execution_subscription {
         execution_params.snapshot = Some(true);
         execution_params.snapshot_trades = Some(true);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: execution_params,
-            req_id: 0,
-        };
+        let subscription = Message::new_subscription(execution_params, 0);
 
         CallResponseTest::builder()
             .match_on(get_expected_execution_subscription())
@@ -100,11 +96,7 @@ mod balances_subscription {
         let mut balances_params = BalancesSubscription::new("anotherToken".into());
         balances_params.snapshot = Some(true);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: balances_params,
-            req_id: 10312008,
-        };
+        let subscription = Message::new_subscription(balances_params, 10312008);
 
         CallResponseTest::builder()
             .match_on(get_expected_balances_subscription())
@@ -147,11 +139,7 @@ mod ticker_subscription {
     async fn test_ticker_subscription() {
         let ticker_params = TickerSubscription::new(vec!["BTC/USD".into()]);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: ticker_params,
-            req_id: 42,
-        };
+        let subscription = Message::new_subscription(ticker_params, 42);
 
         CallResponseTest::builder()
             .match_on(get_expected_ticker_subscription())
@@ -200,11 +188,7 @@ mod book_subscription {
         book_params.depth = Some(10);
         book_params.snapshot = Some(true);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: book_params,
-            req_id: 11,
-        };
+        let subscription = Message::new_subscription(book_params, 11);
 
         CallResponseTest::builder()
             .match_on(get_expected_book_subscription())
@@ -253,11 +237,7 @@ mod l3_subscription {
             BookSubscription::new_l3(vec!["BTC/USD".into()], "someToken".to_string());
         book_params.snapshot = Some(true);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: book_params,
-            req_id: 99,
-        };
+        let subscription = Message::new_subscription(book_params, 99);
 
         CallResponseTest::builder()
             .match_on(get_expected_l3_subscription())
@@ -304,11 +284,7 @@ mod ohlc_subscription {
     async fn test_ohlc_subscription() {
         let ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: ohlc_params,
-            req_id: 121,
-        };
+        let subscription = Message::new_subscription(ohlc_params, 121);
 
         CallResponseTest::builder()
             .match_on(get_expected_ohlc_subscription())
@@ -354,11 +330,7 @@ mod trade_subscription {
     async fn test_trade_subscription() {
         let trade_params = TradesSubscription::new(vec!["BTC/USD".into()]);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: trade_params,
-            req_id: 0,
-        };
+        let subscription = Message::new_subscription(trade_params, 0);
 
         CallResponseTest::builder()
             .match_on(get_expected_trade_subscription())
@@ -404,11 +376,7 @@ mod instruments_subscription {
     async fn test_instruments_subscription() {
         let instruments_params = InstrumentsSubscription::new(true);
 
-        let subscription = Message {
-            method: "subscribe".to_string(),
-            params: instruments_params,
-            req_id: 0,
-        };
+        let subscription = Message::new_subscription(instruments_params, 0);
 
         CallResponseTest::builder()
             .match_on(get_expected_instruments_subscription())
