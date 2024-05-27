@@ -1,4 +1,5 @@
 use futures_util::StreamExt;
+use kraken_async_rs::wss::errors::WSSError;
 use kraken_async_rs::wss::v2::base_messages::{Message, WssMessage};
 use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
 use serde::Serialize;
@@ -131,4 +132,28 @@ impl ParseIncomingTest {
             assert_eq!(*expected, result);
         }
     }
+}
+
+/// Parse an incoming message by spinning up a test server and forwarding the message to it.
+pub async fn parse_for_test(incoming: &str) -> Result<WssMessage, WSSError> {
+    let mut test_state = WssTestState::new().await;
+
+    let (mpsc_send, mpsc_recv) = mpsc::channel::<tokio_tungstenite::tungstenite::Message>(8);
+
+    WsMock::new()
+        .forward_from_channel(mpsc_recv)
+        .mount(&test_state.mock_server)
+        .await;
+
+    let mut stream = test_state.ws_client.connect::<WssMessage>().await.unwrap();
+
+    mpsc_send
+        .send(TungsteniteMessage::Text(incoming.to_string()))
+        .await
+        .unwrap();
+
+    timeout(Duration::from_secs(1), stream.next())
+        .await
+        .unwrap()
+        .unwrap()
 }

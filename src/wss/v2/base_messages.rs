@@ -15,7 +15,6 @@ use std::fmt::Debug;
 pub enum WssMessage {
     Channel(ChannelMessage),
     Method(MethodMessage),
-    Error(String),
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -34,7 +33,7 @@ pub enum MethodMessage {
     #[serde(rename = "batch_add")]
     BatchOrder(ResultResponse<Vec<AddOrderResult>>),
     #[serde(rename = "batch_cancel")]
-    BatchCancel(BatchCancelResponse), // TODO: could maybe #flatten around this to get all on ResultResponse<_>? Then simplify entire structure
+    BatchCancel(BatchCancelResponse),
     #[serde(rename = "subscribe")]
     Subscription(ResultResponse<SubscriptionResult>),
     #[serde(alias = "ping")]
