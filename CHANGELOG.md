@@ -2,6 +2,14 @@
 
 ### In Progress
 
+### v0.1.0
+
+- Websockets V2 support - all V2 websocket endpoints are now supported
+    - Deprecated v1 `KrakenWSSClient` since Kraken will support but no longer update v1
+- Update dependencies (ws-mock -> 0.1.1)
+
+### v0.0.2
+
 - Decimal conversions instead of String (settled on this due to abundance/annoyance of Decimal::try_from(&someString)?
 - Made `KrakenClient.set_user_agent` async (not required but allows Tokio mutex proxying downstream)
 - Changed `vol` and `vol_exec` to `volume` and `volume_executed` in all places

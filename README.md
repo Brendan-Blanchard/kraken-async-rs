@@ -2,7 +2,7 @@
 
 ![badge](https://github.com/Brendan-Blanchard/kraken-async-rs/actions/workflows/main.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs/graph/badge.svg?token=30Y7BIDSNK)](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs)
 
-A complete[^4] wrapper of the Kraken Pro trading API, written in asynchronous Rust.
+A complete[^4] wrapper of the Kraken Pro trading API (v1 and v2 websockets), written in asynchronous Rust.
 
 It's not expected that you'll be able to use Kraken-Async-Rs without consulting
 the [Kraken API](https://docs.kraken.com/rest/#section/General-Usage)
@@ -78,7 +78,39 @@ async fn main() {
 }
 ```
 
-### Example: Listening to Websockets
+### Example: Listening to Websockets (V2)
+
+Public websockets require no authentication, so it's as easy as creating a `v2::KrakenWSSClient`, connecting, and
+sending any subscription methods and then awaiting the `.next()` method of the returned `KrakenMessageStream`.
+
+You can also visit the [full example](examples/live_wss_ohlc_v2.rs) with logging and imports.
+
+```rust
+#[tokio::main]
+async fn main() {
+    let mut client = KrakenWSSClient::new();
+    let mut kraken_stream = client.connect::<WssMessage>().await.unwrap();
+
+    let ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
+    let subscription = Message::new_subscription(ohlc_params, 0);
+
+    let result = kraken_stream.send(&subscription).await;
+    assert!(result.is_ok());
+
+    while let Ok(Some(message)) = timeout(Duration::from_secs(10), kraken_stream.next()).await {
+        if let Ok(response) = message {
+            println!("{:?}", response);
+        } else {
+            println!("Message failed: {:?}", message);
+        }
+    }
+}
+```
+
+### Example: Listening to Websockets (V1 - Deprecated)
+
+_Kraken released a V2 version of their APIs with simplified data types, and more standardized documentation.
+You should use the V2 API instead if at all possible, since the V1 endpoints will be maintained but not improved._
 
 Public websockets require no authentication, so it's as easy as creating a `KrakenWSSClient`, connecting, and sending
 any subscription methods and then awaiting the `.next()` method of the returned `KrakenMessageStream`.
@@ -116,7 +148,8 @@ async fn main() {
 ### Request Details
 
 Requests that have more than 1 or 2 parameters are generally given a struct, rather than having methods with many
-parameters. The `builder` implementation enforces required parameter by using the [simple-builder] package that marks
+parameters. The `builder` implementation enforces required parameter by using
+the [simple-builder](https://crates.io/crates/simple-builder) package that marks
 fields are required, ensuring they must be provided in the `.builder()` call. Any optional parameters can be added using
 a fluent API.
 
@@ -132,11 +165,13 @@ let request = OrderbookRequest::builder("ETHUSD".to_string())
 ### Response Details
 
 A best-effort was made to adhere to the format of Kraken's responses, except for cases where it poses some pretty
-severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are parsed
-to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64` and `f64` 
-timestamps remaining as such. The goal was to provide a great base library for others to build from, without limiting 
-downstream uses by parsing everything and reducing overall performance. If you're developing general-purpose trading 
-algorithms, you should be writing them over a common abstraction that can do this parsing anyway. If you disagree or 
+severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are
+parsed
+to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64`
+and `f64`
+timestamps remaining as such. The goal was to provide a great base library for others to build from, without limiting
+downstream uses by parsing everything and reducing overall performance. If you're developing general-purpose trading
+algorithms, you should be writing them over a common abstraction that can do this parsing anyway. If you disagree or
 have parsing, formatting, or any other issues or blocked use cases, please reach out with a clear example of your issue!
 
 ### Misc Details

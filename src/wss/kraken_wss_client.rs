@@ -23,35 +23,31 @@ type RawStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
 /// A client for connecting to Kraken websockets.
 ///
-/// Connecting to the public (`connect`) or private (`connect_auth`) uris return separate types of
-/// [`KrakenMessageStream`].
+/// Connecting to the public (`connect`) or private (`connect_auth`) uris returns a `KrakenMessageStream`
+/// that can be awaited for values after sending subscriptions or other messages.
 ///
-/// # Example: Listening to Trades
+/// # Example: Listening to OHLC/Candles
 /// Creating a client for public messages requires no token or authentication. All that's needed is
 /// to send a valid subscription message for some number of pairs to subscribe to, then listen
 /// indefinitely.
 /// ```no_run
-/// # use kraken_async_rs::clients::kraken_client::KrakenClient;
-/// # use kraken_async_rs::wss::kraken_wss_client::{KrakenMessageStream, KrakenWSSClient};
-/// # use kraken_async_rs::wss::public::messages::PublicMessage;
-/// # use kraken_async_rs::wss::subscribe_messages::{SubscribeMessage, Subscription};
-/// # use std::time::Duration;
-/// # use tokio::time::timeout;
-/// # use tokio_stream::StreamExt;
+/// use kraken_async_rs::wss::v2::base_messages::{Message, WssMessage};
+/// use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
+/// use kraken_async_rs::wss::v2::market_data_messages::OhlcSubscription;
+/// use std::time::Duration;
+/// use tokio::time::timeout;
+/// use tokio_stream::StreamExt;
 ///
 /// #[tokio::main]
 /// async fn main() {
 ///     let mut client = KrakenWSSClient::new();
-///     let mut kraken_stream: KrakenMessageStream<PublicMessage> = client.connect().await.unwrap();
+///     let mut kraken_stream = client.connect::<WssMessage>().await.unwrap();
 ///
-///     let trades_subscription = Subscription::new_trades_subscription();
-///     let subscribe_message = SubscribeMessage::new(
-///         0,
-///         Some(vec!["BTC/USD".into(), "ETH/USD".into()]),
-///         trades_subscription,
-///     );
+///     let ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
+///     let subscription = Message::new_subscription(ohlc_params, 0);
 ///
-///     kraken_stream.subscribe(&subscribe_message).await.unwrap();
+///     let result = kraken_stream.send(&subscription).await;
+///     assert!(result.is_ok());
 ///
 ///     while let Ok(Some(message)) = timeout(Duration::from_secs(10), kraken_stream.next()).await {
 ///         if let Ok(response) = message {
@@ -62,6 +58,10 @@ type RawStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 ///     }
 /// }
 /// ```
+#[deprecated(
+    since = "0.1.0",
+    note = "Please switch to the supported v2 websockets api"
+)]
 #[derive(Debug, Clone, Copy)]
 pub struct KrakenWSSClient<'a> {
     base_url: &'a str,
