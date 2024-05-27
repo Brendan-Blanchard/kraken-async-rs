@@ -1,7 +1,8 @@
 use crate::wss_v2::shared::ParseIncomingTest;
 use kraken_async_rs::wss::v2::base_messages::{ChannelMessage, SingleResponse, WssMessage};
 use kraken_async_rs::wss::v2::market_data_messages::{
-    BidAsk, Orderbook, OrderbookUpdate, Ticker, L2,
+    BidAsk, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate, Orderbook, OrderbookEvent,
+    OrderbookUpdate, Ticker, L2, L3,
 };
 use rust_decimal_macros::dec;
 
@@ -225,6 +226,147 @@ async fn test_book_update() {
 
     ParseIncomingTest::new()
         .with_incoming(book_update)
+        .expect_message(expected_update)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_l3_snapshot() {
+    let l3_snapshot = r#"{
+        "channel":"level3",
+        "type":"snapshot",
+        "data": [{
+        "symbol":"BTC/USD",
+        "checksum":1361442827,
+        "bids":[
+            {"order_id":"OZYA6B-OE3BH-YJ4PY5","limit_price":66579.2,"order_qty":1.35137590,"timestamp":"2024-05-19T18:55:20.910159752Z"},
+            {"order_id":"OIOQ7V-JT5S2-QLIEPO","limit_price":66579.2,"order_qty":0.47905712,"timestamp":"2024-05-19T18:55:20.910276406Z"},
+            {"order_id":"O34I4J-KIE3I-BOT6VC","limit_price":66579.2,"order_qty":0.03003941,"timestamp":"2024-05-19T18:55:23.001943740Z"},
+            {"order_id":"OUOCIK-GA6WX-DSZC2A","limit_price":66574.1,"order_qty":0.45057561,"timestamp":"2024-05-19T18:55:15.431184641Z"}
+        ],
+        "asks":[
+            {"order_id":"OUPTOY-CCUJG-BMAZ5S","limit_price":66579.3,"order_qty":0.07800000,"timestamp":"2024-05-19T18:55:22.531833732Z"},
+            {"order_id":"OFUNE7-IGNAY-5UATGI","limit_price":66581.5,"order_qty":1.50192021,"timestamp":"2024-05-19T18:55:25.967603045Z"},
+            {"order_id":"ORCUC4-UGIUC-MT5KBA","limit_price":66583.7,"order_qty":0.87745184,"timestamp":"2024-05-19T18:55:18.938264721Z"}
+        ]
+    }]}"#.to_string();
+
+    let expected_snapshot = WssMessage::Channel(ChannelMessage::L3(SingleResponse {
+        data: L3::Orderbook(L3Orderbook {
+            symbol: "BTC/USD".to_string(),
+            bids: vec![
+                L3BidAsk {
+                    order_id: "OZYA6B-OE3BH-YJ4PY5".to_string(),
+                    limit_price: dec!(66579.2),
+                    order_quantity: dec!(1.35137590),
+                    timestamp: "2024-05-19T18:55:20.910159752Z".to_string(),
+                },
+                L3BidAsk {
+                    order_id: "OIOQ7V-JT5S2-QLIEPO".to_string(),
+                    limit_price: dec!(66579.2),
+                    order_quantity: dec!(0.47905712),
+                    timestamp: "2024-05-19T18:55:20.910276406Z".to_string(),
+                },
+                L3BidAsk {
+                    order_id: "O34I4J-KIE3I-BOT6VC".to_string(),
+                    limit_price: dec!(66579.2),
+                    order_quantity: dec!(0.03003941),
+                    timestamp: "2024-05-19T18:55:23.001943740Z".to_string(),
+                },
+                L3BidAsk {
+                    order_id: "OUOCIK-GA6WX-DSZC2A".to_string(),
+                    limit_price: dec!(66574.1),
+                    order_quantity: dec!(0.45057561),
+                    timestamp: "2024-05-19T18:55:15.431184641Z".to_string(),
+                },
+            ],
+            asks: vec![
+                L3BidAsk {
+                    order_id: "OUPTOY-CCUJG-BMAZ5S".to_string(),
+                    limit_price: dec!(66579.3),
+                    order_quantity: dec!(0.07800000),
+                    timestamp: "2024-05-19T18:55:22.531833732Z".to_string(),
+                },
+                L3BidAsk {
+                    order_id: "OFUNE7-IGNAY-5UATGI".to_string(),
+                    limit_price: dec!(66581.5),
+                    order_quantity: dec!(1.50192021),
+                    timestamp: "2024-05-19T18:55:25.967603045Z".to_string(),
+                },
+                L3BidAsk {
+                    order_id: "ORCUC4-UGIUC-MT5KBA".to_string(),
+                    limit_price: dec!(66583.7),
+                    order_quantity: dec!(0.87745184),
+                    timestamp: "2024-05-19T18:55:18.938264721Z".to_string(),
+                },
+            ],
+            checksum: 1361442827,
+        }),
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(l3_snapshot)
+        .expect_message(expected_snapshot)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_l3_update() {
+    let l3_update = r#"{
+        "channel":"level3",
+        "type":"update",
+        "data":[{
+            "checksum":2143854316,
+            "symbol":"BTC/USD",
+            "bids":[
+                {
+                    "event":"delete",
+                    "order_id":"O7SO4Y-RHRAK-GGAHJE",
+                    "limit_price":66567.3,
+                    "order_qty":0.22540000,
+                    "timestamp":"2024-05-19T18:59:46.541105556Z"
+                },
+                {
+                    "event":"add",
+                    "order_id":"OI2XQ5-6JUYI-A5NI6J",
+                    "limit_price":66566.9,
+                    "order_qty":2.82230268,
+                    "timestamp":"2024-05-19T18:59:44.900460701Z"
+                }
+            ],
+            "asks":[]
+        }]
+    }"#
+    .to_string();
+
+    let expected_update = WssMessage::Channel(ChannelMessage::L3(SingleResponse {
+        data: L3::Update(L3OrderbookUpdate {
+            symbol: "BTC/USD".to_string(),
+            bids: vec![
+                L3BidAskUpdate {
+                    event: OrderbookEvent::Delete,
+                    order_id: "O7SO4Y-RHRAK-GGAHJE".to_string(),
+                    limit_price: dec!(66567.3),
+                    order_quantity: dec!(0.22540000),
+                    timestamp: "2024-05-19T18:59:46.541105556Z".to_string(),
+                },
+                L3BidAskUpdate {
+                    event: OrderbookEvent::Add,
+                    order_id: "OI2XQ5-6JUYI-A5NI6J".to_string(),
+                    limit_price: dec!(66566.9),
+                    order_quantity: dec!(2.82230268),
+                    timestamp: "2024-05-19T18:59:44.900460701Z".to_string(),
+                },
+            ],
+            asks: vec![],
+            checksum: 2143854316,
+        }),
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(l3_update)
         .expect_message(expected_update)
         .test()
         .await;
