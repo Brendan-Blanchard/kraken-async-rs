@@ -1,10 +1,11 @@
 use crate::wss_v2::shared::ParseIncomingTest;
+use kraken_async_rs::response_types::BuySell;
 use kraken_async_rs::wss::v2::base_messages::{
     ChannelMessage, MarketDataResponse, SingleResponse, WssMessage,
 };
 use kraken_async_rs::wss::v2::market_data_messages::{
-    BidAsk, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook,
-    OrderbookEvent, OrderbookUpdate, Ticker, L2, L3,
+    BidAsk, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate, MarketLimit, Ohlc, Orderbook,
+    OrderbookEvent, OrderbookUpdate, Ticker, Trade, L2, L3,
 };
 use rust_decimal_macros::dec;
 
@@ -419,6 +420,88 @@ async fn test_candles_snapshot() {
     ParseIncomingTest::new()
         .with_incoming(candles_snapshot)
         .expect_message(expected_snapshot)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_trade_snapshot() {
+    let trade_snapshot = r#"{
+        "channel":"trade",
+        "type":"snapshot",
+        "data":[
+            {"symbol":"BTC/USD","side":"sell","price":68466.9,"qty":0.01919415,"ord_type":"market","trade_id":70635251,"timestamp":"2024-05-27T12:33:10.826003Z"},
+            {"symbol":"BTC/USD","side":"buy","price":68471.2,"qty":0.00007723,"ord_type":"limit","trade_id":70635252,"timestamp":"2024-05-27T12:33:10.980704Z"}
+        ]
+    }"#.to_string();
+
+    let expected_snapshot = WssMessage::Channel(ChannelMessage::Trade(MarketDataResponse {
+        data: vec![
+            Trade {
+                symbol: "BTC/USD".to_string(),
+                side: BuySell::Sell,
+                quantity: dec!(0.01919415),
+                price: dec!(68466.9),
+                order_type: MarketLimit::Market,
+                trade_id: 70635251,
+                timestamp: "2024-05-27T12:33:10.826003Z".to_string(),
+            },
+            Trade {
+                symbol: "BTC/USD".to_string(),
+                side: BuySell::Buy,
+                quantity: dec!(0.00007723),
+                price: dec!(68471.2),
+                order_type: MarketLimit::Limit,
+                trade_id: 70635252,
+                timestamp: "2024-05-27T12:33:10.980704Z".to_string(),
+            },
+        ],
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(trade_snapshot)
+        .expect_message(expected_snapshot)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_trade_update() {
+    let trade_update = r#"{
+        "channel":"trade",
+        "type":"update",
+        "data":[
+            {"symbol":"BTC/USD","side":"buy","price":68500.0,"qty":0.01044926,"ord_type":"limit","trade_id":70635299,"timestamp":"2024-05-27T12:43:11.798009Z"},
+            {"symbol":"BTC/USD","side":"buy","price":68500.0,"qty":0.00483192,"ord_type":"limit","trade_id":70635300,"timestamp":"2024-05-27T12:43:11.798009Z"}
+        ]
+    }"#.to_string();
+
+    let expected_update = WssMessage::Channel(ChannelMessage::Trade(MarketDataResponse {
+        data: vec![
+            Trade {
+                symbol: "BTC/USD".to_string(),
+                side: BuySell::Buy,
+                quantity: dec!(0.01044926),
+                price: dec!(68500.0),
+                order_type: MarketLimit::Limit,
+                trade_id: 70635299,
+                timestamp: "2024-05-27T12:43:11.798009Z".to_string(),
+            },
+            Trade {
+                symbol: "BTC/USD".to_string(),
+                side: BuySell::Buy,
+                quantity: dec!(0.00483192),
+                price: dec!(68500.0),
+                order_type: MarketLimit::Limit,
+                trade_id: 70635300,
+                timestamp: "2024-05-27T12:43:11.798009Z".to_string(),
+            },
+        ],
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(trade_update)
+        .expect_message(expected_update)
         .test()
         .await;
 }
