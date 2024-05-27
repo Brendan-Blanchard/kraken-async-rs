@@ -6,8 +6,10 @@
 #[allow(unused)]
 use crate::wss::kraken_wss_client::KrakenMessageStream;
 #[allow(unused)]
+#[allow(deprecated)]
 use crate::wss::kraken_wss_client::KrakenWSSClient;
 pub mod errors;
+#[allow(deprecated)]
 pub mod kraken_wss_client;
 pub mod kraken_wss_types;
 mod parsing;
