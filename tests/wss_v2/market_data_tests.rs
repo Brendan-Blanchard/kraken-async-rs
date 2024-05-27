@@ -4,8 +4,9 @@ use kraken_async_rs::wss::v2::base_messages::{
     ChannelMessage, MarketDataResponse, SingleResponse, WssMessage,
 };
 use kraken_async_rs::wss::v2::market_data_messages::{
-    BidAsk, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate, MarketLimit, Ohlc, Orderbook,
-    OrderbookEvent, OrderbookUpdate, Ticker, Trade, L2, L3,
+    Asset, AssetStatus, BidAsk, Instruments, L3BidAsk, L3BidAskUpdate, L3Orderbook,
+    L3OrderbookUpdate, MarketLimit, Ohlc, Orderbook, OrderbookEvent, OrderbookUpdate, Pair,
+    PairStatus, Ticker, Trade, L2, L3,
 };
 use rust_decimal_macros::dec;
 
@@ -502,6 +503,103 @@ async fn test_trade_update() {
     ParseIncomingTest::new()
         .with_incoming(trade_update)
         .expect_message(expected_update)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_instruments_snapshot() {
+    let instrument_snapshot = r#"{
+        "channel":"instrument",
+        "type":"snapshot",
+        "data":{
+            "assets":[
+                {"id":"USD","status":"enabled","precision":4,"precision_display":2,"borrowable":true,"collateral_value":1.00,"margin_rate":0.025000},
+                {"id":"EUR","status":"enabled","precision":4,"precision_display":2,"borrowable":true,"collateral_value":1.00,"margin_rate":0.020000},
+                {"id":"ETH","status":"enabled","precision":10,"precision_display":5,"borrowable":true,"collateral_value":1.00,"margin_rate":0.020000}
+            ],
+            "pairs": [
+                {"symbol":"EUR/USD","base":"EUR","quote":"USD","status":"online","qty_precision":8,"qty_increment":0.00000001,"price_precision":5,"cost_precision":5,"marginable":false,"has_index":true,"cost_min":0.50,"tick_size":0.00001,"price_increment":0.00001,"qty_min":0.50000000},
+                {"symbol":"ETH/BTC","base":"ETH","quote":"BTC","status":"online","qty_precision":8,"qty_increment":0.00000001,"price_precision":5,"cost_precision":10,"marginable":true,"has_index":true,"cost_min":0.00002,"margin_initial":0.20,"position_limit_long":1000,"position_limit_short":600,"tick_size":0.00001,"price_increment":0.00001,"qty_min":0.00200000}
+            ]
+        }
+    }"#.to_string();
+
+    let expected_snapshot = WssMessage::Channel(ChannelMessage::Instrument(MarketDataResponse {
+        data: Instruments {
+            assets: vec![
+                Asset {
+                    id: "USD".to_string(),
+                    margin_rate: Some(dec!(0.025000)),
+                    precision: 4,
+                    precision_display: 2,
+                    status: AssetStatus::Enabled,
+                    borrowable: true,
+                    collateral_value: dec!(1.0),
+                },
+                Asset {
+                    id: "EUR".to_string(),
+                    margin_rate: Some(dec!(0.020000)),
+                    precision: 4,
+                    precision_display: 2,
+                    status: AssetStatus::Enabled,
+                    borrowable: true,
+                    collateral_value: dec!(1.0),
+                },
+                Asset {
+                    id: "ETH".to_string(),
+                    margin_rate: Some(dec!(0.020000)),
+                    precision: 10,
+                    precision_display: 5,
+                    status: AssetStatus::Enabled,
+                    borrowable: true,
+                    collateral_value: dec!(1.0),
+                },
+            ],
+            pairs: vec![
+                Pair {
+                    base: "EUR".to_string(),
+                    quote: "USD".to_string(),
+                    cost_min: dec!(0.50),
+                    cost_precision: 5,
+                    has_index: true,
+                    margin_initial: None,
+                    marginable: false,
+                    position_limit_long: None,
+                    position_limit_short: None,
+                    price_increment: dec!(0.00001),
+                    price_precision: 5,
+                    quantity_increment: dec!(0.00000001),
+                    quantity_min: dec!(0.50),
+                    quantity_precision: 8,
+                    status: PairStatus::Online,
+                    symbol: "EUR/USD".to_string(),
+                },
+                Pair {
+                    base: "ETH".to_string(),
+                    quote: "BTC".to_string(),
+                    cost_min: dec!(0.00002),
+                    cost_precision: 10,
+                    has_index: true,
+                    margin_initial: Some(dec!(0.2)),
+                    marginable: true,
+                    position_limit_long: Some(1000),
+                    position_limit_short: Some(600),
+                    price_increment: dec!(0.00001),
+                    price_precision: 5,
+                    quantity_increment: dec!(0.00000001),
+                    quantity_min: dec!(0.002),
+                    quantity_precision: 8,
+                    status: PairStatus::Online,
+                    symbol: "ETH/BTC".to_string(),
+                },
+            ],
+        },
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(instrument_snapshot)
+        .expect_message(expected_snapshot)
         .test()
         .await;
 }
