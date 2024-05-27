@@ -1,5 +1,5 @@
 use crate::request_types::{TimeInForce, TriggerType};
-use crate::response_types::{BuySell, OrderStatusV2, OrderType, PositionStatusV2};
+use crate::response_types::{BuySell, LedgerEntryType, OrderStatusV2, OrderType, PositionStatusV2};
 use crate::wss::v2::market_data_messages::{
     BookSubscriptionResponse, OhlcSubscriptionResponse, TickerSubscriptionResponse,
     TradeSubscriptionResponse,
@@ -32,6 +32,61 @@ pub enum FeeCurrencyPreference {
     Base,
     #[serde(rename = "fciq")]
     Quote,
+}
+
+/// Type of ledger entry in user's ledger
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum LedgerEntryTypeV2 {
+    Trade,
+    Credit,
+    Deposit,
+    Withdrawal,
+    Transfer,
+    Margin,
+    Rollover,
+    Settled,
+    Adjustment,
+    Staking,
+    Sale,
+    Reserve,
+    Conversion,
+    Dividend,
+    Reward,
+    CreatorFee,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum LedgerEntrySubType {
+    SpotFromFutures,
+    SpotToFutures,
+    StakingFromSpot,
+    SpotFromStaking,
+    StakingToSpot,
+    SpotToStaking,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "kebab-case")]
+pub enum LedgerCategory {
+    Deposit,
+    Withdrawal,
+    Trade,
+    MarginTrade,
+    MarginSettled,
+    MarginConversion,
+    Conversion,
+    Credit,
+    MarginRollover,
+    StakingRewards,
+    Instant,
+    EquityTrade,
+    Airdrop,
+    EquityDividend,
+    RewardBonus,
+    Nft,
+    BlockTrade,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -246,18 +301,34 @@ pub struct Wallet {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
+#[serde(untagged)]
+pub enum BalanceResponse {
+    Update(Vec<LedgerUpdate>),
+    Snapshot(Vec<Balance>),
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Balance {
     pub asset: String,
     pub balance: Decimal,
     pub wallets: Option<Vec<Wallet>>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct BalancesResponse {
-    pub channel: String,
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct LedgerUpdate {
+    pub asset: String,
+    pub amount: Decimal,
+    pub balance: Decimal,
+    pub fee: Decimal,
+    pub ledger_id: String,
+    pub ref_id: String,
+    pub timestamp: String,
     #[serde(rename = "type")]
-    pub channel_type: String,
-    pub data: Vec<Balance>,
+    pub ledger_type: LedgerEntryTypeV2,
+    pub sub_type: Option<LedgerEntrySubType>,
+    pub category: LedgerCategory,
+    pub wallet_type: WalletType,
+    pub wallet_id: WalletId,
 }
 
 #[cfg(test)]

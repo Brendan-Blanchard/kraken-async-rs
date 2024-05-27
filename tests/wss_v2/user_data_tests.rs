@@ -4,7 +4,8 @@ use kraken_async_rs::response_types::{BuySell, OrderStatusV2, OrderType};
 use kraken_async_rs::wss::v2::base_messages::{ChannelMessage, Response, WssMessage};
 use kraken_async_rs::wss::v2::trading_messages::PriceType;
 use kraken_async_rs::wss::v2::user_data_messages::{
-    ExecutionResult, ExecutionType, Fee, FeeCurrencyPreference, MakerTaker,
+    Balance, BalanceResponse, ExecutionResult, ExecutionType, Fee, FeeCurrencyPreference,
+    LedgerCategory, LedgerEntryTypeV2, LedgerUpdate, MakerTaker, WalletId, WalletType,
 };
 use rust_decimal_macros::dec;
 
@@ -370,6 +371,150 @@ async fn test_execution_order_update_new() {
     ParseIncomingTest::new()
         .with_incoming(new)
         .expect_message(expected_update_new)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_balances_snapshot() {
+    let balances_snapshot = r#"{
+        "channel":"balances",
+        "type":"snapshot",
+        "data":[
+            {"asset":"BRICK","asset_class":"currency","balance":439.9736},
+            {"asset":"KAR","asset_class":"currency","balance":774.6366982600},
+            {"asset":"KEEP","asset_class":"currency","balance":622.3962481300},
+            {"asset":"MULTI","asset_class":"currency","balance":5.5971035500},
+            {"asset":"USD","asset_class":"currency","balance":160.2405}
+        ],
+        "sequence":1
+    }
+    "#
+    .to_string();
+
+    let expected_snapshot = WssMessage::Channel(ChannelMessage::Balance(Response {
+        data: BalanceResponse::Snapshot(vec![
+            Balance {
+                asset: "BRICK".to_string(),
+                balance: dec!(439.9736),
+                wallets: None,
+            },
+            Balance {
+                asset: "KAR".to_string(),
+                balance: dec!(774.6366982600),
+                wallets: None,
+            },
+            Balance {
+                asset: "KEEP".to_string(),
+                balance: dec!(622.3962481300),
+                wallets: None,
+            },
+            Balance {
+                asset: "MULTI".to_string(),
+                balance: dec!(5.5971035500),
+                wallets: None,
+            },
+            Balance {
+                asset: "USD".to_string(),
+                balance: dec!(160.2405),
+                wallets: None,
+            },
+        ]),
+        sequence: 1,
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(balances_snapshot)
+        .expect_message(expected_snapshot)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_balances_updates() {
+    let usd_update = r#"{
+        "channel":"balances",
+        "type":"update",
+        "data":[{
+            "ledger_id":"DATKX6-PEHL1-HZKND8",
+            "ref_id":"LKAKN2-N0N12-VKQNLN",
+            "timestamp":"2024-05-24T14:01:53.526524Z",
+            "type":"trade",
+            "asset":"USD",
+            "asset_class":"currency",
+            "category":"trade",
+            "wallet_type":"spot",
+            "wallet_id":"main",
+            "amount":-19.9743,
+            "fee":0.0499,
+            "balance":118.0677
+        }],
+        "sequence":4
+    }"#
+    .to_string();
+
+    let expected_usd_update = WssMessage::Channel(ChannelMessage::Balance(Response {
+        data: BalanceResponse::Update(vec![LedgerUpdate {
+            asset: "USD".to_string(),
+            amount: dec!(-19.9743),
+            balance: dec!(118.0677),
+            fee: dec!(0.0499),
+            ledger_id: "DATKX6-PEHL1-HZKND8".to_string(),
+            ref_id: "LKAKN2-N0N12-VKQNLN".to_string(),
+            timestamp: "2024-05-24T14:01:53.526524Z".to_string(),
+            ledger_type: LedgerEntryTypeV2::Trade,
+            sub_type: None,
+            category: LedgerCategory::Trade,
+            wallet_type: WalletType::Spot,
+            wallet_id: WalletId::Main,
+        }]),
+        sequence: 4,
+    }));
+
+    let base_update = r#"{
+        "channel":"balances",
+        "type":"update",
+        "data":[{
+            "ledger_id":"9K6IR4-X9PQJ-OMBG73",
+            "ref_id":"WLINKJ-1TZZW-M3HCOY",
+            "timestamp":"2024-05-12T12:11:57.525134Z",
+            "type":"trade",
+            "asset":"ADX",
+            "asset_class":"currency",
+            "category":"trade",
+            "wallet_type":"spot",
+            "wallet_id":"main",
+            "amount":111.0857412800,
+            "fee":0.0000000000,
+            "balance":147.1906006900
+        }],
+        "sequence":5
+    }"#
+    .to_string();
+
+    let expected_base_update = WssMessage::Channel(ChannelMessage::Balance(Response {
+        data: BalanceResponse::Update(vec![LedgerUpdate {
+            asset: "ADX".to_string(),
+            amount: dec!(111.0857412800),
+            balance: dec!(147.1906006900),
+            fee: dec!(0.0),
+            ledger_id: "9K6IR4-X9PQJ-OMBG73".to_string(),
+            ref_id: "WLINKJ-1TZZW-M3HCOY".to_string(),
+            timestamp: "2024-05-12T12:11:57.525134Z".to_string(),
+            ledger_type: LedgerEntryTypeV2::Trade,
+            sub_type: None,
+            category: LedgerCategory::Trade,
+            wallet_type: WalletType::Spot,
+            wallet_id: WalletId::Main,
+        }]),
+        sequence: 5,
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(usd_update)
+        .expect_message(expected_usd_update)
+        .with_incoming(base_update)
+        .expect_message(expected_base_update)
         .test()
         .await;
 }
