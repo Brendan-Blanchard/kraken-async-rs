@@ -4,9 +4,7 @@ use crate::wss::v2::trading_messages::{
     AddOrderResult, BatchCancelResponse, CancelAllOrdersResult, CancelOnDisconnectResult,
     CancelOrderResult, EditOrderResult,
 };
-use crate::wss::v2::user_data_messages::{
-    Balance, BalanceResponse, ExecutionResult, SubscriptionResult,
-};
+use crate::wss::v2::user_data_messages::{BalanceResponse, ExecutionResult, SubscriptionResult};
 use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_json::Value::Null;
 use std::collections::VecDeque;
@@ -59,7 +57,7 @@ pub enum ChannelMessage {
     #[serde(rename = "trade")]
     Trade(Response<Vec<Trade>>),
     #[serde(rename = "ticker")]
-    Ticker(SingleResponse<Vec<Ticker>>),
+    Ticker(SingleResponse<Ticker>),
     #[serde(rename = "ohlc")]
     Ohlc(Response<Vec<Ohlc>>),
     #[serde(rename = "instrument")]

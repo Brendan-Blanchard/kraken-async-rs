@@ -1,5 +1,5 @@
 use crate::request_types::{TimeInForce, TriggerType};
-use crate::response_types::{BuySell, LedgerEntryType, OrderStatusV2, OrderType, PositionStatusV2};
+use crate::response_types::{BuySell, OrderStatusV2, OrderType, PositionStatusV2};
 use crate::wss::v2::market_data_messages::{
     BookSubscriptionResponse, OhlcSubscriptionResponse, TickerSubscriptionResponse,
     TradeSubscriptionResponse,

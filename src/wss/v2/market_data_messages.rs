@@ -73,9 +73,11 @@ impl TickerSubscription {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Ticker {
     pub ask: Decimal,
-    pub ask_qty: Decimal,
+    #[serde(rename = "ask_qty")]
+    pub ask_quantity: Decimal,
     pub bid: Decimal,
-    pub bid_qty: Decimal,
+    #[serde(rename = "bid_qty")]
+    pub bid_quantity: Decimal,
     pub change: Decimal,
     pub change_pct: Decimal,
     pub high: Decimal,
