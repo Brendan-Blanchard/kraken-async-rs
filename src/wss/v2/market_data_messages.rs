@@ -264,7 +264,7 @@ pub struct Ohlc {
     pub low: Decimal,
     pub close: Decimal,
     pub vwap: Decimal,
-    pub trades: Decimal,
+    pub trades: i64,
     pub volume: Decimal,
     pub interval_begin: String,
     pub interval: i32,

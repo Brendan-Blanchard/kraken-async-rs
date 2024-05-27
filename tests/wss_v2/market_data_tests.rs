@@ -1,8 +1,10 @@
 use crate::wss_v2::shared::ParseIncomingTest;
-use kraken_async_rs::wss::v2::base_messages::{ChannelMessage, SingleResponse, WssMessage};
+use kraken_async_rs::wss::v2::base_messages::{
+    ChannelMessage, MarketDataResponse, SingleResponse, WssMessage,
+};
 use kraken_async_rs::wss::v2::market_data_messages::{
-    BidAsk, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate, Orderbook, OrderbookEvent,
-    OrderbookUpdate, Ticker, L2, L3,
+    BidAsk, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate, Ohlc, Orderbook,
+    OrderbookEvent, OrderbookUpdate, Ticker, L2, L3,
 };
 use rust_decimal_macros::dec;
 
@@ -368,6 +370,55 @@ async fn test_l3_update() {
     ParseIncomingTest::new()
         .with_incoming(l3_update)
         .expect_message(expected_update)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_candles_snapshot() {
+    let candles_snapshot = r#"{
+        "channel":"ohlc",
+        "type":"snapshot",
+        "timestamp":"2024-05-17T11:21:16.318303322Z",
+        "data":[
+            {"symbol":"ETH/USD","open":3027.80,"high":3027.80,"low":3026.13,"close":3026.13,"trades":9,"volume":13.31603062,"vwap":3027.01,"interval_begin":"2024-05-17T11:12:00.000000000Z","interval":1,"timestamp":"2024-05-17T11:13:00.000000Z"},
+            {"symbol":"ETH/USD","open":3026.46,"high":3026.47,"low":3026.46,"close":3026.47,"trades":4,"volume":2.14044498,"vwap":3026.46,"interval_begin":"2024-05-17T11:13:00.000000000Z","interval":1,"timestamp":"2024-05-17T11:14:00.000000Z"}
+        ]
+    }"#
+    .to_string();
+
+    let expected_snapshot = WssMessage::Channel(ChannelMessage::Ohlc(MarketDataResponse {
+        data: vec![
+            Ohlc {
+                symbol: "ETH/USD".to_string(),
+                open: dec!(3027.80),
+                high: dec!(3027.80),
+                low: dec!(3026.13),
+                close: dec!(3026.13),
+                vwap: dec!(3027.01),
+                trades: 9,
+                volume: dec!(13.31603062),
+                interval_begin: "2024-05-17T11:12:00.000000000Z".to_string(),
+                interval: 1,
+            },
+            Ohlc {
+                symbol: "ETH/USD".to_string(),
+                open: dec!(3026.46),
+                high: dec!(3026.47),
+                low: dec!(3026.46),
+                close: dec!(3026.47),
+                vwap: dec!(3026.46),
+                trades: 4,
+                volume: dec!(2.14044498),
+                interval_begin: "2024-05-17T11:13:00.000000000Z".to_string(),
+                interval: 1,
+            },
+        ],
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(candles_snapshot)
+        .expect_message(expected_snapshot)
         .test()
         .await;
 }

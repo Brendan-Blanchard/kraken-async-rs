@@ -55,13 +55,13 @@ pub enum ChannelMessage {
     #[serde(rename = "balances")]
     Balance(Response<BalanceResponse>),
     #[serde(rename = "trade")]
-    Trade(Response<Vec<Trade>>),
+    Trade(MarketDataResponse<Vec<Trade>>),
     #[serde(rename = "ticker")]
     Ticker(SingleResponse<Ticker>),
     #[serde(rename = "ohlc")]
-    Ohlc(Response<Vec<Ohlc>>),
+    Ohlc(MarketDataResponse<Vec<Ohlc>>),
     #[serde(rename = "instrument")]
-    Instrument(Response<Instruments>),
+    Instrument(MarketDataResponse<Instruments>),
     #[serde(rename = "book")]
     Orderbook(SingleResponse<L2>),
     #[serde(rename = "level3")]
@@ -107,6 +107,11 @@ pub struct Pong {
 pub struct Response<T> {
     pub data: T,
     pub sequence: i64,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct MarketDataResponse<T> {
+    pub data: T,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
