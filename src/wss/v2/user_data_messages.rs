@@ -4,7 +4,7 @@ use crate::wss::v2::market_data_messages::{
     BookSubscriptionResponse, OhlcSubscriptionResponse, TickerSubscriptionResponse,
     TradeSubscriptionResponse,
 };
-use crate::wss::v2::trading_messages::{ConditionalParams, PriceType};
+use crate::wss::v2::trading_messages::{ConditionalParams, FeePreference, PriceType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -22,16 +22,6 @@ pub enum MakerTaker {
     Maker,
     #[serde(rename = "t")]
     Taker,
-}
-
-// TODO: From/Into or a shared Ser/De impl for both FeeCurrencyPreference and FeePreference
-
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
-pub enum FeeCurrencyPreference {
-    #[serde(rename = "fcib")]
-    Base,
-    #[serde(rename = "fciq")]
-    Quote,
 }
 
 /// Type of ledger entry in user's ledger
@@ -247,7 +237,7 @@ pub struct ExecutionResult {
     pub effective_time: Option<String>,
     pub expire_time: Option<String>,
     #[serde(rename = "fee_ccy_pref")]
-    pub fee_preference: Option<FeeCurrencyPreference>,
+    pub fee_preference: Option<FeePreference>,
     #[serde(rename = "fee_usd_equiv")]
     pub fee_usd_equivalent: Option<Decimal>,
     pub limit_price: Option<Decimal>,

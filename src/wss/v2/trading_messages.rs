@@ -14,7 +14,9 @@ pub enum AddOrderStatus {
 #[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum FeePreference {
+    #[serde(rename(deserialize = "fcib"))]
     Base,
+    #[serde(rename(deserialize = "fciq"))]
     Quote,
 }
 

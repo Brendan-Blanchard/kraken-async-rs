@@ -150,7 +150,7 @@ async fn main() {
 Requests that have more than 1 or 2 parameters are generally given a struct, rather than having methods with many
 parameters. The `builder` implementation enforces required parameter by using
 the [simple-builder](https://crates.io/crates/simple-builder) package that marks
-fields are required, ensuring they must be provided in the `.builder()` call. Any optional parameters can be added using
+fields as required, ensuring they must be provided in the `.builder()` call. Any optional parameters can be added using
 a fluent API.
 
 For example, the Depth (orderbook) endpoint requires a pair, but can optionally take a `count` parameter for the number
@@ -166,13 +166,14 @@ let request = OrderbookRequest::builder("ETHUSD".to_string())
 
 A best-effort was made to adhere to the format of Kraken's responses, except for cases where it poses some pretty
 severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are
-parsed
-to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64`
-and `f64`
-timestamps remaining as such. The goal was to provide a great base library for others to build from, without limiting
-downstream uses by parsing everything and reducing overall performance. If you're developing general-purpose trading
-algorithms, you should be writing them over a common abstraction that can do this parsing anyway. If you disagree or
-have parsing, formatting, or any other issues or blocked use cases, please reach out with a clear example of your issue!
+parsed to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64`
+`String`/RFC3339, and `f64` timestamps remaining as such. The goal was to provide a great base library for others to
+build
+from, without limiting downstream uses by parsing everything and reducing overall performance. If you're developing
+general-purpose trading algorithms, you should be writing them over a common abstraction that can do this parsing
+anyway.
+If you disagree or have parsing, formatting, or any other issues or blocked use cases, please reach out with a clear
+example of your issue!
 
 ### Misc Details
 

@@ -1,5 +1,5 @@
 use crate::response_types::SystemStatus;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::Number;
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -9,24 +9,6 @@ pub struct StatusUpdate {
     pub connection_id: Number,
     pub system: SystemStatus,
     pub version: String,
-}
-
-#[derive(Debug, Deserialize, PartialEq, Eq)]
-#[serde(deny_unknown_fields)]
-pub struct Heartbeat {
-    pub channel: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct Ping {
-    pub method: String,
-    pub req_id: Option<i64>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct Pong {
-    pub warning: Vec<String>,
 }
 
 #[cfg(test)]

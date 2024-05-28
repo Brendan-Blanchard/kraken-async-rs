@@ -2,10 +2,10 @@ use crate::wss_v2::shared::ParseIncomingTest;
 use kraken_async_rs::request_types::TimeInForce;
 use kraken_async_rs::response_types::{BuySell, OrderStatusV2, OrderType};
 use kraken_async_rs::wss::v2::base_messages::{ChannelMessage, Response, WssMessage};
-use kraken_async_rs::wss::v2::trading_messages::PriceType;
+use kraken_async_rs::wss::v2::trading_messages::{FeePreference, PriceType};
 use kraken_async_rs::wss::v2::user_data_messages::{
-    Balance, BalanceResponse, ExecutionResult, ExecutionType, Fee, FeeCurrencyPreference,
-    LedgerCategory, LedgerEntryTypeV2, LedgerUpdate, MakerTaker, WalletId, WalletType,
+    Balance, BalanceResponse, ExecutionResult, ExecutionType, Fee, LedgerCategory,
+    LedgerEntryTypeV2, LedgerUpdate, MakerTaker, WalletId, WalletType,
 };
 use rust_decimal_macros::dec;
 
@@ -288,7 +288,7 @@ async fn test_execution_order_update_pending() {
             display_quantity: None,
             effective_time: None,
             expire_time: None,
-            fee_preference: Some(FeeCurrencyPreference::Quote),
+            fee_preference: Some(FeePreference::Quote),
             fee_usd_equivalent: Some(dec!(0.0)),
             limit_price: Some(dec!(0.18328)),
             limit_price_type: Some(PriceType::Static),
