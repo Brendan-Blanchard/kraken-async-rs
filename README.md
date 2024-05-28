@@ -2,7 +2,7 @@
 
 ![badge](https://github.com/Brendan-Blanchard/kraken-async-rs/actions/workflows/main.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs/graph/badge.svg?token=30Y7BIDSNK)](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs)
 
-A complete[^4] wrapper of the Kraken Pro trading API (v1 and v2 websockets), written in asynchronous Rust.
+A complete[^3] wrapper of the Kraken Pro trading API (v1 and v2 websockets), written in asynchronous Rust.
 
 It's not expected that you'll be able to use Kraken-Async-Rs without consulting
 the [Kraken API](https://docs.kraken.com/rest/#section/General-Usage)
@@ -12,7 +12,7 @@ documentation. Going forward, you should reference the new API docs:
 [Kraken Websockets V1](https://docs.kraken.com/api/docs/websocket-v1/addorder),
 and [Kraken Websockets V2](https://docs.kraken.com/api/docs/websocket-v2/add_order).
 
-There are many details and interdependencies[^2] to each request that are not documented or enforced in
+There are many details and interdependencies[^1] to each request that are not documented or enforced in
 the library since they're outside this library's control and subject to change.
 
 ### Example: Calling a Public Endpoint
@@ -114,7 +114,8 @@ async fn main() {
 
 ### Example: Listening to Websockets (V1 - Deprecated)
 
-_Kraken released a V2 version of their APIs with simplified data types, and more standardized documentation.
+_Kraken released a V2 version of their APIs with simplified data types, new functionality, and more standardized
+documentation.
 You should use the V2 API instead if at all possible, since the V1 endpoints will be maintained but not improved._
 
 Public websockets require no authentication, so it's as easy as creating a `KrakenWSSClient`, connecting, and sending
@@ -170,10 +171,12 @@ let request = OrderbookRequest::builder("ETHUSD".to_string())
 ### Response Details
 
 A best-effort was made to adhere to the format of Kraken's responses, except for cases where it poses some pretty
-severe usability limitations[^1]. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are
-parsed to rust_decimal::Decimal, and many enums are used where the values are clearly documented. The majority of `i64`
+severe usability limitations. Deserialization uses `serde`, and leaves most datatypes as-is, except Strings are
+parsed to `rust_decimal::Decimal`, and many enums are used where the values are clearly documented. The majority
+of `i64`
 `String`/RFC3339, and `f64` timestamps remain as such. The goal was to provide a great base library for others to
-build from, without limiting downstream uses by parsing everything and reducing overall performance. If you're developing
+build from, without limiting downstream uses by parsing everything and reducing overall performance. If you're
+developing
 general-purpose trading algorithms, you should be writing them over a common abstraction that can do this parsing
 anyway.
 
@@ -183,28 +186,18 @@ example of your issue!
 ### Misc Details
 
 - Parameters and response values are often renamed from the Kraken API fields to adhere to Rust's naming conventions or
-  improve readability[^3]
-
-### Stability and Versioning
-
-I've released the initial version as 0.0.1 because I'm quite confident any initial revisions will be breaking changes.
-Version 0.0.2 releases many fixes and required breaking changes. It's been left as 0.0.2 since v0.1.0 will include the
-Kraken V2 Websockets API, which will have breaking changes to existing enums.
+  improve readability[^2]
 
 ### Contributions
 
 This is a large project developed in isolation, and I undoubtedly missed things despite my best efforts. Please reach
 out with a clear example of any bugs, usability problems, or suggestions for improvement!
 
-[^1]: For instance, the returned OpenOrder JSON values are a JSON object where the keys are the order ids and the
-values contains the order's details, but *do not contain the order's id*. Situations like these were addressed
-case-by-case, since an `Order` object without an id field has very poor usability downstream.
-
-[^2]: An example being the AddOrder endpoint that requires a "Good-'til-Date" order to also have a specified `endtm`
+[^1]: An example being the AddOrder endpoint that requires a "Good-'til-Date" order to also have a specified `endtm`
 value. Cases like these are numerous and *not* enforced by this library.
 
-[^3]: Examples include `refid` -> `ref_id`, `endtm` -> `end_time`, `ofs` -> `order_flags` (
-or `offset`...), `vol_exec` -> `executed_volume`, and many more.
+[^2]: Examples include `refid` -> `ref_id`, `endtm` -> `end_time`, `ofs` -> `order_flags` (
+or `offset`...), `vol_exec` -> `executed_volume`, `qty` -> `quantity`, and many more.
 
-[^4]: NFT trading added some 20+ endpoints near the completion of this library's initial version. I'm considering adding
+[^3]: NFT trading added some 20+ endpoints near the completion of this library's initial version. I'm considering adding
 it, but have no use case for it. Reach out if you do, or want to contribute.
