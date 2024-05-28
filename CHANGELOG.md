@@ -2,8 +2,11 @@
 
 ### In Progress
 
-- Adding support for Kraken's V2 Websocket interface: https://docs.kraken.com/api/docs/websocket-v2/add_order
-    - see `websocket_v2` branch for progress
+### v0.1.0
+
+- Websockets V2 support - all V2 websocket endpoints are now supported
+    - Deprecated v1 `KrakenWSSClient` since Kraken will support but no longer update v1
+- Update dependencies (ws-mock -> 0.1.1)
 
 ### v0.0.2
 

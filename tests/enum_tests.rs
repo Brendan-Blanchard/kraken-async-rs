@@ -103,13 +103,15 @@ fn test_order_flag_display_and_from_str() {
 
 #[test]
 fn test_order_type_display() {
-    test_display_output(OrderType::Market, "market");
     test_display_output(OrderType::Limit, "limit");
+    test_display_output(OrderType::Market, "market");
+    test_display_output(OrderType::Iceberg, "iceberg");
     test_display_output(OrderType::StopLoss, "stop-loss");
-    test_display_output(OrderType::StopLimit, "stop-limit");
-    test_display_output(OrderType::TakeProfit, "take-profit");
     test_display_output(OrderType::StopLossLimit, "stop-loss-limit");
+    test_display_output(OrderType::TakeProfit, "take-profit");
     test_display_output(OrderType::TakeProfitLimit, "take-profit-limit");
+    test_display_output(OrderType::TrailingStop, "trailing-stop");
+    test_display_output(OrderType::TrailingStopLimit, "trailing-stop-limit");
     test_display_output(OrderType::SettlePosition, "settle-position");
 }
 

@@ -229,7 +229,8 @@ impl Display for TriggerType {
 }
 
 /// Strategy for exchange to take when handling a self-crossing order.
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum SelfTradePrevention {
     CancelNewest,
     CancelOldest,
@@ -253,6 +254,19 @@ impl Display for SelfTradePrevention {
 /// Good 'til Date (must come with an expiration time in the request)
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum TimeInForce {
+    GTC,
+    IOC,
+    GTD,
+}
+
+/// Time in Force for the given order.
+///
+/// Good 'til Cancelled
+/// Immediate or Cancel (aka Fill or Kill)
+/// Good 'til Date (must come with an expiration time in the request)
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum TimeInForceV2 {
     GTC,
     IOC,
     GTD,

@@ -147,13 +147,15 @@ pub enum MarketLimitChar {
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum OrderType {
-    Market,
     Limit,
+    Market,
+    Iceberg, // TODO: maybe not available on WSS AddOrder?
     StopLoss,
-    StopLimit,
-    TakeProfit,
     StopLossLimit,
+    TakeProfit,
     TakeProfitLimit,
+    TrailingStop,
+    TrailingStopLimit,
     SettlePosition,
 }
 
@@ -184,11 +186,13 @@ impl Display for OrderType {
             OrderType::Market => write!(f, "market"),
             OrderType::Limit => write!(f, "limit"),
             OrderType::StopLoss => write!(f, "stop-loss"),
-            OrderType::StopLimit => write!(f, "stop-limit"),
             OrderType::TakeProfit => write!(f, "take-profit"),
             OrderType::StopLossLimit => write!(f, "stop-loss-limit"),
             OrderType::TakeProfitLimit => write!(f, "take-profit-limit"),
             OrderType::SettlePosition => write!(f, "settle-position"),
+            OrderType::Iceberg => write!(f, "iceberg"),
+            OrderType::TrailingStop => write!(f, "trailing-stop"),
+            OrderType::TrailingStopLimit => write!(f, "trailing-stop-limit"),
         }
     }
 }
@@ -204,11 +208,32 @@ pub enum OrderStatus {
     Expired,
 }
 
+/// Status of an order
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum OrderStatusV2 {
+    PendingNew,
+    New,
+    PartiallyFilled,
+    Filled,
+    Canceled,
+    Expired,
+}
+
 /// Status of a position
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum PositionStatus {
     Open,
+    Closed,
+}
+
+/// Status of a position
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum PositionStatusV2 {
+    Open,
+    Closing,
     Closed,
 }
 
