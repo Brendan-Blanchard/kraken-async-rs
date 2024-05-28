@@ -10,6 +10,9 @@
 
 ### v0.0.2
 
+Using rust_decimal::Decimal instead of Strings where applicable. Bug fixes, cleanup, more enum usage, and other changes
+from using downstream and finding what drove poor patterns, etc.
+
 - Decimal conversions instead of String (settled on this due to abundance/annoyance of Decimal::try_from(&someString)?
 - Made `KrakenClient.set_user_agent` async (not required but allows Tokio mutex proxying downstream)
 - Changed `vol` and `vol_exec` to `volume` and `volume_executed` in all places
