@@ -140,7 +140,7 @@ pub struct BidAsk {
 #[serde(deny_unknown_fields)]
 pub struct Orderbook {
     pub symbol: String,
-    pub checksum: i64,
+    pub checksum: u32,
     pub bids: Vec<BidAsk>,
     pub asks: Vec<BidAsk>,
 }
@@ -148,7 +148,7 @@ pub struct Orderbook {
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct OrderbookUpdate {
     pub symbol: String,
-    pub checksum: i64,
+    pub checksum: u32,
     pub timestamp: String,
     pub bids: Vec<BidAsk>,
     pub asks: Vec<BidAsk>,
@@ -166,7 +166,7 @@ pub struct L3Orderbook {
     pub symbol: String,
     pub bids: Vec<L3BidAsk>,
     pub asks: Vec<L3BidAsk>,
-    pub checksum: i64,
+    pub checksum: u32,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -174,7 +174,7 @@ pub struct L3OrderbookUpdate {
     pub symbol: String,
     pub bids: Vec<L3BidAskUpdate>,
     pub asks: Vec<L3BidAskUpdate>,
-    pub checksum: i64,
+    pub checksum: u32,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
