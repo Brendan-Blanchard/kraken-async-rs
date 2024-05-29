@@ -265,6 +265,7 @@ pub struct ExecutionResult {
     pub triggers: Option<TriggerDescription>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Clone)]
 pub struct BalancesSubscription {
     pub channel: String,

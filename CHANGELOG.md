@@ -2,6 +2,8 @@
 
 ### In Progress
 
+- Fix `BalancesSubscription` sending null for snapshot by default (skip_serializing_none)
+
 ### v0.1.0
 
 - Websockets V2 support - all V2 websocket endpoints are now supported
