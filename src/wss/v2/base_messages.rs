@@ -67,7 +67,7 @@ pub enum ChannelMessage {
     L3(SingleResponse<L3>),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Message<T>
 where
     T: Debug,

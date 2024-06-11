@@ -51,7 +51,7 @@ pub enum PairStatus {
 
 #[serde_as]
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct TickerSubscription {
     pub channel: String,
     pub symbol: Vec<String>,
@@ -90,7 +90,7 @@ pub struct Ticker {
 
 #[serde_as]
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct BookSubscription {
     pub channel: String,
     pub symbol: Vec<String>,
@@ -199,7 +199,7 @@ pub struct L3BidAskUpdate {
 
 #[serde_as]
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct OhlcSubscription {
     pub channel: String,
     pub symbol: Vec<String>,
@@ -272,7 +272,7 @@ pub struct Ohlc {
 
 #[serde_as]
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct TradesSubscription {
     pub channel: String,
     pub symbol: Vec<String>,
@@ -304,7 +304,7 @@ pub struct Trade {
 
 #[serde_as]
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct InstrumentsSubscription {
     pub channel: String,
     pub snapshot: Option<bool>,
