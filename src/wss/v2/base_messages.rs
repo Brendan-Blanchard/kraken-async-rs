@@ -15,6 +15,7 @@ use std::fmt::Debug;
 pub enum WssMessage {
     Channel(ChannelMessage),
     Method(MethodMessage),
+    Error(ErrorResponse),
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -145,6 +146,18 @@ pub struct ResultResponse<T> {
 
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct ErrorResponse {
+    pub error: Option<String>,
+    pub method: String,
+    pub status: String,
+    pub success: bool,
+    pub req_id: i64,
+    pub time_in: String,
+    pub time_out: String,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct PongResponse {
     pub error: Option<String>,
     pub req_id: i64,
@@ -156,7 +169,9 @@ pub struct PongResponse {
 mod tests {
     use crate::response_types::SystemStatus;
     use crate::wss::v2::admin_messages::StatusUpdate;
-    use crate::wss::v2::base_messages::{ChannelMessage, SingleResponse, WssMessage};
+    use crate::wss::v2::base_messages::{
+        ChannelMessage, ErrorResponse, SingleResponse, WssMessage,
+    };
     use serde_json::Number;
     use std::str::FromStr;
 
@@ -180,6 +195,24 @@ mod tests {
     #[test]
     fn test_deserializing_l2_update() {
         let raw = r#"{"channel":"book","type":"update","data":[{"symbol":"BTC/USD","bids":[],"asks":[{"price":66732.5,"qty":5.48256063}],"checksum":2855135483,"timestamp":"2024-05-19T16:32:26.777454Z"}]}"#;
-        let parsed = serde_json::from_str::<ChannelMessage>(raw).unwrap();
+        let _parsed = serde_json::from_str::<ChannelMessage>(raw).unwrap();
+    }
+
+    #[test]
+    fn test_deserializing_error_message() {
+        let raw = r#"{"error":"ESession:Invalid session","method":"subscribe","req_id":42,"status":"error","success":false,"time_in":"2023-04-19T12:04:41.320119Z","time_out":"2023-04-19T12:04:41.980119Z"}"#;
+
+        let expected = WssMessage::Error(ErrorResponse {
+            error: Some("ESession:Invalid session".to_string()),
+            method: "subscribe".to_string(),
+            status: "error".to_string(),
+            success: false,
+            req_id: 42,
+            time_in: "2023-04-19T12:04:41.320119Z".to_string(),
+            time_out: "2023-04-19T12:04:41.980119Z".to_string(),
+        });
+
+        let parsed = serde_json::from_str::<WssMessage>(raw).unwrap();
+        assert_eq!(expected, parsed);
     }
 }

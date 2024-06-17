@@ -3,6 +3,7 @@
 ### In Progress
 
 - Fix `BalancesSubscription` sending null for snapshot by default (skip_serializing_none)
+- Fix `WSSMessage` by adding WssMessage(ErrorResponse { .. }) variant
 - Change `checksum` fields for L2 and L3 books to `u32` to match crc32fast crate impl
 - Derive Clone for `Message<T>` and all `*Subscription` types
 
