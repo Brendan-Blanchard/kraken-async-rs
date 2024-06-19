@@ -4,9 +4,7 @@ use kraken_async_rs::clients::rate_limited_kraken_client::RateLimitedKrakenClien
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::RecentTradesRequest;
 use kraken_async_rs::response_types::RecentTrade;
-use kraken_async_rs::secrets::secrets_provider::{
-    EnvSecretsProvider, SecretsProvider,
-};
+use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use time::{Duration, OffsetDateTime};
