@@ -7,7 +7,8 @@
 - Change `checksum` fields for L2 and L3 books to `u32` to match crc32fast crate impl
 - Derive Clone for `Message<T>` and all `*Subscription` types
 - Bump dependencies
-- Derive Clone for `RateLimitedKrakenClient` so clones can share the rate limiters
+- Derive `Clone` for `RateLimitedKrakenClient` so clones can share the rate limiters
+- Derive `Debug` for `CoreKrakenClient` for consistency
 
 ### v0.1.0
 

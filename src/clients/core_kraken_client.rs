@@ -83,6 +83,7 @@ struct EmptyRequest {}
 ///     }
 /// }
 /// ```
+#[derive(Debug, Clone)]
 pub struct CoreKrakenClient {
     pub api_url: String,
     secrets_provider: Box<dyn SecretsProvider>,
