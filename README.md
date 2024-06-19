@@ -25,7 +25,7 @@ the [full example](examples/live_public_endpoint_request.rs) for imports.
 #[tokio::main]
 async fn main() {
     // credentials aren't needed for public endpoints
-    let secrets_provider = Box::new(StaticSecretsProvider::new("", ""));
+    let secrets_provider: Arc<Mutex<Box<dyn SecretsProvider>>> = Box::new(Arc::new(Mutex::new(StaticSecretsProvider::new("", ""))));
     let nonce_provider: Arc<Mutex<Box<dyn NonceProvider>>> =
         Arc::new(Mutex::new(Box::new(IncreasingNonceProvider::new())));
     let mut client = CoreKrakenClient::new(secrets_provider, nonce_provider);
@@ -62,7 +62,7 @@ keys from the local env. See the [full example](examples/live_open_orders_reques
 async fn main() {
     // note that this will fail if you don't have your key and secret set to these env vars
     // eg `export KRAKEN_KEY="YOUR-API-KEY"`, ...
-    let secrets_provider = Box::new(EnvSecretsProvider::new("KRAKEN_KEY", "KRAKEN_SECRET"));
+    let secrets_provider: Arc<Mutex<Box<dyn SecretsProvider>>> = Box::new(Arc::new(Mutex::new(StaticSecretsProvider::new("", ""))));
     let nonce_provider: Arc<Mutex<Box<dyn NonceProvider>>> =
         Arc::new(Mutex::new(Box::new(IncreasingNonceProvider::new())));
     let mut client = CoreKrakenClient::new(secrets_provider, nonce_provider);

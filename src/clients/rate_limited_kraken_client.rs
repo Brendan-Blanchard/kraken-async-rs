@@ -71,7 +71,7 @@ where
     C: KrakenClient,
 {
     fn new(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     ) -> RateLimitedKrakenClient<C> {
         RateLimitedKrakenClient {
@@ -84,7 +84,7 @@ where
     }
 
     fn new_with_url(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
         url: String,
     ) -> Self {
@@ -634,7 +634,7 @@ where
 
     /// Create a new rate-limited client using the provided [SecretsProvider] and [NonceProvider]
     pub fn new_with_verification_tier(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
         verification: VerificationTier,
     ) -> Self {
@@ -649,7 +649,7 @@ where
 
     /// Create a new client, specifying the user's verification tier and the base URL.
     pub fn new_with_verification_tier_and_url(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
         url: String,
         verification: VerificationTier,
@@ -706,8 +706,10 @@ mod tests {
         let secrets_provider = StaticSecretsProvider::new("", "");
         let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
             Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
-        let client: RateLimitedKrakenClient<CoreKrakenClient> =
-            RateLimitedKrakenClient::new(Box::new(secrets_provider), nonce_provider);
+        let client: RateLimitedKrakenClient<CoreKrakenClient> = RateLimitedKrakenClient::new(
+            Box::new(Arc::new(Mutex::new(secrets_provider))),
+            nonce_provider,
+        );
 
         assert_eq!(client.core_client.api_url, KRAKEN_BASE_URL);
     }

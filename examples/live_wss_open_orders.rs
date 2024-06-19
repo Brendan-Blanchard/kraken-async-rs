@@ -1,7 +1,7 @@
 use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
-use kraken_async_rs::secrets::secrets_provider::EnvSecretsProvider;
+use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
 use kraken_async_rs::wss::kraken_wss_client::{KrakenMessageStream, KrakenWSSClient};
 use kraken_async_rs::wss::private::messages::PrivateMessage;
 use kraken_async_rs::wss::subscribe_messages::{SubscribeMessage, Subscription};
@@ -20,7 +20,10 @@ use tracing_subscriber::{fmt, Registry};
 async fn main() {
     set_up_logging("live_open_orders.log");
 
-    let secrets_provider = Box::new(EnvSecretsProvider::new("KRAKEN_KEY", "KRAKEN_SECRET"));
+    let secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>> = Box::new(Arc::new(Mutex::new(
+        EnvSecretsProvider::new("KRAKEN_KEY", "KRAKEN_SECRET"),
+    )));
+
     let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
         Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
     let mut kraken_client = CoreKrakenClient::new(secrets_provider, nonce_provider);

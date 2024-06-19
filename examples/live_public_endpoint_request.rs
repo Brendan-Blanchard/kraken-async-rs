@@ -3,7 +3,7 @@ use kraken_async_rs::clients::http_response_types::ResultErrorResponse;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::TradableAssetPairsRequest;
-use kraken_async_rs::secrets::secrets_provider::StaticSecretsProvider;
+use kraken_async_rs::secrets::secrets_provider::{SecretsProvider, StaticSecretsProvider};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -11,7 +11,8 @@ use tokio::sync::Mutex;
 #[tokio::main]
 async fn main() {
     // credentials aren't needed for public endpoints
-    let secrets_provider = Box::new(StaticSecretsProvider::new("", ""));
+    let secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>> =
+        Box::new(Arc::new(Mutex::new(StaticSecretsProvider::new("", ""))));
     let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
         Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
     let mut client = CoreKrakenClient::new(secrets_provider, nonce_provider);

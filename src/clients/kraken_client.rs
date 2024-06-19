@@ -83,7 +83,7 @@ pub mod endpoints {
 pub trait KrakenClient: Send + Sync {
     /// Creates a new instance with the given [SecretsProvider] and [NonceProvider].
     fn new(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     ) -> Self;
 
@@ -92,7 +92,7 @@ pub trait KrakenClient: Send + Sync {
     /// Useful if using a proxy, testing with a mock-server, or if the URL changes from the default
     /// used in this library.
     fn new_with_url(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
         url: String,
     ) -> Self;

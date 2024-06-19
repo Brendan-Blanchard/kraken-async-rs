@@ -58,14 +58,14 @@ impl TestClient {
 
 impl KrakenClient for TestClient {
     fn new(
-        _secrets_provider: Box<dyn SecretsProvider>,
+        _secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         _nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     ) -> Self {
         Self { current_id: 0 }
     }
 
     fn new_with_url(
-        _secrets_provider: Box<dyn SecretsProvider>,
+        _secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         _nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
         _url: String,
     ) -> Self {

@@ -5,7 +5,7 @@ use kraken_async_rs::request_types::{
     AddOrderRequest, CancelOrderRequest, EditOrderRequest, OrderRequest,
 };
 use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
-use kraken_async_rs::secrets::secrets_provider::EnvSecretsProvider;
+use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
 use rust_decimal_macros::dec;
 use std::fs::File;
 use std::sync::Arc;
@@ -22,7 +22,10 @@ async fn main() {
     set_up_logging("trading.log");
     // note that this will fail if you don't have your key and secret set to these env vars
     // eg `export KRAKEN_KEY="YOUR-API-KEY"`, ...
-    let secrets_provider = Box::new(EnvSecretsProvider::new("KRAKEN_KEY", "KRAKEN_SECRET"));
+    let secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>> = Box::new(Arc::new(Mutex::new(
+        EnvSecretsProvider::new("KRAKEN_KEY", "KRAKEN_SECRET"),
+    )));
+
     let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
         Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
 

@@ -52,14 +52,14 @@ pub struct TestClientErr {}
 
 impl KrakenClient for TestClientErr {
     fn new(
-        _secrets_provider: Box<dyn SecretsProvider>,
+        _secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         _nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     ) -> Self {
         Self {}
     }
 
     fn new_with_url(
-        _secrets_provider: Box<dyn SecretsProvider>,
+        _secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         _nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
         _url: String,
     ) -> Self {

@@ -4,7 +4,9 @@ use kraken_async_rs::clients::rate_limited_kraken_client::RateLimitedKrakenClien
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::RecentTradesRequest;
 use kraken_async_rs::response_types::RecentTrade;
-use kraken_async_rs::secrets::secrets_provider::StaticSecretsProvider;
+use kraken_async_rs::secrets::secrets_provider::{
+    EnvSecretsProvider, SecretsProvider,
+};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use time::{Duration, OffsetDateTime};
@@ -22,7 +24,10 @@ const MAX_RECENT_TRADES: i64 = 1000;
 /// of unique ids retrieved.
 #[tokio::main]
 async fn main() {
-    let secrets_provider = Box::new(StaticSecretsProvider::new("", ""));
+    let secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>> = Box::new(Arc::new(Mutex::new(
+        EnvSecretsProvider::new("KRAKEN_KEY", "KRAKEN_SECRET"),
+    )));
+
     let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
         Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
 

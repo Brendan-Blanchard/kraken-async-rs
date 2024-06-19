@@ -58,7 +58,8 @@ struct EmptyRequest {}
 /// #[tokio::main]
 /// async fn main() {
 ///     // credentials aren't needed for public endpoints
-///     let secrets_provider = Box::new(StaticSecretsProvider::new("", ""));
+///     use kraken_async_rs::secrets::secrets_provider::SecretsProvider;
+/// let secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>> = Box::new(Arc::new(Mutex::new(StaticSecretsProvider::new("", ""))));
 ///     let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
 ///         Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
 ///     let mut client = CoreKrakenClient::new(secrets_provider, nonce_provider);
@@ -86,7 +87,7 @@ struct EmptyRequest {}
 #[derive(Debug, Clone)]
 pub struct CoreKrakenClient {
     pub api_url: String,
-    secrets_provider: Box<dyn SecretsProvider>,
+    secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
     nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     http_client: Client<HttpsConnector<HttpConnector>, String>,
     user_agent: Option<String>,
@@ -94,7 +95,7 @@ pub struct CoreKrakenClient {
 
 impl KrakenClient for CoreKrakenClient {
     fn new(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     ) -> Self {
         let https = HttpsConnector::new();
@@ -110,7 +111,7 @@ impl KrakenClient for CoreKrakenClient {
     }
 
     fn new_with_url(
-        secrets_provider: Box<dyn SecretsProvider>,
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
         url: String,
     ) -> Self {
@@ -701,7 +702,7 @@ impl CoreKrakenClient {
         url: &Url,
         signature: Signature,
     ) -> Result<String, ClientError> {
-        let request = self.build_form_request(method, url, signature)?;
+        let request = self.build_form_request(method, url, signature).await?;
         self.body_from_request(request).await
     }
 
@@ -711,13 +712,14 @@ impl CoreKrakenClient {
         url: &Url,
         signature: Signature,
     ) -> Result<String, ClientError> {
+        let mut secrets_provider = self.secrets_provider.lock().await;
         let request = Self::request_builder_from_url(method, url)?
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
             .header("User-Agent", self.get_user_agent().as_str())
             .header(
                 "API-Key",
-                self.secrets_provider.get_secrets().key.expose_secret(),
+                secrets_provider.get_secrets().key.expose_secret(),
             )
             .header("API-Sign", signature.signature)
             .body(signature.body_data)?;
@@ -731,7 +733,7 @@ impl CoreKrakenClient {
         url: &Url,
         signature: Signature,
     ) -> Result<Vec<u8>, ClientError> {
-        let request = self.build_form_request(method, url, signature)?;
+        let request = self.build_form_request(method, url, signature).await?;
         let resp = self.http_client.request(request).await?;
 
         let status = resp.status();
@@ -764,19 +766,20 @@ impl CoreKrakenClient {
         }
     }
 
-    fn build_form_request(
+    async fn build_form_request(
         &mut self,
         method: Method,
         url: &Url,
         signature: Signature,
     ) -> Result<Request<String>, ClientError> {
+        let mut secrets_provider = self.secrets_provider.lock().await;
         let request = Self::request_builder_from_url(method, url)?
             .header("Accept", "application/json")
             .header("Content-Type", "application/x-www-form-urlencoded")
             .header("User-Agent", self.get_user_agent().as_str())
             .header(
                 "API-Key",
-                self.secrets_provider.get_secrets().key.expose_secret(),
+                secrets_provider.get_secrets().key.expose_secret(),
             )
             .header("API-Sign", signature.signature)
             .body(signature.body_data)?;
@@ -787,12 +790,13 @@ impl CoreKrakenClient {
     where
         R: ToQueryParams,
     {
+        let mut secrets_provider = self.secrets_provider.lock().await;
         let mut provider = self.nonce_provider.lock().await;
         let nonce = provider.get_nonce();
         let encoded_data = self.encode_form_request(nonce, request);
         generate_signature(
             nonce,
-            self.secrets_provider.get_secrets().secret.expose_secret(),
+            secrets_provider.get_secrets().secret.expose_secret(),
             endpoint,
             encoded_data,
         )
@@ -806,12 +810,13 @@ impl CoreKrakenClient {
     where
         R: Serialize,
     {
-        let mut provider = self.nonce_provider.lock().await;
-        let nonce = provider.get_nonce();
+        let mut secrets_provider = self.secrets_provider.lock().await;
+        let mut nonce_provider = self.nonce_provider.lock().await;
+        let nonce = nonce_provider.get_nonce();
         let encoded_data = self.encode_json_request(nonce, request)?;
         Ok(generate_signature(
             nonce,
-            self.secrets_provider.get_secrets().secret.expose_secret(),
+            secrets_provider.get_secrets().secret.expose_secret(),
             endpoint,
             encoded_data,
         ))

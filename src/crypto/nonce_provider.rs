@@ -1,11 +1,12 @@
 //! Trait and implementation for providing request nonces
 #[allow(unused)]
 use crate::clients::kraken_client::KrakenClient;
+use std::fmt::Debug;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// A nonce generator that should be used to populate the nonce of every request created by a
 /// [KrakenClient].
-pub trait NonceProvider: Send + Sync {
+pub trait NonceProvider: Send + Sync + Debug {
     fn get_nonce(&mut self) -> u64;
 }
 
@@ -16,6 +17,7 @@ pub trait NonceProvider: Send + Sync {
 /// within several seconds of each other. Consult the [Kraken docs] for instructions and trade-offs.
 ///
 /// [Kraken docs]: https://support.kraken.com/hc/en-us/articles/360001148023-What-is-a-nonce-window-
+#[derive(Debug, Clone, Copy)]
 pub struct IncreasingNonceProvider {
     last: u64,
 }

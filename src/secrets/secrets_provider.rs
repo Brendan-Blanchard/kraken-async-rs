@@ -2,9 +2,10 @@
 use dotenvy::dotenv;
 use secrecy::Secret;
 use std::env;
+use std::fmt::Debug;
 
 /// A struct containing the API key and secret (using [secrecy::Secret])
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Secrets {
     pub key: Secret<String>,
     pub secret: Secret<String>,
@@ -14,7 +15,7 @@ pub struct Secrets {
 ///
 /// Clients are generic over [SecretsProvider] so the client can specify how to retrieve the API
 /// key and secret at runtime.
-pub trait SecretsProvider: Send + Sync {
+pub trait SecretsProvider: Send + Sync + Debug {
     fn get_secrets(&mut self) -> Secrets;
 }
 
@@ -22,6 +23,7 @@ pub trait SecretsProvider: Send + Sync {
 ///
 /// This retrieves secrets once from the environment and caches them. If your use case requires
 /// retrieving them each time, a custom implementation may be your best choice.
+#[derive(Debug, Clone)]
 pub struct EnvSecretsProvider<'a> {
     key_name: &'a str,
     secret_name: &'a str,
@@ -74,6 +76,7 @@ impl<'a> EnvSecretsProvider<'a> {
 /// *This is not recommended for use outside of testing!* It is relatively unsafe to store the key
 /// and secret as plain text outside of secrecy, and would be downright unsafe to store the key
 /// and secret in source-code by directly creating a [StaticSecretsProvider] with `'static` strings.
+#[derive(Debug, Clone)]
 pub struct StaticSecretsProvider<'a> {
     key: &'a str,
     secret: &'a str,
