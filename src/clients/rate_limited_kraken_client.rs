@@ -39,6 +39,10 @@ use tokio::sync::Mutex;
 /// values used in this library are scaled to be 100x those of Kraken's documentation to keep them
 /// as integers using semaphore permits instead of floating-point math.
 ///
+/// [`RateLimitedKrakenClient`]s are cloneable, which results in a new client that shares the same
+/// rate limiting state. This is useful for giving many services access to a client while ensuring
+/// that all will jointly respect the rate limits of the exchange.
+///
 /// *Warning: This is not meant to be a comprehensive solution to all rate limiting, but is a best-effort
 /// attempt to match the API's specifications. In some cases cloud providers, or server implementations
 /// may inject random errors to prevent coordinated attacks or abuse. As such, this cannot anticipate
@@ -50,6 +54,7 @@ use tokio::sync::Mutex;
 /// [overview rate-limiting page]: https://docs.kraken.com/rest/#section/Rate-Limits/Matching-Engine-Rate-Limits
 /// [api rate-limiting page]: https://support.kraken.com/hc/en-us/articles/206548367-What-are-the-API-rate-limits-#3
 /// [trading rate-limiting page]: https://support.kraken.com/hc/en-us/articles/360045239571-Trading-rate-limits
+#[derive(Debug, Clone)]
 pub struct RateLimitedKrakenClient<C>
 where
     C: KrakenClient,
@@ -301,7 +306,7 @@ where
     ) -> Result<ResultErrorResponse<AddOrder>, ClientError> {
         self.trading_rate_limiter.add_order().await;
         let response = self.core_client.add_order(request).await;
-        self.notify_add_order(&response, request.user_ref);
+        self.notify_add_order(&response, request.user_ref).await;
 
         response
     }
@@ -312,7 +317,7 @@ where
     ) -> Result<ResultErrorResponse<AddOrderBatch>, ClientError> {
         self.trading_rate_limiter.add_order_batch(request).await;
         let response = self.core_client.add_order_batch(request).await;
-        self.notify_add_order_batched(&response, request);
+        self.notify_add_order_batched(&response, request).await;
 
         response
     }
@@ -323,7 +328,7 @@ where
     ) -> Result<ResultErrorResponse<OrderEdit>, ClientError> {
         self.trading_rate_limiter.edit_order(request).await;
         let response = self.core_client.edit_order(request).await;
-        self.notify_edit_order(&response, request.user_ref);
+        self.notify_edit_order(&response, request.user_ref).await;
         response
     }
 
@@ -540,7 +545,7 @@ where
 {
     /// Notify the trading rate limiter that an order was created at this time, this timestamp is
     /// used for determining the order's lifetime for edit and cancel penalties.
-    fn notify_add_order(
+    async fn notify_add_order(
         &mut self,
         order_response: &Result<ResultErrorResponse<AddOrder>, ClientError>,
         user_ref: Option<i64>,
@@ -551,18 +556,20 @@ where
         }) = order_response
         {
             for tx_id in &result.tx_id {
-                self.trading_rate_limiter.notify_add_order(
-                    tx_id.clone(),
-                    OffsetDateTime::now_utc().unix_timestamp(),
-                    user_ref,
-                )
+                self.trading_rate_limiter
+                    .notify_add_order(
+                        tx_id.clone(),
+                        OffsetDateTime::now_utc().unix_timestamp(),
+                        user_ref,
+                    )
+                    .await;
             }
         }
     }
 
     /// Notify the trading rate limiter of all orders created in this batch so it can determine
     /// order lifetimes for edit and cancel penalties.
-    fn notify_add_order_batched(
+    async fn notify_add_order_batched(
         &mut self,
         order_response: &Result<ResultErrorResponse<AddOrderBatch>, ClientError>,
         request: &AddBatchedOrderRequest,
@@ -573,18 +580,20 @@ where
         }) = order_response
         {
             for (order, request) in result.orders.iter().zip(request.orders.iter()) {
-                self.trading_rate_limiter.notify_add_order(
-                    order.tx_id.clone(),
-                    OffsetDateTime::now_utc().unix_timestamp(),
-                    request.user_ref,
-                )
+                self.trading_rate_limiter
+                    .notify_add_order(
+                        order.tx_id.clone(),
+                        OffsetDateTime::now_utc().unix_timestamp(),
+                        request.user_ref,
+                    )
+                    .await
             }
         }
     }
 
     /// Notify the trading rate limiter of the edited order, since the new order has a fresh order
     /// lifetime.
-    fn notify_edit_order(
+    async fn notify_edit_order(
         &mut self,
         order_response: &Result<ResultErrorResponse<OrderEdit>, ClientError>,
         user_ref: Option<i64>,
@@ -594,11 +603,13 @@ where
             ..
         }) = order_response
         {
-            self.trading_rate_limiter.notify_add_order(
-                result.tx_id.clone(),
-                OffsetDateTime::now_utc().unix_timestamp(),
-                user_ref,
-            )
+            self.trading_rate_limiter
+                .notify_add_order(
+                    result.tx_id.clone(),
+                    OffsetDateTime::now_utc().unix_timestamp(),
+                    user_ref,
+                )
+                .await
         }
     }
 }

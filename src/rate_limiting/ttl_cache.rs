@@ -75,6 +75,7 @@ where
 
 /// A time-to-live cache that removes values when they expire. This is used to store and look up
 /// orders, to determine how old they are for rate limiting penalties when editing or cancelling.
+#[derive(Debug)]
 pub struct TtlCache<K, T>
 where
     K: Ord + Clone,

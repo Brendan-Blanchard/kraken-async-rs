@@ -15,6 +15,7 @@ pub fn new_public_rate_limiter() -> SlidingWindowRateLimiter {
 ///
 /// This is used for several endpoints that are rate limited by IP and trading pair, so each pair
 /// is given a unique rate limiter.
+#[derive(Debug, Clone)]
 pub struct KeyedRateLimiter<K>
 where
     K: Ord,

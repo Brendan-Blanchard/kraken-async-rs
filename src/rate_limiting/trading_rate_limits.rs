@@ -12,9 +12,10 @@ use tokio::sync::Mutex;
 const ORDER_TTL_US: i128 = 300_i128 * 10_i128.pow(6);
 
 /// An implementation of the most accurate trading rate limits given by Kraken
+#[derive(Debug, Clone)]
 pub struct KrakenTradingRateLimiter {
-    ttl_ref_id_cache: TtlCache<String, i64>,
-    ttl_user_ref_cache: TtlCache<i64, i64>,
+    ttl_ref_id_cache: Arc<Mutex<TtlCache<String, i64>>>,
+    ttl_user_ref_cache: Arc<Mutex<TtlCache<i64, i64>>>,
     rate_limiter: TokenBucketRateLimiter,
 }
 
@@ -57,8 +58,9 @@ impl KrakenTradingRateLimiter {
     pub async fn edit_order(&mut self, edit_order_request: &EditOrderRequest) {
         let now_seconds = OffsetDateTime::now_utc().unix_timestamp();
         let request_id = edit_order_request.tx_id.clone();
-        let order_lifetime = self
-            .ttl_ref_id_cache
+
+        let mut cache_guard = self.ttl_ref_id_cache.lock().await;
+        let order_lifetime = cache_guard
             .get(&request_id)
             .map(|ttl_entry| now_seconds - ttl_entry.data)
             .unwrap_or(i64::MAX);
@@ -74,11 +76,13 @@ impl KrakenTradingRateLimiter {
     /// This is inclusive of penalties for orders cancelled soon after creation.
     pub async fn cancel_order_tx_id(&mut self, id: &String) {
         let now_seconds = OffsetDateTime::now_utc().unix_timestamp();
-        let order_lifetime = self
-            .ttl_ref_id_cache
+
+        let mut cache_guard = self.ttl_ref_id_cache.lock().await;
+        let order_lifetime = cache_guard
             .get(id)
             .map(|ttl_entry| now_seconds - ttl_entry.data)
             .unwrap_or(i64::MAX);
+        drop(cache_guard);
 
         self.cancel_with_penalty(order_lifetime).await;
     }
@@ -88,11 +92,13 @@ impl KrakenTradingRateLimiter {
     /// This is inclusive of penalties for orders cancelled soon after creation.
     pub async fn cancel_order_user_ref(&mut self, id: &i64) {
         let now_seconds = OffsetDateTime::now_utc().unix_timestamp();
-        let order_lifetime = self
-            .ttl_user_ref_cache
+
+        let mut cache_guard = self.ttl_user_ref_cache.lock().await;
+        let order_lifetime = cache_guard
             .get(id)
             .map(|ttl_entry| now_seconds - ttl_entry.data)
             .unwrap_or(i64::MAX);
+        drop(cache_guard);
 
         self.cancel_with_penalty(order_lifetime).await;
     }
@@ -108,13 +114,21 @@ impl KrakenTradingRateLimiter {
     ///
     /// Order lifetimes must be known in order to determine the penalties for editing or cancelling
     /// orders that were placed less than 300s ago.
-    pub fn notify_add_order(&mut self, tx_id: String, placement_time: i64, user_ref: Option<i64>) {
+    pub async fn notify_add_order(
+        &mut self,
+        tx_id: String,
+        placement_time: i64,
+        user_ref: Option<i64>,
+    ) {
         let ttl_ref_entry = TtlEntry::new(tx_id, ORDER_TTL_US, placement_time);
-        self.ttl_ref_id_cache.insert(ttl_ref_entry);
+
+        let mut cache_guard = self.ttl_ref_id_cache.lock().await;
+        cache_guard.insert(ttl_ref_entry);
 
         if let Some(user_ref) = user_ref {
             let ttl_user_ref_entry = TtlEntry::new(user_ref, ORDER_TTL_US, placement_time);
-            self.ttl_user_ref_cache.insert(ttl_user_ref_entry);
+            let mut cache_guard = self.ttl_user_ref_cache.lock().await;
+            cache_guard.insert(ttl_user_ref_entry);
         }
     }
 
