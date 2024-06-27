@@ -11,7 +11,7 @@ use tokio::net::TcpStream;
 use tokio_stream::Stream;
 use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
 use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
-use tracing::{debug, info};
+use tracing::{debug, trace};
 use url::Url;
 
 const WS_KRAKEN: &str = "wss://ws.kraken.com/v2";
@@ -146,7 +146,7 @@ where
     /// returns Poll:Ready with a message if available, otherwise Poll:Pending
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         if let Poll::Ready(Some(message)) = Pin::new(&mut self.stream).poll_next(cx)? {
-            info!("Received: {}", message.to_string());
+            trace!("Received: {}", message.to_string());
             let parsed: T = serde_json::from_str(message.to_text()?)?;
             Poll::Ready(Some(Ok(parsed)))
         } else {

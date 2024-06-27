@@ -11,6 +11,7 @@
 - Bump dependencies
 - Derive `Clone` for `RateLimitedKrakenClient` so clones can share the rate limiters
 - Derive `Debug` for `CoreKrakenClient` for consistency
+- Make incoming WSS messages trace!(...) only; reduces logs with correct settings
 
 ### v0.1.0
 
