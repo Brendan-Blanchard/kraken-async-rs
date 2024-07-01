@@ -1,6 +1,6 @@
 [package]
 name = "kraken-async-rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Brendan Blanchard"]
 description = "An async REST and WSS client for the Kraken Pro APIs"
@@ -21,9 +21,9 @@ sha2 = "0.10.8"
 tokio = { version = "1.38.0", features = ["full"] }
 dotenvy = "0.15.7"
 serde = { version = "1.0.203", features = ["derive"] }
-serde_json = { version = "1.0.117", features = [] }
+serde_json = { version = "1.0.119", features = [] }
 url = "2.5.2"
-serde_with = { version = "3.8.1", features = ["time_0_3"] }
+serde_with = { version = "3.8.2", features = ["time_0_3"] }
 serde_tuple = "0.5.0"
 tracing = "0.1.40"
 secrecy = "0.8.0"

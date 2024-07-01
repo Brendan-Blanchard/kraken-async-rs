@@ -253,7 +253,7 @@ pub struct ExecutionResult {
     pub order_type: Option<OrderType>,
     pub order_status: OrderStatusV2,
     #[serde(rename = "order_userref")]
-    pub order_user_ref: i64,
+    pub order_user_ref: Option<i64>,
     pub post_only: Option<bool>,
     pub position_status: Option<PositionStatusV2>,
     pub reduce_only: Option<bool>,
@@ -329,7 +329,7 @@ mod tests {
 
     #[test]
     fn test_deserializing_execution_trade() {
-        let message = r#"{"order_id":"O7IBL5-O2V6X-EEXY4U","order_userref":0,"exec_id":"TJE7HC-DKBTI-5BFVKE","exec_type":"trade","trade_id":365573,"symbol":"KAR/USD","side":"buy","last_qty":105.02014889,"last_price":0.121,"liquidity_ind":"t","cost":12.70744,"order_status":"filled","order_type":"limit","timestamp":"2024-05-18T05:41:33.480251Z","fee_usd_equiv":0.05083,"fees":[{"asset":"USD","qty":0.05083}]}"#;
+        let message = r#"{"order_id":"O7IBL5-O2V6X-EEXY4U","exec_id":"TJE7HC-DKBTI-5BFVKE","exec_type":"trade","trade_id":365573,"symbol":"KAR/USD","side":"buy","last_qty":105.02014889,"last_price":0.121,"liquidity_ind":"t","cost":12.70744,"order_status":"filled","order_type":"limit","timestamp":"2024-05-18T05:41:33.480251Z","fee_usd_equiv":0.05083,"fees":[{"asset":"USD","qty":0.05083}]}"#;
         let expected = ExecutionResult {
             execution_type: ExecutionType::Trade,
             cash_order_quantity: None,
@@ -361,7 +361,7 @@ mod tests {
             order_quantity: None,
             order_type: Some(OrderType::Limit),
             order_status: OrderStatusV2::Filled,
-            order_user_ref: 0,
+            order_user_ref: None,
             post_only: None,
             position_status: None,
             reduce_only: None,
@@ -408,7 +408,7 @@ mod tests {
             order_quantity: None,
             order_type: None,
             order_status: OrderStatusV2::New,
-            order_user_ref: 0,
+            order_user_ref: Some(0),
             post_only: None,
             position_status: None,
             reduce_only: None,

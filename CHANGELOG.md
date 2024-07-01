@@ -5,13 +5,14 @@
 - Change `KrakenClient` signature to require `secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,` to enable `Clone`
   on `CoreKrakenClient`
 - Fix `BalancesSubscription` sending null for snapshot by default (skip_serializing_none)
-- Fix `WSSMessage` by adding WssMessage(ErrorResponse { .. }) variant
+- Fix `WSSMessage` by adding `WssMessage(ErrorResponse { .. })` variant
 - Change `checksum` fields for L2 and L3 books to `u32` to match crc32fast crate impl
 - Derive Clone for `Message<T>` and all `*Subscription` types
-- Bump dependencies
 - Derive `Clone` for `RateLimitedKrakenClient` so clones can share the rate limiters
 - Derive `Debug` for `CoreKrakenClient` for consistency
 - Make incoming WSS messages trace!(...) only; reduces logs with correct settings
+- Make `ExecutionResult.order_user_ref` optional
+- Bump dependencies
 
 ### v0.1.0
 
