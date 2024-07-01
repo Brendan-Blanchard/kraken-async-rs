@@ -2,6 +2,8 @@
 
 ### In Progress
 
+### v0.2.0
+
 - Change `KrakenClient` signature to require `secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,` to enable `Clone`
   on `CoreKrakenClient`
 - Fix `BalancesSubscription` sending null for snapshot by default (skip_serializing_none)
