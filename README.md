@@ -183,6 +183,13 @@ anyway.
 If you disagree or have parsing, formatting, or any other issues or blocked use cases, please reach out with a clear
 example of your issue!
 
+### Security
+
+- The `secrecy` crate is used to prevent accidental logging of websocket tokens in request and response objects
+- The features `debug-inbound` and `debug-outbound` are off by default, and **will log tokens when enabled**, as they
+  log
+  incoming and outgoing messages as strings, which cannot be redacted easily
+
 ### Misc Details
 
 - Parameters and response values are often renamed from the Kraken API fields to adhere to Rust's naming conventions or

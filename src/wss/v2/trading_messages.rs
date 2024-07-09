@@ -1,3 +1,4 @@
+use crate::crypto::secrets::Token;
 use crate::request_types::{IntOrString, SelfTradePrevention, TimeInForceV2, TriggerType};
 use crate::response_types::{BuySell, OrderType};
 use rust_decimal::serde::{float, float_option};
@@ -84,7 +85,7 @@ pub struct AddOrderParams {
     #[serde(rename = "cash_order_qty")]
     pub cash_order_quantity: Option<Decimal>,
     pub validate: Option<bool>,
-    pub token: String,
+    pub token: Token,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -119,7 +120,7 @@ pub struct EditOrderParams {
     pub symbol: String,
     pub triggers: Option<TriggerParams>,
     pub validate: Option<bool>,
-    pub token: String,
+    pub token: Token,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -137,7 +138,7 @@ pub struct CancelOrderParams {
     pub client_order_id: Option<Vec<String>>,
     #[serde(rename = "order_userref")]
     pub order_user_ref: Option<Vec<i64>>,
-    pub token: String,
+    pub token: Token,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -148,7 +149,7 @@ pub struct CancelOrderResult {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CancelAllOrdersParams {
-    pub token: String,
+    pub token: Token,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -160,7 +161,7 @@ pub struct CancelAllOrdersResult {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CancelOnDisconnectParams {
     pub timeout: i64,
-    pub token: String,
+    pub token: Token,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -211,14 +212,14 @@ pub struct BatchOrderParams {
     pub deadline: Option<String>,
     pub symbol: String,
     pub validate: Option<bool>,
-    pub token: String,
+    pub token: Token,
     pub orders: Vec<BatchOrder>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct BatchCancelParams {
     pub orders: Vec<IntOrString>,
-    pub token: String,
+    pub token: Token,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

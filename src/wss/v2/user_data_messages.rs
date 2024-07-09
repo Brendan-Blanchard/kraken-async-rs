@@ -1,3 +1,4 @@
+use crate::crypto::secrets::Token;
 use crate::request_types::{TimeInForce, TriggerType};
 use crate::response_types::{BuySell, OrderStatusV2, OrderType, PositionStatusV2};
 use crate::wss::v2::market_data_messages::{
@@ -123,14 +124,14 @@ pub struct SubscriptionRequest<T> {
 #[derive(Debug, Serialize, Clone)]
 pub struct ExecutionSubscription {
     pub channel: String,
-    pub token: String,
+    pub token: Token,
     pub snapshot_trades: Option<bool>,
     pub rate_counter: Option<bool>,
     pub snapshot: Option<bool>,
 }
 
 impl ExecutionSubscription {
-    pub fn new(token: String) -> Self {
+    pub fn new(token: Token) -> Self {
         ExecutionSubscription {
             channel: "executions".to_string(),
             token,
@@ -269,12 +270,12 @@ pub struct ExecutionResult {
 #[derive(Debug, Serialize, Clone)]
 pub struct BalancesSubscription {
     pub channel: String,
-    pub token: String,
+    pub token: Token,
     pub snapshot: Option<bool>,
 }
 
 impl BalancesSubscription {
-    pub fn new(token: String) -> Self {
+    pub fn new(token: Token) -> Self {
         BalancesSubscription {
             channel: "balances".to_string(),
             token,

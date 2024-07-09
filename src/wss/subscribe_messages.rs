@@ -1,4 +1,5 @@
 //! Subscribe and unsubscribe messages for websocket channels
+use crate::crypto::secrets::Token;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::fmt::{Display, Formatter};
@@ -46,7 +47,7 @@ pub struct Subscription {
     #[serde(rename = "ratecounter")]
     pub rate_counter: Option<bool>,
     pub snapshot: Option<bool>,
-    pub token: Option<String>,
+    pub token: Option<Token>,
     pub consolidate_taker: Option<bool>,
 }
 
@@ -80,7 +81,7 @@ impl Subscription {
     /// Create a new subscription to the OwnTrades channel for a specific token.
     ///
     /// Optionally receive a snapshot of recent orders.
-    pub fn new_own_trades_subscription(token: String, snapshot: Option<bool>) -> Subscription {
+    pub fn new_own_trades_subscription(token: Token, snapshot: Option<bool>) -> Subscription {
         Subscription {
             depth: None,
             interval: None,
@@ -134,7 +135,7 @@ impl Subscription {
     /// Create a new subscription to all open orders for the user.
     ///
     /// Optionally get rate limiter updates from the server.
-    pub fn new_open_orders_subscription(token: String, rate_counter: Option<bool>) -> Subscription {
+    pub fn new_open_orders_subscription(token: Token, rate_counter: Option<bool>) -> Subscription {
         Subscription {
             depth: None,
             interval: None,
@@ -154,7 +155,7 @@ pub struct Unsubscription {
     pub depth: Option<i64>,
     pub interval: Option<i64>,
     pub name: Option<SubscriptionName>,
-    pub token: Option<String>,
+    pub token: Option<Token>,
 }
 
 /// Using a given [Subscription] message, generate the corresponding [Unsubscription] message.
@@ -253,7 +254,7 @@ pub struct SubscriptionResponse {
     #[serde(rename = "maxratecount")]
     pub max_rate_count: Option<i64>,
     pub name: Option<SubscriptionName>,
-    pub token: Option<String>,
+    pub token: Option<Token>,
 }
 
 /// Status message returned after a subscription
@@ -284,6 +285,7 @@ pub struct OneOf {
 
 #[cfg(test)]
 mod tests {
+    use crate::crypto::secrets::Token;
     use crate::wss::subscribe_messages::{Subscription, SubscriptionName};
 
     #[test]
@@ -302,9 +304,14 @@ mod tests {
 
     #[test]
     fn test_new_own_trades_subscription() {
-        let ohlc_subscription =
-            Subscription::new_own_trades_subscription("ETHUSD".to_string(), Some(true));
-        assert_eq!(Some("ETHUSD".into()), ohlc_subscription.token);
+        let ohlc_subscription = Subscription::new_own_trades_subscription(
+            Token::new("someToken".to_string()),
+            Some(true),
+        );
+        assert_eq!(
+            Some(Token::new("someToken".to_string())),
+            ohlc_subscription.token
+        );
         assert_eq!(Some(true), ohlc_subscription.snapshot);
         assert_eq!(Some(SubscriptionName::OwnTrades), ohlc_subscription.name);
     }
@@ -323,9 +330,14 @@ mod tests {
 
     #[test]
     fn test_new_open_orders_subscription() {
-        let ohlc_subscription =
-            Subscription::new_open_orders_subscription("ATOMUSD".to_string(), Some(false));
-        assert_eq!(Some("ATOMUSD".into()), ohlc_subscription.token);
+        let ohlc_subscription = Subscription::new_open_orders_subscription(
+            Token::new("someToken".to_string()),
+            Some(false),
+        );
+        assert_eq!(
+            Some(Token::new("someToken".to_string())),
+            ohlc_subscription.token
+        );
         assert_eq!(Some(false), ohlc_subscription.rate_counter);
         assert_eq!(Some(SubscriptionName::OpenOrders), ohlc_subscription.name);
     }

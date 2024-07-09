@@ -1,3 +1,4 @@
+use crate::crypto::secrets::Token;
 use crate::response_types::BuySell;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -97,7 +98,7 @@ pub struct BookSubscription {
     pub depth: Option<i32>,
     pub snapshot: Option<bool>,
     /// only needed for L3 subscription
-    pub token: Option<String>,
+    pub token: Option<Token>,
 }
 
 impl BookSubscription {
@@ -111,7 +112,7 @@ impl BookSubscription {
         }
     }
 
-    pub fn new_l3(symbol: Vec<String>, token: String) -> Self {
+    pub fn new_l3(symbol: Vec<String>, token: Token) -> Self {
         BookSubscription {
             channel: "level3".to_string(),
             symbol,

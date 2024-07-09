@@ -183,7 +183,10 @@ where
     {
         let message_json = serde_json::to_string(message)?;
 
-        debug!("Sending: {}", message_json);
+        if cfg!(feature = "debug-outbound") {
+            debug!("Sending: {}", message_json);
+        }
+
         stream
             .send(Message::Binary(message_json.as_bytes().to_vec()))
             .await?;
@@ -200,7 +203,9 @@ where
     /// returns Poll:Ready with a message if available, otherwise Poll:Pending
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         if let Poll::Ready(Some(message)) = Pin::new(&mut self.stream).poll_next(cx)? {
-            trace!("Received: {}", message.to_string());
+            if cfg!(feature = "debug-inbound") {
+                trace!("Received: {}", message.to_string());
+            }
             let parsed: T = serde_json::from_str(message.to_text()?)?;
             Poll::Ready(Some(Ok(parsed)))
         } else {

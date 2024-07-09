@@ -1,4 +1,5 @@
 //! Trading requests and responses
+use crate::crypto::secrets::Token;
 use crate::request_types::TimeInForce;
 use crate::response_types::{BuySell, OrderFlag, OrderType};
 use rust_decimal::Decimal;
@@ -18,7 +19,7 @@ pub struct AddOrderRequest {
     #[builder(required)]
     pub event: String,
     #[builder(required)]
-    pub token: String,
+    pub token: Token,
     #[builder(required)]
     #[serde(rename = "ordertype")]
     pub order_type: OrderType,
@@ -96,7 +97,7 @@ pub struct EditOrderRequest {
     #[builder(required)]
     pub event: String,
     #[builder(required)]
-    pub token: String,
+    pub token: Token,
     #[serde(rename = "orderid")]
     pub order_id: Option<String>,
     #[serde(rename = "reqid")]
@@ -139,7 +140,7 @@ pub struct CancelOrderRequest {
     #[builder(required)]
     pub event: String,
     #[builder(required)]
-    pub token: String,
+    pub token: Token,
     #[serde(rename = "txid")]
     pub tx_id: Option<Vec<String>>,
     #[serde(rename = "reqid")]
@@ -163,7 +164,7 @@ pub struct CancelOrderResponse {
 #[derive(Debug, Serialize, PartialEq)]
 pub struct CancelAllRequest {
     pub event: String,
-    pub token: String,
+    pub token: Token,
     #[serde(rename = "reqid")]
     pub req_id: Option<i64>,
 }
@@ -185,7 +186,7 @@ pub struct CancelAllResponse {
 #[derive(Debug, Serialize, PartialEq)]
 pub struct CancelAllAfterRequest {
     pub event: String,
-    pub token: String,
+    pub token: Token,
     #[serde(rename = "reqid")]
     pub req_id: Option<i64>,
     pub timeout: i64,

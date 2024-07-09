@@ -2,6 +2,10 @@
 
 ### In Progress
 
+- Add custom `Token(Secret<String>)` type for websocket tokens to avoid accidental exposure via logging etc
+    - Feature-gated logging of incoming and outgoing messages to prevent disclosure of secrets by default (
+      see `debug-inbound` and `debug-outbound` features)
+
 ### v0.2.0
 
 - Change `KrakenClient` signature to require `secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,` to enable `Clone`

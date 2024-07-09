@@ -1,4 +1,5 @@
 use crate::wss_v2::shared::CallResponseTest;
+use kraken_async_rs::crypto::secrets::Token;
 use kraken_async_rs::request_types::TimeInForceV2;
 use kraken_async_rs::response_types::{BuySell, OrderType};
 use kraken_async_rs::wss::v2::base_messages::MethodMessage::{AddOrder, CancelOrder, EditOrder};
@@ -52,7 +53,7 @@ async fn test_add_order() {
         stp_type: None,
         cash_order_quantity: None,
         validate: None,
-        token: "aToken".to_string(),
+        token: Token::new("aToken".to_string()),
     };
 
     let message = Message {
@@ -101,7 +102,7 @@ async fn test_edit_order() {
         fee_preference: None,
         no_market_price_protection: None,
         validate: None,
-        token: "someToken".to_string(),
+        token: Token::new("someToken".to_string()),
         order_id: "K1FF7H-A13AR-Q1S9Z6".to_string(),
     };
 
@@ -141,7 +142,7 @@ async fn test_cancel_order() {
         order_id: Some(vec!["1V7PZA-L5RIM-RX2G6B".into()]),
         client_order_id: None,
         order_user_ref: None,
-        token: "thatToken".to_string(),
+        token: Token::new("thatToken".to_string()),
     };
 
     let message = Message {
@@ -177,7 +178,7 @@ async fn test_cancel_all_orders() {
     }));
 
     let cancel_all = CancelAllOrdersParams {
-        token: "thisToken".to_string(),
+        token: Token::new("thisToken".to_string()),
     };
 
     let message = Message {
@@ -215,7 +216,7 @@ async fn test_cancel_on_disconnect() {
 
     let cancel_on_disconnect = CancelOnDisconnectParams {
         timeout: 5,
-        token: "yourToken".to_string(),
+        token: Token::new("yourToken".to_string()),
     };
 
     let message = Message {
@@ -261,7 +262,7 @@ async fn test_batch_add() {
     let batch_add = BatchOrderParams {
         deadline: None,
         symbol: "USDC/USD".to_string(),
-        token: "myToken".to_string(),
+        token: Token::new("myToken".to_string()),
         validate: None,
         orders: vec![
             BatchOrder {
@@ -340,7 +341,7 @@ async fn test_batch_cancel() {
 
     let batch_cancel = BatchCancelParams {
         orders: vec!["IY8YF6-Y6LCR-AMZD7P".into(), "XR6VND-GLY6K-DL33TB".into()],
-        token: "theirToken".to_string(),
+        token: Token::new("theirToken".to_string()),
     };
 
     let message = Message {

@@ -1,15 +1,17 @@
 //! REST response types
 use crate::clients::errors::ClientError;
+use crate::crypto::secrets::Token;
 use crate::request_types::TriggerType;
 use rust_decimal::Decimal;
-use serde::{Deserialize, Serialize};
+use secrecy::ExposeSecret;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_this_or_that::as_i64;
 use serde_tuple::Deserialize_tuple;
 use serde_with::formats::CommaSeparator;
 use serde_with::StringWithSeparator;
 use serde_with::{serde_as, DisplayFromStr};
 use std::collections::HashMap;
-use std::fmt::{Display, Formatter};
+use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
 
 /// A user's level of KYC verification with Kraken
@@ -1219,9 +1221,9 @@ pub struct EarnAmount {
 }
 
 /// Response type for GetWebSocketsToken
-#[derive(Debug, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct WebsocketToken {
-    pub token: String,
+    pub token: Token,
     pub expires: i64,
 }
 

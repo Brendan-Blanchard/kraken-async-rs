@@ -8,6 +8,7 @@ use serde_json::{json, Value};
 
 mod execution_subscription {
     use super::*;
+    use kraken_async_rs::crypto::secrets::Token;
 
     use kraken_async_rs::wss::v2::user_data_messages::{
         ExecutionSubscription, ExecutionsSubscriptionResult,
@@ -45,7 +46,7 @@ mod execution_subscription {
 
     #[tokio::test]
     async fn test_execution_subscription() {
-        let mut execution_params = ExecutionSubscription::new("someToken".into());
+        let mut execution_params = ExecutionSubscription::new(Token::new("someToken".to_string()));
         execution_params.snapshot = Some(true);
         execution_params.snapshot_trades = Some(true);
 
@@ -64,6 +65,7 @@ mod execution_subscription {
 
 mod balances_subscription {
     use super::*;
+    use kraken_async_rs::crypto::secrets::Token;
 
     use kraken_async_rs::wss::v2::user_data_messages::{
         BalanceSubscriptionResult, BalancesSubscription,
@@ -93,7 +95,7 @@ mod balances_subscription {
 
     #[tokio::test]
     async fn test_balances_subscription() {
-        let mut balances_params = BalancesSubscription::new("anotherToken".into());
+        let mut balances_params = BalancesSubscription::new(Token::new("anotherToken".to_string()));
         balances_params.snapshot = Some(true);
 
         let subscription = Message::new_subscription(balances_params, 10312008);
@@ -203,6 +205,7 @@ mod book_subscription {
 
 mod l3_subscription {
     use super::*;
+    use kraken_async_rs::crypto::secrets::Token;
     use kraken_async_rs::wss::v2::market_data_messages::{
         BookSubscription, BookSubscriptionResponse,
     };
@@ -234,7 +237,7 @@ mod l3_subscription {
     #[tokio::test]
     async fn test_l3_subscription() {
         let mut book_params =
-            BookSubscription::new_l3(vec!["BTC/USD".into()], "someToken".to_string());
+            BookSubscription::new_l3(vec!["BTC/USD".into()], Token::new("someToken".to_string()));
         book_params.snapshot = Some(true);
 
         let subscription = Message::new_subscription(book_params, 99);

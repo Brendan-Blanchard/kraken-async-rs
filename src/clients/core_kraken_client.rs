@@ -761,7 +761,10 @@ impl CoreKrakenClient {
         if !status.is_success() {
             Err(ClientError::HttpStatus(text))
         } else {
-            debug!("Received: {}", text);
+            if cfg!(feature = "debug-inbound") {
+                debug!("Received: {}", text);
+            }
+
             Ok(text)
         }
     }

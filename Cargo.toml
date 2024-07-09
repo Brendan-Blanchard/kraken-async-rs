@@ -26,7 +26,7 @@ url = "2.5.2"
 serde_with = { version = "3.8.2", features = ["time_0_3"] }
 serde_tuple = "0.5.0"
 tracing = "0.1.40"
-secrecy = "0.8.0"
+secrecy = { version = "0.8.0", features = ["default", "serde"] }
 async-rate-limit = "0.1.0"
 simple-builder = "0.0.2"
 to-query-params = "0.0.4"
@@ -42,3 +42,8 @@ rust_decimal_macros = "1.34.2"
 wiremock = "0.6.0"
 tracing-subscriber = "0.3.18"
 ws-mock = "0.1.1"
+
+[features]
+default = []
+debug-inbound = []
+debug-outbound = []
