@@ -5,6 +5,7 @@
 - Add custom `Token(Secret<String>)` type for websocket tokens to avoid accidental exposure via logging etc
     - Feature-gated logging of incoming and outgoing messages to prevent disclosure of secrets by default (
       see `debug-inbound` and `debug-outbound` features)
+- Add `Clone` to remaining response types, add Copy where sensible
 
 ### v0.2.0
 

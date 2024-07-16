@@ -357,7 +357,7 @@ pub enum AccountTransferStatus {
 }
 
 /// Wrapper type for loose typing of allocation/earn fees
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone, Copy)]
 #[serde(untagged)]
 pub enum EarnFee {
     Decimal(Decimal),
@@ -366,7 +366,7 @@ pub enum EarnFee {
 }
 
 /// Source of yield for a given earn strategy
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum YieldSourceType {
     Staking,
@@ -375,7 +375,7 @@ pub enum YieldSourceType {
 }
 
 /// Type of compounding for a given strategy
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum AutoCompoundType {
     Enabled,
@@ -384,7 +384,7 @@ pub enum AutoCompoundType {
 }
 
 /// Type of asset lock-up for a given earn strategy
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum LockType {
     Flex,
@@ -393,7 +393,7 @@ pub enum LockType {
 }
 
 /// Kraken server time given in both unix timestamp and RFC1123
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct SystemTime {
     #[serde(rename = "unixtime")]
     pub unix_time: i64,
@@ -401,14 +401,14 @@ pub struct SystemTime {
 }
 
 /// Kraken server status, including an RFC3339 timestamp.
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct SystemStatusInfo {
     pub status: SystemStatus,
     pub timestamp: String,
 }
 
 /// Asset details (e.g. for ETH, USDC, BTC, etc)
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AssetInfo {
     #[serde(rename = "aclass")]
     pub asset_class: String,
@@ -421,14 +421,14 @@ pub struct AssetInfo {
 }
 
 /// Tiered fee description
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct FeeByVolume {
     pub volume: f64,
     pub fee: f64,
 }
 
 /// Trading pair details, including all necessary details for formatting orders
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct TradableAssetPair {
     #[serde(rename = "altname")]
     pub alt_name: String,
@@ -463,14 +463,14 @@ pub struct TradableAssetPair {
 }
 
 /// Ticker containing trade count data for the last 24 hours
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct TickerTrades {
     pub today: i64,
     pub last_24_h: i64,
 }
 
 /// Ticker helper type to serve differently typed data for the last 24 hours.
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct TickerDecimal {
     pub today: Decimal,
     pub last_24_h: Decimal,
@@ -479,7 +479,7 @@ pub struct TickerDecimal {
 /// Best bid or ask
 ///
 /// Separate type needed for varying data format from REST API.
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct RestTickerBidAsk {
     pub price: Decimal,
     pub whole_lot_volume: Decimal,
@@ -489,7 +489,7 @@ pub struct RestTickerBidAsk {
 /// Best bid or ask
 ///
 /// Separate type needed for different format from WSS API.
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct TickerBidAsk {
     pub price: Decimal,
     #[serde(deserialize_with = "as_i64")]
@@ -498,14 +498,14 @@ pub struct TickerBidAsk {
 }
 
 /// Price and volume for the most recent trade
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct LastTrade {
     pub price: Decimal,
     pub volume: Decimal,
 }
 
 /// Complete ticker information for an asset
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct RestTickerInfo {
     #[serde(rename(deserialize = "a"))]
     pub asks: TickerBidAsk,
@@ -528,7 +528,7 @@ pub struct RestTickerInfo {
 }
 
 /// Candlestick data for the given interval
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct OHLC {
     pub time: i64,
     pub open: Decimal,
@@ -543,7 +543,7 @@ pub struct OHLC {
 /// OHLC data by pair
 ///
 /// Includes `last` value for use in incremental updates
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct OhlcResponse {
     pub last: i64,
     #[serde(flatten)]
@@ -553,7 +553,7 @@ pub struct OhlcResponse {
 /// Bid or Ask
 ///
 /// Identical data for bids and asks, only context determines if it's a bid or ask.
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct BidAsk {
     pub price: Decimal,
     pub volume: Decimal,
@@ -561,7 +561,7 @@ pub struct BidAsk {
 }
 
 /// Orderbook containing some depth of bids and asks
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Orderbook {
     pub asks: Vec<BidAsk>,
     pub bids: Vec<BidAsk>,
@@ -570,7 +570,7 @@ pub struct Orderbook {
 /// A public trade
 ///
 /// The model is the same regardless of if request to be consolidated by taker
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct RecentTrade {
     pub price: Decimal,
     pub volume: Decimal,
@@ -585,7 +585,7 @@ pub struct RecentTrade {
 ///
 /// `last` parameter allows for pagination.
 #[serde_as]
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct RecentTrades {
     #[serde_as(as = "DisplayFromStr")]
     pub last: i64,
@@ -594,7 +594,7 @@ pub struct RecentTrades {
 }
 
 /// Bid-ask spread at a given time
-#[derive(Debug, Deserialize_tuple, PartialEq)]
+#[derive(Debug, Deserialize_tuple, PartialEq, Clone)]
 pub struct Spread {
     pub time: i64,
     pub bid: Decimal,
@@ -604,7 +604,7 @@ pub struct Spread {
 /// Spreads for one or many assets
 ///
 /// `last` parameter allows for incremental updates
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct RecentSpreads {
     pub last: i64,
     #[serde(flatten)]
@@ -618,7 +618,7 @@ pub type AccountBalances = HashMap<String, Decimal>;
 pub type ExtendedBalances = HashMap<String, ExtendedBalance>;
 
 /// Detailed balance data, including holds and credit (if available)
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct ExtendedBalance {
     pub balance: Decimal,
     pub hold_trade: Decimal,
@@ -627,7 +627,7 @@ pub struct ExtendedBalance {
 }
 
 /// Detailed margin balance data
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct TradeBalances {
     #[serde(rename(deserialize = "eb"))]
     pub equivalent_balance: Decimal,
@@ -652,7 +652,7 @@ pub struct TradeBalances {
 }
 
 /// Details of individual order
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct OrderDescription {
     pub pair: String,
     #[serde(rename(deserialize = "type"))]
@@ -667,14 +667,14 @@ pub struct OrderDescription {
 }
 
 /// Wrapper to map open orders by Kraken ref-id
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct OpenOrders {
     pub open: HashMap<String, Order>,
 }
 
 /// Order object for OpenOrders and QueryOrders
 #[serde_as]
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Order {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
@@ -711,7 +711,7 @@ pub struct Order {
 
 /// Order object for closed orders
 #[serde_as]
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct ClosedOrder {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
@@ -746,7 +746,7 @@ pub struct ClosedOrder {
 }
 
 /// Response type for mapping order ids to orders
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct ClosedOrders {
     pub closed: HashMap<String, ClosedOrder>,
     pub count: i64,
@@ -755,7 +755,7 @@ pub struct ClosedOrders {
 /// A private trade
 ///
 /// Includes fees paid, ledger entries, related order and position ids, etc.
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Trade {
     #[serde(rename = "ordertxid")]
     pub order_tx_id: String,
@@ -782,7 +782,7 @@ pub struct Trade {
 pub type TradesInfo = HashMap<String, Trade>;
 
 /// Response type for user's trade history
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct TradesHistory {
     pub trades: TradesInfo,
     pub count: i64,
@@ -793,7 +793,7 @@ pub type OpenPositions = HashMap<String, OpenPosition>;
 
 /// Details of an open margin position
 #[serde_as]
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct OpenPosition {
     #[serde(rename = "ordertxid")]
     pub order_tx_id: String,
@@ -824,7 +824,7 @@ pub struct OpenPosition {
 }
 
 /// Entry in the user's ledger
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct LedgerEntry {
     #[serde(rename = "refid")]
     pub ref_id: String,
@@ -844,14 +844,14 @@ pub struct LedgerEntry {
 pub type QueryLedgerInfo = HashMap<String, LedgerEntry>;
 
 /// Response type for Ledgers and QueryLedgers
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct LedgerInfo {
     pub ledger: QueryLedgerInfo,
     pub count: i64,
 }
 
 /// Description of fee tier
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Fees {
     pub fee: Decimal,
     #[serde(rename = "minfee")]
@@ -870,7 +870,7 @@ pub struct Fees {
 ///
 /// In the case of maker-taker fees, `fees` maps trading pairs to taker fees. Otherwise, it
 /// represents fees more broadly.
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct TradeVolume {
     pub currency: String,
     pub volume: Decimal,
@@ -879,13 +879,13 @@ pub struct TradeVolume {
 }
 
 /// Response type for ExportReport
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct ExportReport {
     pub id: String,
 }
 
 /// Description of an export report
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct ExportReportStatus {
     pub id: String,
     pub descr: String,
@@ -908,7 +908,7 @@ pub struct ExportReportStatus {
 }
 
 /// Response type for deleting an export report
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct DeleteExportReport {
     pub delete: Option<bool>,
     pub cancel: Option<bool>,
@@ -917,14 +917,14 @@ pub struct DeleteExportReport {
 /// English description of an added order and closing order instruction (if given)
 ///
 /// Such as "buy 5.00000000 USDCUSD @ limit 1.0000"
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AddOrderDescription {
     pub order: String,
     pub close: Option<String>,
 }
 
 /// Response type for AddOrder
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AddOrder {
     #[serde(rename = "txid")]
     pub tx_id: Vec<String>,
@@ -933,7 +933,7 @@ pub struct AddOrder {
 }
 
 /// Description of an added batch order, including potential error value.
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct BatchedOrder {
     #[serde(rename = "txid")]
     pub tx_id: String,
@@ -942,13 +942,13 @@ pub struct BatchedOrder {
 }
 
 /// Response type for AddOrderBatch
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AddOrderBatch {
     pub orders: Vec<BatchedOrder>,
 }
 
 /// Response type for an edited order
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct OrderEdit {
     pub status: OrderEditStatus,
     #[serde(rename = "txid")]
@@ -963,14 +963,14 @@ pub struct OrderEdit {
 }
 
 /// Response for CancelOrder
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct CancelOrder {
     pub count: i64,
     pub pending: Option<bool>,
 }
 
 /// Response for CancelAllOrdersAfter
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CancelAllOrdersAfter {
     pub current_time: String,
@@ -978,7 +978,7 @@ pub struct CancelAllOrdersAfter {
 }
 
 /// Description of a deposit method
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct DepositMethod {
     pub method: String,
@@ -990,7 +990,7 @@ pub struct DepositMethod {
 }
 
 /// Description of a withdrawal method
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct WithdrawMethod {
     pub asset: String,
     pub method: String,
@@ -999,7 +999,7 @@ pub struct WithdrawMethod {
 }
 
 /// Description of a deposit address
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct DepositAddress {
     pub address: String,
     #[serde(rename = "expiretm")]
@@ -1010,7 +1010,7 @@ pub struct DepositAddress {
 }
 
 /// Description of a withdrawal method
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct WithdrawalAddress {
     pub address: String,
     pub asset: String,
@@ -1023,7 +1023,7 @@ pub struct WithdrawalAddress {
 /// Response type for status of a deposit or withdrawal
 ///
 /// Response can either be bare (Response) or be a wrapper containing a cursor for the next page (Cursor)
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 #[serde(untagged)]
 pub enum DepositWithdrawResponse {
     Cursor(DepositWithdrawalCursor),
@@ -1031,14 +1031,14 @@ pub enum DepositWithdrawResponse {
 }
 
 /// Cursor response that wraps a deposit
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct DepositWithdrawalCursor {
     deposit: Vec<DepositWithdrawal>,
     cursor: BoolOrString,
 }
 
 /// Description of a deposit or withdrawal
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct DepositWithdrawal {
     pub method: String,
     #[serde(rename = "aclass")]
@@ -1059,7 +1059,7 @@ pub struct DepositWithdrawal {
 }
 
 /// Description of a withdrawal
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Withdrawal {
     pub method: String,
     pub limit: BoolOrString,
@@ -1068,34 +1068,34 @@ pub struct Withdrawal {
 }
 
 /// Response type containing only a ref id for confirmation
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct ConfirmationRefId {
     #[serde(rename = "refid")]
     pub ref_id: String,
 }
 
 /// Response type for a transfer to a linked Futures account
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AccountTransfer {
     pub transfer_id: String,
     pub status: AccountTransferStatus,
 }
 
 /// Response type for AllocateStatus
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AllocationStatus {
     pub pending: bool,
 }
 
 /// Paginated response type for /Earn/Strategies
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct EarnStrategies {
     pub items: Vec<EarnStrategy>,
     pub next_cursor: Option<String>,
 }
 
 /// Description of an individual earn strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct EarnStrategy {
     pub allocation_fee: EarnFee,
     pub allocation_restriction_info: Vec<String>,
@@ -1113,7 +1113,7 @@ pub struct EarnStrategy {
 }
 
 /// Details of how funds are locked by an earn strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct LockTypeDetail {
     #[serde(rename = "type")]
     pub lock_type: LockType,
@@ -1122,7 +1122,7 @@ pub struct LockTypeDetail {
 }
 
 /// Details of an earn strategy's commitments and rewards
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct BondingDetail {
     pub payout_frequency: Option<i64>,
     pub bonding_period: Option<i64>,
@@ -1135,14 +1135,14 @@ pub struct BondingDetail {
 }
 
 /// Bracketed estimate for a strategy's APR
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AprEstimate {
     pub low: Decimal,
     pub high: Decimal,
 }
 
 /// Wrapper type for compounding nature of a strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AutoCompound {
     #[serde(rename = "type")]
     pub auto_compound_type: AutoCompoundType,
@@ -1150,14 +1150,14 @@ pub struct AutoCompound {
 }
 
 /// Wrapper type for the origin of rewards from a strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct YieldSource {
     #[serde(rename = "type")]
     pub yield_type: YieldSourceType,
 }
 
 /// Response type for Earn/Allocations
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct EarnAllocations {
     pub converted_asset: String,
     pub items: Vec<EarnAllocation>,
@@ -1166,7 +1166,7 @@ pub struct EarnAllocations {
 }
 
 /// Description of an allocation to an earn strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct EarnAllocation {
     pub amount_allocated: AmountAllocated,
     pub native_asset: String,
@@ -1176,7 +1176,7 @@ pub struct EarnAllocation {
 }
 
 /// Details of an allocation to a particular strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AmountAllocated {
     pub bonding: Option<AllocationState>,
     pub exit_queue: Option<AllocationState>,
@@ -1186,7 +1186,7 @@ pub struct AmountAllocated {
 }
 
 /// State of a single allocation to a strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AllocationState {
     pub allocation_count: i64,
     pub allocations: Vec<Allocation>,
@@ -1195,7 +1195,7 @@ pub struct AllocationState {
 }
 
 /// Description of assets allocated to a strategy
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Allocation {
     pub created_at: String,
     pub expires: String,
@@ -1204,7 +1204,7 @@ pub struct Allocation {
 }
 
 /// Description of the payout for a particular allocation
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct Payout {
     pub period_end: String,
     pub period_start: String,
@@ -1213,7 +1213,7 @@ pub struct Payout {
 }
 
 /// Amount earned by an allocation in the requested and native assets
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone, Copy)]
 pub struct EarnAmount {
     pub converted: Decimal,
     pub native: Decimal,
