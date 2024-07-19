@@ -812,8 +812,8 @@ pub struct OpenPosition {
     #[serde(rename(deserialize = "vol_closed"))]
     pub volume_closed: Decimal,
     pub margin: Decimal,
-    pub value: Decimal,
-    pub net: Decimal,
+    pub value: Option<Decimal>,
+    pub net: Option<Decimal>,
     pub terms: String,
     #[serde(rename = "rollovertm")]
     pub rollover_time: String,
