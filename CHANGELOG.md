@@ -2,10 +2,15 @@
 
 ### In Progress
 
+- Considering package re-organization for better imports etc.
+
+### v0.3.0
+
 - Add custom `Token(Secret<String>)` type for websocket tokens to avoid accidental exposure via logging etc
-    - Feature-gated logging of incoming and outgoing messages to prevent disclosure of secrets by default (
-      see `debug-inbound` and `debug-outbound` features)
-- Add `Clone` to remaining response types, add Copy where sensible
+    - Feature-gated logging of incoming and outgoing messages to prevent disclosure of secrets by default
+      (see `debug-inbound` and `debug-outbound` features)
+- Add `Clone` to remaining response types, add `Copy` where sensible
+- Modify `OpenPosition` to have `net` and `value` be optional (return depends on query params)
 
 ### v0.2.0
 
