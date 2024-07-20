@@ -667,6 +667,30 @@ pub fn get_open_positions_json() -> Value {
         }
     })
 }
+pub fn get_open_positions_json_do_calc_optional_fields() -> Value {
+    json!({
+        "error": [ ],
+        "result": {
+            "TF5GVO-T7ZZ2-6NBKBI": {
+                "ordertxid": "OLWNFG-LLH4R-D6SFFP",
+                "posstatus": "open",
+                "pair": "XXBTZUSD",
+                "time": 1605280097.8294,
+                "type": "buy",
+                "ordertype": "limit",
+                "cost": "104610.52842",
+                "fee": "289.06565",
+                "vol": "8.82412861",
+                "vol_closed": "0.20200000",
+                "margin": "20922.10568",
+                "terms": "0.0100% per 4 hours",
+                "rollovertm": "1616672637",
+                "misc": "",
+                "oflags": ""
+            }
+        }
+    })
+}
 
 pub fn get_ledgers_info_json() -> Value {
     json!({

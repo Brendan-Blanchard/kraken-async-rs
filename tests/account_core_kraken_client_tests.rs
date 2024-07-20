@@ -5,7 +5,8 @@ mod resources;
 use crate::resources::kraken_responses::account_response_json::{
     get_account_balance_json, get_closed_orders_json, get_delete_export_report_json,
     get_export_report_response, get_export_report_status_json, get_extended_balance_json,
-    get_ledgers_info_json, get_open_orders_json, get_open_positions_json, get_query_ledgers_json,
+    get_ledgers_info_json, get_open_orders_json, get_open_positions_json,
+    get_open_positions_json_do_calc_optional_fields, get_query_ledgers_json,
     get_query_order_info_json, get_query_trades_info_json, get_request_export_report_json,
     get_trade_balance_json, get_trade_volume_json, get_trades_history_json,
 };
@@ -234,6 +235,30 @@ async fn test_get_open_positions() {
         .and(body_string_contains("docalcs=true"))
         .and(body_string_contains("consolidation=market"))
         .respond_with(ResponseTemplate::new(200).set_body_json(get_open_positions_json()))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    test_core_endpoint!(secrets_provider, mock_server, get_open_positions, &request);
+}
+
+#[tokio::test]
+async fn test_get_open_positions_do_calc_optional_fields() {
+    let secrets_provider = get_null_secrets_provider();
+    let request = OpenPositionsRequest::builder().do_calcs(false).build();
+
+    let mock_server = MockServer::start().await;
+
+    Mock::given(method(Method::POST))
+        .and(path("/0/private/OpenPositions"))
+        .and(header_exists("User-Agent"))
+        .and(header_exists("API-Key"))
+        .and(header_exists("API-Sign"))
+        .and(body_string_contains("docalcs=false"))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(get_open_positions_json_do_calc_optional_fields()),
+        )
         .expect(1)
         .mount(&mock_server)
         .await;
