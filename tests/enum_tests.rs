@@ -158,9 +158,9 @@ fn test_trigger_type_display() {
 
 #[test]
 fn test_self_trade_prevention_display() {
-    test_display_output(SelfTradePrevention::CancelNewest, "cancel-newest");
-    test_display_output(SelfTradePrevention::CancelOldest, "cancel-oldest");
-    test_display_output(SelfTradePrevention::CancelBoth, "cancel-both");
+    test_display_output(SelfTradePrevention::CancelNewest, "cancel_newest");
+    test_display_output(SelfTradePrevention::CancelOldest, "cancel_oldest");
+    test_display_output(SelfTradePrevention::CancelBoth, "cancel_both");
 }
 
 #[test]
