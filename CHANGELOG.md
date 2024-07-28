@@ -4,6 +4,11 @@
 
 - Considering package re-organization for better imports etc.
 
+### v0.4.0
+
+- Update tokio-tungstenite to 0.23.1, several breaking changes
+- Fix serde for SelfTradePrevention to be camel_case
+
 ### v0.3.0
 
 - Add custom `Token(Secret<String>)` type for websocket tokens to avoid accidental exposure via logging etc

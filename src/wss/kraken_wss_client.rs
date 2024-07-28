@@ -108,7 +108,7 @@ impl<'a> KrakenWSSClient<'a> {
         T: for<'d> Deserialize<'d>,
     {
         let url = Url::parse(url)?;
-        let (raw_stream, _response) = connect_async(url).await?;
+        let (raw_stream, _response) = connect_async(url.as_str()).await?;
 
         Ok(KrakenMessageStream {
             stream: raw_stream,
