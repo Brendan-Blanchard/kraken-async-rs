@@ -21,7 +21,7 @@ sha2 = "0.10.8"
 tokio = { version = "1.39.2", features = ["full"] }
 dotenvy = "0.15.7"
 serde = { version = "1.0.204", features = ["derive"] }
-serde_json = { version = "1.0.120", features = [] }
+serde_json = { version = "1.0.121", features = [] }
 url = "2.5.2"
 serde_with = { version = "3.9.0", features = ["time_0_3"] }
 serde_tuple = "0.5.0"
