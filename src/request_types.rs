@@ -230,7 +230,7 @@ impl Display for TriggerType {
 
 /// Strategy for exchange to take when handling a self-crossing order.
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[serde(rename_all = "snake_case")]
 pub enum SelfTradePrevention {
     CancelNewest,
     CancelOldest,
@@ -240,9 +240,9 @@ pub enum SelfTradePrevention {
 impl Display for SelfTradePrevention {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            SelfTradePrevention::CancelNewest => write!(f, "cancel-newest"),
-            SelfTradePrevention::CancelOldest => write!(f, "cancel-oldest"),
-            SelfTradePrevention::CancelBoth => write!(f, "cancel-both"),
+            SelfTradePrevention::CancelNewest => write!(f, "cancel_newest"),
+            SelfTradePrevention::CancelOldest => write!(f, "cancel_oldest"),
+            SelfTradePrevention::CancelBoth => write!(f, "cancel_both"),
         }
     }
 }
