@@ -3,6 +3,12 @@
 ### In Progress
 
 - Considering package re-organization for better imports etc.
+- Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
+
+### v0.4.0
+
+- Update tokio-tungstenite to 0.23.1, several breaking changes
+- Fix serde and Display for SelfTradePrevention to be snake_case
 
 ### v0.3.0
 
