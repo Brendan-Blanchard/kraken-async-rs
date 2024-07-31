@@ -233,7 +233,7 @@ pub enum PositionStatus {
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum PositionStatusV2 {
-    Open,
+    Opened,
     Closing,
     Closed,
 }

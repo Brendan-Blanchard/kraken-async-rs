@@ -89,11 +89,10 @@ pub struct AddOrderParams {
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields)]
 pub struct AddOrderResult {
     pub order_id: String,
     #[serde(rename = "order_userref")]
-    pub order_user_ref: Option<String>,
+    pub order_user_ref: Option<i64>,
     pub warning: Option<Vec<String>>,
 }
 
