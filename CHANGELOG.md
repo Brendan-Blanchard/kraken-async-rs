@@ -5,6 +5,13 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
+### v0.4.1
+
+- Fix parsing of `ExecutionResult` after addition of new fields
+- Fix `PositionStatusV2::Open` -> `Opened`
+- Add cl_ord_id (client_order_id) to `AddOrderResult`, `CancelOrderResult`, `BatchOrder`, `BatchOrderParams`,
+  `BatchCancelResponse`, and `ExecutionResult`
+
 ### v0.4.0
 
 - Update tokio-tungstenite to 0.23.1, several breaking changes
