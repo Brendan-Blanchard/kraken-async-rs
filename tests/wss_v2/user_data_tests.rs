@@ -68,6 +68,7 @@ async fn test_execution_trades_snapshot() {
                 timestamp: "2024-04-16T10:54:38.243302Z".to_string(),
                 trade_id: Some(37496584),
                 triggers: None,
+                client_order_id: None,
             },
             ExecutionResult {
                 execution_type: ExecutionType::Trade,
@@ -110,6 +111,7 @@ async fn test_execution_trades_snapshot() {
                 timestamp: "2024-01-28T21:03:18.167719Z".to_string(),
                 trade_id: Some(2125408),
                 triggers: None,
+                client_order_id: None,
             },
             ExecutionResult {
                 execution_type: ExecutionType::Trade,
@@ -152,6 +154,7 @@ async fn test_execution_trades_snapshot() {
                 timestamp: "2024-01-13T12:24:42.541293Z".to_string(),
                 trade_id: Some(35272682),
                 triggers: None,
+                client_order_id: None,
             },
             ExecutionResult {
                 execution_type: ExecutionType::Trade,
@@ -194,6 +197,7 @@ async fn test_execution_trades_snapshot() {
                 timestamp: "2024-01-10T07:14:14.485774Z".to_string(),
                 trade_id: Some(112396),
                 triggers: None,
+                client_order_id: None,
             },
         ],
         sequence: 1,
@@ -252,6 +256,7 @@ async fn test_execution_order_update_cancelled() {
             timestamp: "2024-05-18T12:58:40.165132Z".to_string(),
             trade_id: None,
             triggers: None,
+            client_order_id: None,
         }],
         sequence: 143,
     }));
@@ -309,6 +314,7 @@ async fn test_execution_order_update_pending() {
             timestamp: "2024-05-18T12:01:56.165888Z".to_string(),
             trade_id: None,
             triggers: None,
+            client_order_id: None,
         }],
         sequence: 120,
     }));
@@ -364,6 +370,7 @@ async fn test_execution_order_update_new() {
             timestamp: "2024-05-18T12:58:51.121515Z".to_string(),
             trade_id: None,
             triggers: None,
+            client_order_id: None,
         }],
         sequence: 148,
     }));

@@ -66,6 +66,7 @@ async fn main() {
         cash_order_quantity: None,
         validate: None,
         token: token.clone(),
+        client_order_id: None,
     };
 
     let order_message = Message {

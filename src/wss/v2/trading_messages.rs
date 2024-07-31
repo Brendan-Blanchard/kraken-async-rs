@@ -86,15 +86,18 @@ pub struct AddOrderParams {
     pub cash_order_quantity: Option<Decimal>,
     pub validate: Option<bool>,
     pub token: Token,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
-#[serde(deny_unknown_fields)]
 pub struct AddOrderResult {
     pub order_id: String,
     #[serde(rename = "order_userref")]
-    pub order_user_ref: Option<String>,
+    pub order_user_ref: Option<i64>,
     pub warning: Option<Vec<String>>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 #[skip_serializing_none]
@@ -145,6 +148,8 @@ pub struct CancelOrderParams {
 pub struct CancelOrderResult {
     pub order_id: String,
     pub warning: Option<Vec<String>>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -204,6 +209,8 @@ pub struct BatchOrder {
     #[serde(with = "float_option")]
     #[serde(rename = "cash_order_qty")]
     pub cash_order_quantity: Option<Decimal>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 #[skip_serializing_none]
@@ -220,6 +227,8 @@ pub struct BatchOrderParams {
 pub struct BatchCancelParams {
     pub orders: Vec<IntOrString>,
     pub token: Token,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -236,4 +245,6 @@ pub struct BatchCancelResponse {
     pub req_id: i64,
     pub time_in: String,
     pub time_out: String,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<Vec<String>>,
 }
