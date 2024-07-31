@@ -264,6 +264,8 @@ pub struct ExecutionResult {
     pub timestamp: String,
     pub trade_id: Option<i64>,
     pub triggers: Option<TriggerDescription>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 #[skip_serializing_none]
@@ -372,6 +374,7 @@ mod tests {
             timestamp: "2024-05-18T05:41:33.480251Z".to_string(),
             trade_id: Some(365573),
             triggers: None,
+            client_order_id: None,
         };
         let parsed: ExecutionResult = serde_json::from_str(message).unwrap();
 
@@ -419,6 +422,7 @@ mod tests {
             timestamp: "2024-05-18T11:00:37.240691Z".to_string(),
             trade_id: None,
             triggers: None,
+            client_order_id: None,
         };
         let parsed: ExecutionResult = serde_json::from_str(message).unwrap();
 
