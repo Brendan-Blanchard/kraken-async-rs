@@ -22,6 +22,7 @@ async fn test_add_order() {
             order_id: "OPS23M-VS41G-DDE5Z2".to_string(),
             order_user_ref: None,
             warning: None,
+            client_order_id: None,
         }),
         error: None,
         success: true,
@@ -54,6 +55,7 @@ async fn test_add_order() {
         cash_order_quantity: None,
         validate: None,
         token: Token::new("aToken".to_string()),
+        client_order_id: None,
     };
 
     let message = Message {
@@ -130,6 +132,7 @@ async fn test_cancel_order() {
         result: Some(CancelOrderResult {
             order_id: "1V7PZA-L5RIM-RX2G6B".to_string(),
             warning: None,
+            client_order_id: None,
         }),
         error: None,
         success: true,
@@ -245,11 +248,14 @@ async fn test_batch_add() {
                 order_id: "JQDNTT-MZEIZ-OZKUDD".to_string(),
                 order_user_ref: None,
                 warning: None,
+                client_order_id: None,
             },
             AddOrderResult {
                 order_id: "X67GEK-3VQWM-HPNQ89".to_string(),
                 order_user_ref: None,
                 warning: None,
+
+                client_order_id: None,
             },
         ]),
         error: None,
@@ -285,6 +291,7 @@ async fn test_batch_add() {
                 no_market_price_protection: None,
                 stp_type: None,
                 cash_order_quantity: None,
+                client_order_id: None,
             },
             BatchOrder {
                 order_type: OrderType::Limit,
@@ -306,6 +313,7 @@ async fn test_batch_add() {
                 no_market_price_protection: None,
                 stp_type: None,
                 cash_order_quantity: None,
+                client_order_id: None,
             },
         ],
     };
@@ -328,7 +336,7 @@ async fn test_batch_add() {
 
 #[tokio::test]
 async fn test_batch_cancel() {
-    let expected_request = json!({"method":"batch_cancel","params":{"orders":["IY8YF6-Y6LCR-AMZD7P","XR6VND-GLY6K-DL33TB"],"token":"theirToken"},"req_id":0});
+    let expected_request = json!({"method":"batch_cancel","params":{"orders":["IY8YF6-Y6LCR-AMZD7P","XR6VND-GLY6K-DL33TB"],"token":"theirToken", "cl_ord_id": null},"req_id":0});
     let response = r#"{"method":"batch_cancel","orders_cancelled":2,"req_id":0,"success":true,"time_in":"2024-05-19T19:29:58.063754Z","time_out":"2024-05-19T19:29:58.071569Z"}"#.to_string();
     let expected_response = WssMessage::Method(MethodMessage::BatchCancel(BatchCancelResponse {
         orders_cancelled: 2,
@@ -337,11 +345,13 @@ async fn test_batch_cancel() {
         req_id: 0,
         time_in: "2024-05-19T19:29:58.063754Z".to_string(),
         time_out: "2024-05-19T19:29:58.071569Z".to_string(),
+        client_order_id: None,
     }));
 
     let batch_cancel = BatchCancelParams {
         orders: vec!["IY8YF6-Y6LCR-AMZD7P".into(), "XR6VND-GLY6K-DL33TB".into()],
         token: Token::new("theirToken".to_string()),
+        client_order_id: None,
     };
 
     let message = Message {

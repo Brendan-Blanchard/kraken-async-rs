@@ -228,7 +228,7 @@ pub struct BatchCancelParams {
     pub orders: Vec<IntOrString>,
     pub token: Token,
     #[serde(rename = "cl_ord_id")]
-    pub client_order_is: Option<Vec<String>>,
+    pub client_order_id: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -246,5 +246,5 @@ pub struct BatchCancelResponse {
     pub time_in: String,
     pub time_out: String,
     #[serde(rename = "cl_ord_id")]
-    pub client_order_is: Option<Vec<String>>,
+    pub client_order_id: Option<Vec<String>>,
 }
