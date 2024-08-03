@@ -227,7 +227,7 @@ pub struct BatchOrderParams {
 pub struct BatchCancelParams {
     pub orders: Vec<IntOrString>,
     pub token: Token,
-    #[serde(rename = "cl_ord_id")]
+    #[serde(rename = "cl_ord_id", skip_serializing_if = "Option::is_none")]
     pub client_order_id: Option<Vec<String>>,
 }
 
