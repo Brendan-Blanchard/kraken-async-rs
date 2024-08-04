@@ -90,14 +90,6 @@ where
             req_id,
         }
     }
-
-    pub fn new_ping(req_id: i64) -> Message<Option<()>> {
-        Message {
-            method: "ping".to_string(),
-            params: None,
-            req_id,
-        }
-    }
 }
 
 // this is required to not serialize None for generic type parameters
