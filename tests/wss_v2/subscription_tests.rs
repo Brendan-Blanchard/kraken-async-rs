@@ -47,8 +47,8 @@ mod execution_subscription {
     #[tokio::test]
     async fn test_execution_subscription() {
         let mut execution_params = ExecutionSubscription::new(Token::new("someToken".to_string()));
-        execution_params.snapshot = Some(true);
         execution_params.snapshot_trades = Some(true);
+        execution_params.snapshot_order = None;
 
         let subscription = Message::new_subscription(execution_params, 0);
 

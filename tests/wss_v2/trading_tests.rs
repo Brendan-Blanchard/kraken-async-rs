@@ -130,7 +130,7 @@ async fn test_cancel_order() {
     let response = r#"{"method":"cancel_order","req_id":0,"result":{"order_id":"1V7PZA-L5RIM-RX2G6B"},"success":true,"time_in":"2024-05-19T19:18:44.987402Z","time_out":"2024-05-19T19:18:44.989756Z"}"#.to_string();
     let expected_response = WssMessage::Method(CancelOrder(ResultResponse {
         result: Some(CancelOrderResult {
-            order_id: "1V7PZA-L5RIM-RX2G6B".to_string(),
+            order_id: Some("1V7PZA-L5RIM-RX2G6B".to_string()),
             warning: None,
             client_order_id: None,
         }),
