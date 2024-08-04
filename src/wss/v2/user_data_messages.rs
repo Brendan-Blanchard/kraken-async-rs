@@ -125,9 +125,11 @@ pub struct SubscriptionRequest<T> {
 pub struct ExecutionSubscription {
     pub channel: String,
     pub token: Token,
+    #[serde(rename = "snap_trades")]
     pub snapshot_trades: Option<bool>,
+    #[serde(rename = "snap_orders")]
+    pub snapshot_order: Option<bool>,
     pub rate_counter: Option<bool>,
-    pub snapshot: Option<bool>,
 }
 
 impl ExecutionSubscription {
@@ -136,8 +138,8 @@ impl ExecutionSubscription {
             channel: "executions".to_string(),
             token,
             snapshot_trades: None,
+            snapshot_order: None,
             rate_counter: None,
-            snapshot: None,
         }
     }
 }
