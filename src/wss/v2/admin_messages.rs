@@ -6,7 +6,7 @@ use serde_json::Number;
 pub struct StatusUpdate {
     pub api_version: String,
     // true type is i128, but serde does not support it: https://github.com/serde-rs/json/issues/740
-    pub connection_id: Number,
+    pub connection_id: Option<Number>,
     pub system: SystemStatus,
     pub version: String,
 }
@@ -23,7 +23,7 @@ mod tests {
         let message = r#"{"api_version":"v2","connection_id":18266300427528990701,"system":"online","version":"2.0.4"}"#;
         let expected = StatusUpdate {
             api_version: "v2".to_string(),
-            connection_id: Number::from_str("18266300427528990701").unwrap(),
+            connection_id: Some(Number::from_str("18266300427528990701").unwrap()),
             system: SystemStatus::Online,
             version: "2.0.4".to_string(),
         };

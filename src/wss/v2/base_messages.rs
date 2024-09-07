@@ -181,9 +181,26 @@ mod tests {
         let expected = WssMessage::Channel(ChannelMessage::Status(SingleResponse {
             data: StatusUpdate {
                 api_version: "v2".to_string(),
-                connection_id: Number::from_str("18266300427528990701").unwrap(),
+                connection_id: Some(Number::from_str("18266300427528990701").unwrap()),
                 system: SystemStatus::Online,
                 version: "2.0.4".to_string(),
+            },
+        }));
+
+        let parsed = serde_json::from_str::<WssMessage>(message).unwrap();
+
+        assert_eq!(expected, parsed);
+    }
+
+    #[test]
+    fn test_deserializing_maintenance_status_update() {
+        let message = r#"{"channel":"status","data":[{"api_version":"v2","system":"maintenance","version":"2.0.6"}],"type":"update"}"#;
+        let expected = WssMessage::Channel(ChannelMessage::Status(SingleResponse {
+            data: StatusUpdate {
+                api_version: "v2".to_string(),
+                connection_id: None,
+                system: SystemStatus::Maintenance,
+                version: "2.0.6".to_string(),
             },
         }));
 

@@ -5,6 +5,10 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
+### v0.4.x
+
+- Fix `StatusUpdate.connection_id` after observing it's not always populated
+
 ### v0.4.2
 
 - Fix `ExecutionResult` for trigger orders, where `actual_price`, `peak_price`, `last_price`, and `timestamp` are not
