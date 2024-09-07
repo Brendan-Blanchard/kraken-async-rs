@@ -14,7 +14,7 @@ async fn test_admin_messages() {
     let status_message = WssMessage::Channel(Status(SingleResponse {
         data: StatusUpdate {
             api_version: "v2".to_string(),
-            connection_id: Number::from_str("12393906104898154338").unwrap(),
+            connection_id: Some(Number::from_str("12393906104898154338").unwrap()),
             system: SystemStatus::Online,
             version: "2.0.4".to_string(),
         },
