@@ -68,9 +68,11 @@ pub struct AddOrderParams {
     pub margin: Option<bool>,
     pub post_only: Option<bool>,
     pub reduce_only: Option<bool>,
-    pub effective_time: Option<String>, // RFC3339
     pub expire_time: Option<String>,
     pub deadline: Option<String>,
+    pub effective_time: Option<String>, // RFC3339
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     #[serde(rename = "order_userref")]
     pub order_user_ref: Option<i64>,
     pub conditional: Option<ConditionalParams>,
@@ -85,9 +87,8 @@ pub struct AddOrderParams {
     #[serde(rename = "cash_order_qty")]
     pub cash_order_quantity: Option<Decimal>,
     pub validate: Option<bool>,
+    pub sender_sub_id: Option<String>,
     pub token: Token,
-    #[serde(rename = "cl_ord_id")]
-    pub client_order_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

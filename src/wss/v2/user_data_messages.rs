@@ -216,6 +216,8 @@ pub struct ExecutionResult {
     pub execution_type: ExecutionType,
     #[serde(rename = "cash_order_qty")]
     pub cash_order_quantity: Option<Decimal>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     pub contingent: Option<ConditionalParams>,
     pub cost: Option<Decimal>,
     #[serde(rename = "exec_id")]
@@ -258,14 +260,13 @@ pub struct ExecutionResult {
     pub post_only: Option<bool>,
     pub position_status: Option<PositionStatusV2>,
     pub reduce_only: Option<bool>,
+    pub sender_sub_id: Option<String>,
     pub side: Option<BuySell>,
     pub symbol: Option<String>,
     pub time_in_force: Option<TimeInForce>,
     pub timestamp: String,
     pub trade_id: Option<i64>,
     pub triggers: Option<TriggerDescription>,
-    #[serde(rename = "cl_ord_id")]
-    pub client_order_id: Option<String>,
 }
 
 #[skip_serializing_none]
@@ -368,6 +369,7 @@ mod tests {
             post_only: None,
             position_status: None,
             reduce_only: None,
+            sender_sub_id: None,
             side: Some(BuySell::Buy),
             symbol: Some("KAR/USD".to_string()),
             time_in_force: None,
@@ -416,6 +418,7 @@ mod tests {
             post_only: None,
             position_status: None,
             reduce_only: None,
+            sender_sub_id: None,
             side: None,
             symbol: None,
             time_in_force: None,

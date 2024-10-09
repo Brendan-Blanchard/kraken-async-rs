@@ -63,6 +63,7 @@ async fn main() {
         stp_type: Some(SelfTradePrevention::CancelNewest),
         cash_order_quantity: None,
         validate: None,
+        sender_sub_id: None,
         token: token.clone(),
         client_order_id: None,
     };

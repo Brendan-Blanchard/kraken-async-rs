@@ -7,7 +7,7 @@
 
 ### v0.5.0
 
-- Update to Spot REST V1 as of 13 May 2024 changelog notes
+- Update to Spot REST V1 as of 15 May 2024 changelog notes
 - Bump various dependencies
 - Fix `StatusUpdate.connection_id` after observing it's not always populated
 - Add test-support default feature for common example and testing code

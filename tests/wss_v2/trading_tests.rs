@@ -15,14 +15,14 @@ use serde_json::json;
 
 #[tokio::test]
 async fn test_add_order() {
-    let expected_request = json!({"method":"add_order","params":{"order_type":"limit","side":"buy","symbol":"USDC/USD","limit_price":0.95,"time_in_force":"ioc","order_qty":5.0,"post_only":false,"fee_preference":"quote","token":"aToken"},"req_id":0});
-    let response = r#"{"method":"add_order","req_id":0,"result":{"order_id":"OPS23M-VS41G-DDE5Z2"},"success":true,"time_in":"2024-05-18T12:05:50.293682Z","time_out":"2024-05-18T12:05:50.300542Z"}"#.to_string();
+    let expected_request = json!({"method":"add_order","params":{"order_type":"limit","side":"buy","symbol":"USDC/USD","limit_price":0.95,"time_in_force":"ioc","order_qty":5.0,"post_only":false,"fee_preference":"quote","token":"aToken","cl_ord_id":"client-zero","sender_sub_id":"sender-one"},"req_id":0});
+    let response = r#"{"method":"add_order","req_id":0,"result":{"order_id":"OPS23M-VS41G-DDE5Z2","cl_ord_id":"client-zero"},"success":true,"time_in":"2024-05-18T12:05:50.293682Z","time_out":"2024-05-18T12:05:50.300542Z"}"#.to_string();
     let expected_response = WssMessage::Method(AddOrder(ResultResponse {
         result: Some(AddOrderResult {
             order_id: "OPS23M-VS41G-DDE5Z2".to_string(),
             order_user_ref: None,
             warning: None,
-            client_order_id: None,
+            client_order_id: Some("client-zero".to_string()),
         }),
         error: None,
         success: true,
@@ -54,8 +54,9 @@ async fn test_add_order() {
         stp_type: None,
         cash_order_quantity: None,
         validate: None,
+        sender_sub_id: Some("sender-one".to_string()),
         token: Token::new("aToken".to_string()),
-        client_order_id: None,
+        client_order_id: Some("client-zero".to_string()),
     };
 
     let message = Message {
