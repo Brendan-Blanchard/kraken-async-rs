@@ -577,6 +577,8 @@ pub struct DeleteExportRequest {
 pub struct AddOrderRequest {
     #[query(rename = "userref")]
     pub user_ref: Option<i64>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     #[builder(required)]
     #[query(required, rename = "ordertype")]
     pub order_type: OrderType,
@@ -638,6 +640,8 @@ pub struct AddBatchedOrderRequest {
 pub struct BatchedOrderRequest {
     #[serde(rename = "userref")]
     pub user_ref: Option<i64>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     #[builder(required)]
     #[serde(rename = "ordertype")]
     pub order_type: OrderType,
@@ -700,6 +704,8 @@ pub struct CancelOrderRequest {
     #[query(required, rename = "txid")]
     #[builder(required)]
     pub tx_id: IntOrString,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 /// A "dead man's switch" for all active orders.
@@ -716,20 +722,32 @@ pub struct CancelAllOrdersAfterRequest {
 /// A request to cancel up to 50 orders in a batch by tx id or user ref.
 #[derive(Debug, Clone, Builder, Serialize)]
 pub struct CancelBatchOrdersRequest {
+    // TODO: these apparently need to be maps of { id: null } -- need live testing
     #[builder(required)]
     pub orders: Vec<IntOrString>,
+    #[serde(rename = "cl_ord_ids")]
+    pub client_order_ids: Option<Vec<String>>,
 }
 
 impl CancelBatchOrdersRequest {
     pub fn from_user_refs(refs: Vec<i64>) -> CancelBatchOrdersRequest {
         CancelBatchOrdersRequest {
             orders: refs.into_iter().map(IntOrString::Int).collect(),
+            client_order_ids: None,
         }
     }
 
     pub fn from_tx_ids(ids: Vec<String>) -> CancelBatchOrdersRequest {
         CancelBatchOrdersRequest {
             orders: ids.into_iter().map(IntOrString::String).collect(),
+            client_order_ids: None,
+        }
+    }
+
+    pub fn from_client_order_ids(ids: Vec<String>) -> CancelBatchOrdersRequest {
+        CancelBatchOrdersRequest {
+            orders: vec![],
+            client_order_ids: Some(ids),
         }
     }
 }
