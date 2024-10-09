@@ -8,12 +8,9 @@ use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
 use kraken_async_rs::test_support::set_up_logging;
 use rust_decimal_macros::dec;
-use std::fs::File;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::info;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Registry};
 
 /// This places an order, queries, edits, then cancels it.
 ///

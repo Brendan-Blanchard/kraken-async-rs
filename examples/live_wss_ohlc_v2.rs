@@ -2,13 +2,10 @@ use kraken_async_rs::test_support::set_up_logging;
 use kraken_async_rs::wss::v2::base_messages::{Message, WssMessage};
 use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
 use kraken_async_rs::wss::v2::market_data_messages::OhlcSubscription;
-use std::fs::File;
 use std::time::Duration;
 use tokio::time::timeout;
 use tokio_stream::StreamExt;
 use tracing::{info, warn};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Registry};
 
 #[tokio::main]
 async fn main() {

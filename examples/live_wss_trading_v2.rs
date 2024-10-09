@@ -12,15 +12,12 @@ use kraken_async_rs::wss::v2::trading_messages::{
     AddOrderParams, AddOrderResult, CancelOrderParams, EditOrderParams, FeePreference,
 };
 use rust_decimal_macros::dec;
-use std::fs::File;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tokio_stream::StreamExt;
 use tracing::{info, warn};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Registry};
 
 /// This places a new order for 5 USDC at a low price that's unlikely to be filled ($0.95), then
 /// edits the order on receipt of its confirmation, and cancels once it's been edited.

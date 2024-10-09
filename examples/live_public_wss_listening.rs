@@ -2,11 +2,8 @@ use kraken_async_rs::test_support::set_up_logging;
 use kraken_async_rs::wss::kraken_wss_client::{KrakenMessageStream, KrakenWSSClient};
 use kraken_async_rs::wss::public::messages::PublicMessage;
 use kraken_async_rs::wss::subscribe_messages::{SubscribeMessage, Subscription};
-use std::fs::File;
 use tokio_stream::StreamExt;
 use tracing::info;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Registry};
 
 /// This shows setting up a log file, and listening to all public websocket streams as one.
 ///

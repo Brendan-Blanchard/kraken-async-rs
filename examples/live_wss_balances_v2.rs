@@ -6,15 +6,12 @@ use kraken_async_rs::test_support::set_up_logging;
 use kraken_async_rs::wss::v2::base_messages::{Message, WssMessage};
 use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
 use kraken_async_rs::wss::v2::user_data_messages::BalancesSubscription;
-use std::fs::File;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tokio_stream::StreamExt;
 use tracing::{info, warn};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Registry};
 
 /// This example creates a `CoreKrakenClient` to retrieve a websocket token, then subscribes to
 /// the Balances channel, listening for a snapshot and any updates to balances.
