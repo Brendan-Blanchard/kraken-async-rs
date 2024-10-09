@@ -6,6 +6,7 @@ use kraken_async_rs::request_types::{
 };
 use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
+use kraken_async_rs::test_support::set_up_logging;
 use rust_decimal_macros::dec;
 use std::fs::File;
 use std::sync::Arc;
@@ -91,24 +92,4 @@ async fn main() {
     info!("{:?}", cancel);
 
     assert_eq!(1, cancel.count);
-}
-
-fn set_up_logging(filename: &str) {
-    let subscriber = Registry::default()
-        .with(
-            fmt::Layer::default()
-                .with_ansi(false)
-                .with_writer(get_log_file(filename)),
-        )
-        .with(fmt::Layer::default().pretty().with_writer(std::io::stdout));
-
-    tracing::subscriber::set_global_default(subscriber).unwrap();
-}
-
-fn get_log_file(filename: &str) -> File {
-    File::options()
-        .append(true)
-        .create(true)
-        .open(filename)
-        .expect("failed to open test log file!")
 }

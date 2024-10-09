@@ -1,3 +1,4 @@
+use kraken_async_rs::test_support::set_up_logging;
 use kraken_async_rs::wss::kraken_wss_client::{KrakenMessageStream, KrakenWSSClient};
 use kraken_async_rs::wss::public::messages::PublicMessage;
 use kraken_async_rs::wss::subscribe_messages::{SubscribeMessage, Subscription};
@@ -36,24 +37,4 @@ async fn main() {
     while let Some(message) = kraken_stream.next().await {
         info!("{:?}", message.unwrap());
     }
-}
-
-fn set_up_logging(filename: &str) {
-    let subscriber = Registry::default()
-        .with(
-            fmt::Layer::default()
-                .with_ansi(false)
-                .with_writer(get_log_file(filename)),
-        )
-        .with(fmt::Layer::default().pretty().with_writer(std::io::stdout));
-
-    tracing::subscriber::set_global_default(subscriber).unwrap();
-}
-
-fn get_log_file(filename: &str) -> File {
-    File::options()
-        .append(true)
-        .create(true)
-        .open(filename)
-        .expect("failed to open test log file!")
 }
