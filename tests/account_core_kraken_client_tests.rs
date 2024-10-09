@@ -88,7 +88,10 @@ async fn test_get_trade_balance() {
 #[tokio::test]
 async fn test_get_open_orders() {
     let secrets_provider = get_null_secrets_provider();
-    let request = OpenOrdersRequest::builder().trades(true).build();
+    let request = OpenOrdersRequest::builder()
+        .trades(true)
+        .cl_ord_id("some-uuid".to_string())
+        .build();
 
     let mock_server = MockServer::start().await;
 
@@ -98,6 +101,7 @@ async fn test_get_open_orders() {
         .and(header_exists("API-Key"))
         .and(header_exists("API-Sign"))
         .and(body_string_contains("trades=true"))
+        .and(body_string_contains("cl_ord_id=some-uuid"))
         .respond_with(ResponseTemplate::new(200).set_body_json(get_open_orders_json()))
         .expect(1)
         .mount(&mock_server)

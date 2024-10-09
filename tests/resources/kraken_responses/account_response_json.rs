@@ -180,6 +180,7 @@ pub fn get_open_orders_json() -> Value {
                 "604X4L-ANXHT-JV0ZQT": {
                     "refid":null,
                     "userref":0,
+                    "cl_ord_id": "some-uuid",
                     "status": "open",
                     "opentm": 1676384710.121142,
                     "starttm":0,
@@ -201,6 +202,8 @@ pub fn get_open_orders_json() -> Value {
                     "price": "0.00000000",
                     "stopprice": "0.00000000",
                     "limitprice": "0.00000000",
+                    "trigger": "index",
+                    "margin": false,
                     "misc": "",
                     "oflags": "fciq"
                 },
@@ -371,6 +374,7 @@ pub fn get_closed_orders_json() -> Value {
               "price": "0.00000",
               "stopprice": "0.00000",
               "limitprice": "0.00000",
+              "margin": false,
               "misc": "",
               "oflags": "fciq",
               "trigger": "index"
@@ -392,6 +396,7 @@ pub fn get_closed_orders_json() -> Value {
               "price": "0.00000",
               "stopprice": "0.00000",
               "limitprice": "0.00000",
+              "margin": true,
               "misc": "",
               "oflags": "fciq",
               "trigger": "index"

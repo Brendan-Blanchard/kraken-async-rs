@@ -679,6 +679,7 @@ pub struct Order {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
     pub userref: Option<i64>,
+    pub cl_ord_id: Option<String>,
     pub status: OrderStatus,
     #[serde(rename = "opentm")]
     pub open_time: f64,
@@ -700,12 +701,14 @@ pub struct Order {
     pub stop_price: Decimal,
     #[serde(rename = "limitprice")]
     pub limit_price: Decimal,
+    pub trigger: Option<TriggerType>,
+    pub margin: Option<bool>,
     pub misc: String,
+    pub sender_sub_id: Option<String>,
     #[serde(rename = "oflags")]
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
     pub order_flags: Vec<OrderFlag>,
     pub trades: Option<Vec<String>>,
-    pub trigger: Option<TriggerType>,
     pub reason: Option<String>,
 }
 
@@ -716,6 +719,7 @@ pub struct ClosedOrder {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
     pub userref: Option<i64>,
+    pub cl_ord_id: Option<String>,
     pub status: OrderStatus,
     #[serde(rename = "opentm")]
     pub open_time: f64,
@@ -736,12 +740,14 @@ pub struct ClosedOrder {
     pub stop_price: Decimal,
     #[serde(rename = "limitprice")]
     pub limit_price: Decimal,
+    pub trigger: Option<TriggerType>,
+    pub margin: Option<bool>,
     pub misc: String,
     #[serde(rename = "oflags")]
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
     pub order_flags: Vec<OrderFlag>,
     pub trades: Option<Vec<String>>,
-    pub trigger: Option<TriggerType>,
+    pub sender_sub_id: Option<String>,
     pub reason: Option<String>,
 }
 
