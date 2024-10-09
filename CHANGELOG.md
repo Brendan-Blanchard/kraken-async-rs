@@ -5,9 +5,12 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
-### v0.4.x
+### v0.5.0
 
+- Update to Spot REST V1 as of 13 May 2024 changelog notes
+- Bump various dependencies
 - Fix `StatusUpdate.connection_id` after observing it's not always populated
+- Add test-support default feature for common example and testing code
 
 ### v0.4.2
 
