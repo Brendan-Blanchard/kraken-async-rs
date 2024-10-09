@@ -60,7 +60,7 @@ type RawStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 /// ```
 #[deprecated(
     since = "0.1.0",
-    note = "Please switch to the supported v2 websockets api"
+    note = "v1 websockets will be removed in the following version - please switch to the supported v2 websockets api"
 )]
 #[derive(Debug, Clone, Copy)]
 pub struct KrakenWSSClient<'a> {
