@@ -162,7 +162,10 @@ async fn test_cancel_order_batch_with_max_penalty() {
     );
     order_ids.push(IntOrString::Int(user_ref_request.user_ref.unwrap()));
 
-    let batch_cancel_request = CancelBatchOrdersRequest { orders: order_ids };
+    let batch_cancel_request = CancelBatchOrdersRequest {
+        orders: order_ids,
+        client_order_ids: None,
+    };
 
     // 1 additional order w/ user ref costs 100, 5 instant cancels cost 800 each, for 4100 total,
     // making 4100 / 234 = ~17.52 (requires 18s wait)
@@ -277,5 +280,6 @@ fn edit_from_order(order: &AddOrder) -> EditOrderRequest {
 fn cancel_from_order(order: &AddOrder) -> CancelOrderRequest {
     CancelOrderRequest {
         tx_id: IntOrString::String(order.tx_id.first().unwrap().clone()),
+        client_order_id: None,
     }
 }

@@ -577,7 +577,7 @@ pub struct DeleteExportRequest {
 pub struct AddOrderRequest {
     #[query(rename = "userref")]
     pub user_ref: Option<i64>,
-    #[serde(rename = "cl_ord_id")]
+    #[query(rename = "cl_ord_id")]
     pub client_order_id: Option<String>,
     #[builder(required)]
     #[query(required, rename = "ordertype")]
@@ -704,7 +704,7 @@ pub struct CancelOrderRequest {
     #[query(required, rename = "txid")]
     #[builder(required)]
     pub tx_id: IntOrString,
-    #[serde(rename = "cl_ord_id")]
+    #[query(rename = "cl_ord_id")]
     pub client_order_id: Option<String>,
 }
 
