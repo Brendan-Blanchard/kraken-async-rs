@@ -5,8 +5,8 @@ use kraken_async_rs::wss::v2::base_messages::{ChannelMessage, Response, WssMessa
 use kraken_async_rs::wss::v2::trading_messages::{FeePreference, PriceType};
 use kraken_async_rs::wss::v2::user_data_messages::{
     Balance, BalanceResponse, ExecutionResult, ExecutionType, Fee, LedgerCategory,
-    LedgerEntryTypeV2, LedgerUpdate, MakerTaker, TriggerDescription, TriggerStatus, WalletId,
-    WalletType,
+    LedgerEntryTypeV2, LedgerUpdate, MakerTaker, TriggerDescription, TriggerStatus, Wallet,
+    WalletId, WalletType,
 };
 use rust_decimal_macros::dec;
 
@@ -465,11 +465,15 @@ async fn test_balances_snapshot() {
         "channel":"balances",
         "type":"snapshot",
         "data":[
-            {"asset":"BRICK","asset_class":"currency","balance":439.9736},
-            {"asset":"KAR","asset_class":"currency","balance":774.6366982600},
-            {"asset":"KEEP","asset_class":"currency","balance":622.3962481300},
-            {"asset":"MULTI","asset_class":"currency","balance":5.5971035500},
-            {"asset":"USD","asset_class":"currency","balance":160.2405}
+            {"asset":"BRICK","asset_class":"currency","balance":439.9736, "wallets": []},
+            {"asset":"KAR","asset_class":"currency","balance":774.6366982600, "wallets": []},
+            {"asset":"KEEP","asset_class":"currency","balance":622.3962481300, "wallets": []},
+            {"asset":"MULTI","asset_class":"currency","balance":5.5971035500, "wallets": []},
+            {"asset":"USD","asset_class":"currency","balance":160.2405, "wallets": [{
+                "type": "spot",
+                "id": "main",
+                "balance": 1.34
+            }]}
         ],
         "sequence":1
     }
@@ -481,27 +485,31 @@ async fn test_balances_snapshot() {
             Balance {
                 asset: "BRICK".to_string(),
                 balance: dec!(439.9736),
-                wallets: None,
+                wallets: vec![],
             },
             Balance {
                 asset: "KAR".to_string(),
                 balance: dec!(774.6366982600),
-                wallets: None,
+                wallets: vec![],
             },
             Balance {
                 asset: "KEEP".to_string(),
                 balance: dec!(622.3962481300),
-                wallets: None,
+                wallets: vec![],
             },
             Balance {
                 asset: "MULTI".to_string(),
                 balance: dec!(5.5971035500),
-                wallets: None,
+                wallets: vec![],
             },
             Balance {
                 asset: "USD".to_string(),
                 balance: dec!(160.2405),
-                wallets: None,
+                wallets: vec![Wallet {
+                    balance: dec!(1.34),
+                    wallet_type: WalletType::Spot,
+                    id: WalletId::Main,
+                }],
             },
         ]),
         sequence: 1,
@@ -546,6 +554,7 @@ async fn test_balances_updates() {
             ledger_id: "DATKX6-PEHL1-HZKND8".to_string(),
             ref_id: "LKAKN2-N0N12-VKQNLN".to_string(),
             timestamp: "2024-05-24T14:01:53.526524Z".to_string(),
+            asset_class: "currency".to_string(),
             ledger_type: LedgerEntryTypeV2::Trade,
             sub_type: None,
             category: LedgerCategory::Trade,
@@ -585,6 +594,7 @@ async fn test_balances_updates() {
             ledger_id: "9K6IR4-X9PQJ-OMBG73".to_string(),
             ref_id: "WLINKJ-1TZZW-M3HCOY".to_string(),
             timestamp: "2024-05-12T12:11:57.525134Z".to_string(),
+            asset_class: "currency".to_string(),
             ledger_type: LedgerEntryTypeV2::Trade,
             sub_type: None,
             category: LedgerCategory::Trade,

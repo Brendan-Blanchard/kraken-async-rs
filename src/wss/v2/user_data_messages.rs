@@ -306,7 +306,7 @@ pub enum BalanceResponse {
 pub struct Balance {
     pub asset: String,
     pub balance: Decimal,
-    pub wallets: Option<Vec<Wallet>>,
+    pub wallets: Vec<Wallet>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -318,6 +318,7 @@ pub struct LedgerUpdate {
     pub ledger_id: String,
     pub ref_id: String,
     pub timestamp: String,
+    pub asset_class: String,
     #[serde(rename = "type")]
     pub ledger_type: LedgerEntryTypeV2,
     pub sub_type: Option<LedgerEntrySubType>,

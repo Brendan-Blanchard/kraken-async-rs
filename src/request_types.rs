@@ -353,6 +353,7 @@ pub struct AssetInfoRequest {
 pub struct TradableAssetPairsRequest {
     pub pair: Option<StringCSV>,
     pub info: Option<AssetPairInfo>,
+    pub country_code: Option<String>,
 }
 
 /// A request for common ticker info for one or many pairs.
