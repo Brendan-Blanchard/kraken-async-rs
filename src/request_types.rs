@@ -724,7 +724,6 @@ pub struct CancelAllOrdersAfterRequest {
 /// A request to cancel up to 50 orders in a batch by tx id or user ref.
 #[derive(Debug, Clone, Builder, Serialize)]
 pub struct CancelBatchOrdersRequest {
-    // TODO: these apparently need to be maps of { id: null } -- need live testing
     #[builder(required)]
     pub orders: Vec<IntOrString>,
     #[serde(rename = "cl_ord_ids")]
