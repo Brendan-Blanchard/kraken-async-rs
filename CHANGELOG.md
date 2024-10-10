@@ -7,7 +7,7 @@
 
 ### v0.5.0
 
-- Update to Spot REST V1, Spot Websockets V2.0.5 as of 23 June 2024 changelog notes
+- Update to Spot REST V1, Spot Websockets V2.0.6 as of 26 June 2024 changelog notes
 - Bump various dependencies
 - Fix `StatusUpdate.connection_id` after observing it's not always populated
 - Add test-support default feature for common example and testing code

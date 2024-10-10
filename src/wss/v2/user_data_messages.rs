@@ -125,9 +125,13 @@ pub struct SubscriptionRequest<T> {
 pub struct ExecutionSubscription {
     pub channel: String,
     pub token: Token,
-    pub snapshot_trades: Option<bool>,
     pub rate_counter: Option<bool>,
+    pub snap_trades: Option<bool>,
+    pub snap_orders: Option<bool>,
+    #[deprecated]
     pub snapshot: Option<bool>,
+    #[deprecated]
+    pub snapshot_trades: Option<bool>,
 }
 
 impl ExecutionSubscription {
@@ -137,6 +141,8 @@ impl ExecutionSubscription {
             token,
             snapshot_trades: None,
             rate_counter: None,
+            snap_trades: None,
+            snap_orders: None,
             snapshot: None,
         }
     }
