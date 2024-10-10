@@ -245,6 +245,8 @@ pub struct ExecutionResult {
     pub display_quantity: Option<Decimal>,
     pub effective_time: Option<String>,
     pub expire_time: Option<String>,
+    pub ext_ord_id: Option<String>,
+    pub ext_exec_id: Option<String>,
     #[serde(rename = "fee_ccy_pref")]
     pub fee_preference: Option<FeePreference>,
     #[serde(rename = "fee_usd_equiv")]
@@ -252,6 +254,7 @@ pub struct ExecutionResult {
     pub limit_price: Option<Decimal>,
     pub limit_price_type: Option<PriceType>,
     pub margin: Option<bool>,
+    pub margin_borrow: Option<bool>,
     #[serde(rename = "no_mpp")]
     pub no_market_price_protection: Option<bool>,
     #[serde(rename = "ord_ref_id")]
@@ -340,7 +343,7 @@ mod tests {
 
     #[test]
     fn test_deserializing_execution_trade() {
-        let message = r#"{"order_id":"O7IBL5-O2V6X-EEXY4U","exec_id":"TJE7HC-DKBTI-5BFVKE","exec_type":"trade","trade_id":365573,"symbol":"KAR/USD","side":"buy","last_qty":105.02014889,"last_price":0.121,"liquidity_ind":"t","cost":12.70744,"order_status":"filled","order_type":"limit","timestamp":"2024-05-18T05:41:33.480251Z","fee_usd_equiv":0.05083,"fees":[{"asset":"USD","qty":0.05083}]}"#;
+        let message = r#"{"order_id":"O7IBL5-O2V6X-EEXY4U","exec_id":"TJE7HC-DKBTI-5BFVKE","exec_type":"trade","ext_ord_id":"some-uuid","ext_exec_id":"another-uuid","trade_id":365573,"symbol":"KAR/USD","side":"buy","last_qty":105.02014889,"last_price":0.121,"liquidity_ind":"t","cost":12.70744,"order_status":"filled","order_type":"limit","timestamp":"2024-05-18T05:41:33.480251Z","fee_usd_equiv":0.05083,"fees":[{"asset":"USD","qty":0.05083}]}"#;
         let expected = ExecutionResult {
             execution_type: ExecutionType::Trade,
             cash_order_quantity: None,
@@ -361,11 +364,14 @@ mod tests {
             display_quantity: None,
             effective_time: None,
             expire_time: None,
+            ext_ord_id: Some("some-uuid".to_string()),
+            ext_exec_id: Some("another-uuid".to_string()),
             fee_preference: None,
             fee_usd_equivalent: Some(dec!(0.05083)),
             limit_price: None,
             limit_price_type: None,
             margin: None,
+            margin_borrow: None,
             no_market_price_protection: None,
             order_ref_id: None,
             order_id: "O7IBL5-O2V6X-EEXY4U".to_string(),
@@ -410,11 +416,14 @@ mod tests {
             display_quantity: None,
             effective_time: None,
             expire_time: None,
+            ext_ord_id: None,
+            ext_exec_id: None,
             fee_preference: None,
             fee_usd_equivalent: None,
             limit_price: None,
             limit_price_type: None,
             margin: None,
+            margin_borrow: None,
             no_market_price_protection: None,
             order_ref_id: None,
             order_id: "OLADEP-E5D5S-IKEHMF".to_string(),
