@@ -90,7 +90,7 @@ async fn test_get_open_orders() {
     let secrets_provider = get_null_secrets_provider();
     let request = OpenOrdersRequest::builder()
         .trades(true)
-        .cl_ord_id("some-uuid".to_string())
+        .client_order_id("some-uuid".to_string())
         .build();
 
     let mock_server = MockServer::start().await;

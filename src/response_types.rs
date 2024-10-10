@@ -679,7 +679,8 @@ pub struct Order {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
     pub userref: Option<i64>,
-    pub cl_ord_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     pub status: OrderStatus,
     #[serde(rename = "opentm")]
     pub open_time: f64,
@@ -719,7 +720,8 @@ pub struct ClosedOrder {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
     pub userref: Option<i64>,
-    pub cl_ord_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     pub status: OrderStatus,
     #[serde(rename = "opentm")]
     pub open_time: f64,

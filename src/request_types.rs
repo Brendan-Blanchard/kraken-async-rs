@@ -424,7 +424,8 @@ pub struct TradeBalanceRequest {
 pub struct OpenOrdersRequest {
     pub trades: Option<bool>,
     pub userref: Option<i64>,
-    pub cl_ord_id: Option<String>,
+    #[query(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 /// A request to retrieve historical orders, 50 at a time.
@@ -441,7 +442,8 @@ pub struct ClosedOrdersRequest {
     pub offset: Option<i64>,
     #[query(rename = "closetime")]
     pub close_time: Option<CloseTime>,
-    pub cl_ord_id: Option<String>,
+    #[query(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 /// A request for the details of up to 50 orders by id.
