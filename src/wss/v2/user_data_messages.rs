@@ -135,7 +135,7 @@ pub struct ExecutionSubscription {
 }
 
 impl ExecutionSubscription {
-    #[allow(deprecated)]
+    #[allow(clippy::deprecated)]
     pub fn new(token: Token) -> Self {
         ExecutionSubscription {
             channel: "executions".to_string(),
