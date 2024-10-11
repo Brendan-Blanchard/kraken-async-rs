@@ -101,6 +101,10 @@ pub struct AddOrderResult {
     pub client_order_id: Option<String>,
 }
 
+// TODO: AmendOrderParams
+
+// TODO: AmendOrderResult
+
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EditOrderParams {

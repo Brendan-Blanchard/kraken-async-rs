@@ -100,10 +100,13 @@ pub enum WalletId {
 pub enum ExecutionType {
     PendingNew,
     New,
+    Trade,
     Filled,
     Canceled,
     Expired,
-    Trade,
+    Amended,
+    Restated,
+    Status,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -219,6 +222,7 @@ pub struct TriggerDescription {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct ExecutionResult {
+    pub amended: Option<bool>,
     #[serde(rename = "exec_type")]
     pub execution_type: ExecutionType,
     #[serde(rename = "cash_order_qty")]
@@ -347,6 +351,7 @@ mod tests {
     fn test_deserializing_execution_trade() {
         let message = r#"{"order_id":"O7IBL5-O2V6X-EEXY4U","exec_id":"TJE7HC-DKBTI-5BFVKE","exec_type":"trade","ext_ord_id":"some-uuid","ext_exec_id":"another-uuid","trade_id":365573,"symbol":"KAR/USD","side":"buy","last_qty":105.02014889,"last_price":0.121,"liquidity_ind":"t","cost":12.70744,"order_status":"filled","order_type":"limit","timestamp":"2024-05-18T05:41:33.480251Z","fee_usd_equiv":0.05083,"fees":[{"asset":"USD","qty":0.05083}]}"#;
         let expected = ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::Trade,
             cash_order_quantity: None,
             contingent: None,
@@ -403,6 +408,7 @@ mod tests {
     fn test_deserializing_execution_new_update() {
         let message = r#"{"timestamp":"2024-05-18T11:00:37.240691Z","order_status":"new","exec_type":"new","order_userref":0,"order_id":"OLADEP-E5D5S-IKEHMF"}"#;
         let expected = ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::New,
             cash_order_quantity: None,
             contingent: None,

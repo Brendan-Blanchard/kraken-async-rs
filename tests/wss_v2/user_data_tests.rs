@@ -29,6 +29,7 @@ async fn test_execution_trades_snapshot() {
     let expected_trades_snapshot = WssMessage::Channel(ChannelMessage::Execution(Response {
         data: vec![
             ExecutionResult {
+                amended: None,
                 execution_type: ExecutionType::Trade,
                 cash_order_quantity: None,
                 contingent: None,
@@ -77,6 +78,7 @@ async fn test_execution_trades_snapshot() {
                 client_order_id: None,
             },
             ExecutionResult {
+                amended: None,
                 execution_type: ExecutionType::Trade,
                 cash_order_quantity: None,
                 contingent: None,
@@ -125,6 +127,7 @@ async fn test_execution_trades_snapshot() {
                 client_order_id: None,
             },
             ExecutionResult {
+                amended: None,
                 execution_type: ExecutionType::Trade,
                 cash_order_quantity: None,
                 contingent: None,
@@ -173,6 +176,7 @@ async fn test_execution_trades_snapshot() {
                 client_order_id: None,
             },
             ExecutionResult {
+                amended: None,
                 execution_type: ExecutionType::Trade,
                 cash_order_quantity: None,
                 contingent: None,
@@ -240,6 +244,7 @@ async fn test_execution_order_update_cancelled() {
 
     let expected_update_cancel = WssMessage::Channel(ChannelMessage::Execution(Response {
         data: vec![ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::Canceled,
             cash_order_quantity: None,
             contingent: None,
@@ -303,6 +308,7 @@ async fn test_execution_limit_order_update_pending() {
 
     let expected_update_pending = WssMessage::Channel(ChannelMessage::Execution(Response {
         data: vec![ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::PendingNew,
             cash_order_quantity: None,
             contingent: None,
@@ -367,6 +373,7 @@ async fn test_execution_stop_loss_limit_order_update_pending() {
 
     let expected_update_pending = WssMessage::Channel(ChannelMessage::Execution(Response {
         data: vec![ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::PendingNew,
             cash_order_quantity: None,
             contingent: None,
@@ -437,6 +444,7 @@ async fn test_execution_order_update_new() {
 
     let expected_update_new = WssMessage::Channel(ChannelMessage::Execution(Response {
         data: vec![ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::New,
             cash_order_quantity: None,
             contingent: None,

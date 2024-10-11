@@ -206,6 +206,8 @@ pub trait KrakenClient: Send + Sync {
         request: &OrderRequest,
     ) -> impl Future<Output = Result<ResultErrorResponse<HashMap<String, Order>>, ClientError>>;
 
+    // TODO: get order amends endpoint
+
     /// Get trades from the full history your account, up to 50 at a time.
     ///
     /// Pagination is done using the `start`, `end` and `ofs` (offset) parameters.
@@ -282,6 +284,8 @@ pub trait KrakenClient: Send + Sync {
         &mut self,
         request: &AddBatchedOrderRequest,
     ) -> impl Future<Output = Result<ResultErrorResponse<AddOrderBatch>, ClientError>>;
+
+    // TODO: amend order endpoint
 
     /// Edit the volume or price of an existing order, excluding contingent orders like stop/profit orders.
     fn edit_order(
