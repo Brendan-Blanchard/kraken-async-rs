@@ -1,11 +1,12 @@
 use crate::wss_v2::shared::ParseIncomingTest;
-use kraken_async_rs::request_types::TimeInForce;
+use kraken_async_rs::request_types::{TimeInForce, TriggerType};
 use kraken_async_rs::response_types::{BuySell, OrderStatusV2, OrderType};
 use kraken_async_rs::wss::v2::base_messages::{ChannelMessage, Response, WssMessage};
 use kraken_async_rs::wss::v2::trading_messages::{FeePreference, PriceType};
 use kraken_async_rs::wss::v2::user_data_messages::{
     Balance, BalanceResponse, ExecutionResult, ExecutionType, Fee, LedgerCategory,
-    LedgerEntryTypeV2, LedgerUpdate, MakerTaker, WalletId, WalletType,
+    LedgerEntryTypeV2, LedgerUpdate, MakerTaker, TriggerDescription, TriggerStatus, WalletId,
+    WalletType,
 };
 use rust_decimal_macros::dec;
 
@@ -269,7 +270,7 @@ async fn test_execution_order_update_cancelled() {
 }
 
 #[tokio::test]
-async fn test_execution_order_update_pending() {
+async fn test_execution_limit_order_update_pending() {
     let pending_new = r#"{"channel":"executions","type":"update","data":[{"order_id":"AHOJQ8-1E72C-8M2VQH","symbol":"ADX/USD",
     "order_qty":81.36256082,"cum_cost":0.0000000,"time_in_force":"GTC","exec_type":"pending_new","side":"buy","order_type":"limit",
     "order_userref":0,"limit_price_type":"static","limit_price":0.18328,"stop_price":0.00000,"order_status":"pending_new",
@@ -314,6 +315,74 @@ async fn test_execution_order_update_pending() {
             timestamp: "2024-05-18T12:01:56.165888Z".to_string(),
             trade_id: None,
             triggers: None,
+            client_order_id: None,
+        }],
+        sequence: 120,
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(pending_new)
+        .expect_message(expected_update_pending)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_execution_stop_loss_limit_order_update_pending() {
+    let pending_new = r#"{"channel":"executions","type":"update","data":[{"order_id":"AHOJQ8-1E72C-8M2VQH","symbol":"ADX/USD",
+    "order_qty":81.36256082,"cum_cost":0,"time_in_force":"GTC","exec_type":"pending_new","side":"buy","order_type":"stop-loss-limit",
+    "order_userref":0,"limit_price_type":"static","triggers":{"price":0.2,"price_type":"static","reference":"index","status":"untriggered"},
+    "stop_price":0.2,"limit_price":0.2,"trigger":"index","order_status":"pending_new","fee_usd_equiv":0,"fee_ccy_pref":"fciq",
+    "timestamp":"2024-05-18T12:01:56.165888Z"}],"sequence":120}"#.to_string();
+
+    let expected_update_pending = WssMessage::Channel(ChannelMessage::Execution(Response {
+        data: vec![ExecutionResult {
+            execution_type: ExecutionType::PendingNew,
+            cash_order_quantity: None,
+            contingent: None,
+            cost: None,
+            execution_id: None,
+            fees: None,
+            liquidity_indicator: None,
+            last_price: None,
+            last_quantity: None,
+            average_price: None,
+            reason: None,
+            cumulative_cost: Some(dec!(0.0)),
+            cumulative_quantity: None,
+            display_quantity: None,
+            effective_time: None,
+            expire_time: None,
+            fee_preference: Some(FeePreference::Quote),
+            fee_usd_equivalent: Some(dec!(0.0)),
+            limit_price: Some(dec!(0.2)),
+            limit_price_type: Some(PriceType::Static),
+            margin: None,
+            no_market_price_protection: None,
+            order_ref_id: None,
+            order_id: "AHOJQ8-1E72C-8M2VQH".to_string(),
+            order_quantity: Some(dec!(81.36256082)),
+            order_type: Some(OrderType::StopLossLimit),
+            order_status: OrderStatusV2::PendingNew,
+            order_user_ref: Some(0),
+            post_only: None,
+            position_status: None,
+            reduce_only: None,
+            side: Some(BuySell::Buy),
+            symbol: Some("ADX/USD".to_string()),
+            time_in_force: Some(TimeInForce::GTC),
+            timestamp: "2024-05-18T12:01:56.165888Z".to_string(),
+            trade_id: None,
+            triggers: Some(TriggerDescription {
+                reference: TriggerType::Index,
+                price: dec!(0.2),
+                price_type: PriceType::Static,
+                actual_price: None,
+                peak_price: None,
+                last_price: None,
+                status: TriggerStatus::Untriggered,
+                timestamp: None,
+            }),
             client_order_id: None,
         }],
         sequence: 120,

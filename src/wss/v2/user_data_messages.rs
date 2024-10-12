@@ -205,11 +205,11 @@ pub struct TriggerDescription {
     pub reference: TriggerType,
     pub price: Decimal,
     pub price_type: PriceType,
-    pub actual_price: Decimal,
-    pub peak_price: Decimal,
-    pub last_price: Decimal,
+    pub actual_price: Option<Decimal>,
+    pub peak_price: Option<Decimal>,
+    pub last_price: Option<Decimal>,
     pub status: TriggerStatus,
-    pub timestamp: String,
+    pub timestamp: Option<String>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
