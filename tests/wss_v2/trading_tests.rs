@@ -336,7 +336,7 @@ async fn test_batch_add() {
 
 #[tokio::test]
 async fn test_batch_cancel() {
-    let expected_request = json!({"method":"batch_cancel","params":{"orders":["IY8YF6-Y6LCR-AMZD7P","XR6VND-GLY6K-DL33TB"],"token":"theirToken", "cl_ord_id": null},"req_id":0});
+    let expected_request = json!({"method":"batch_cancel","params":{"orders":["IY8YF6-Y6LCR-AMZD7P","XR6VND-GLY6K-DL33TB"],"token":"theirToken"},"req_id":0});
     let response = r#"{"method":"batch_cancel","orders_cancelled":2,"req_id":0,"success":true,"time_in":"2024-05-19T19:29:58.063754Z","time_out":"2024-05-19T19:29:58.071569Z"}"#.to_string();
     let expected_response = WssMessage::Method(MethodMessage::BatchCancel(BatchCancelResponse {
         orders_cancelled: 2,

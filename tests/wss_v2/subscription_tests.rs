@@ -15,7 +15,7 @@ mod execution_subscription {
     };
 
     fn get_expected_execution_subscription() -> Value {
-        json!({"method":"subscribe","params":{"channel":"executions","token":"someToken","snapshot_trades":true,"snapshot":true},"req_id":0})
+        json!({"method":"subscribe","params":{"channel":"executions","token":"someToken","snap_trades":true},"req_id":0})
     }
 
     fn get_execution_subscription_response() -> String {
