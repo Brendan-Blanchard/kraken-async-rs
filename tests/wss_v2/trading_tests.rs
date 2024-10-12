@@ -131,7 +131,7 @@ async fn test_cancel_order() {
     let response = r#"{"method":"cancel_order","req_id":0,"result":{"order_id":"1V7PZA-L5RIM-RX2G6B"},"success":true,"time_in":"2024-05-19T19:18:44.987402Z","time_out":"2024-05-19T19:18:44.989756Z"}"#.to_string();
     let expected_response = WssMessage::Method(CancelOrder(ResultResponse {
         result: Some(CancelOrderResult {
-            order_id: "1V7PZA-L5RIM-RX2G6B".to_string(),
+            order_id: Some("1V7PZA-L5RIM-RX2G6B".to_string()),
             warning: None,
             client_order_id: None,
         }),
@@ -145,6 +145,46 @@ async fn test_cancel_order() {
     let cancel_order = CancelOrderParams {
         order_id: Some(vec!["1V7PZA-L5RIM-RX2G6B".into()]),
         client_order_id: None,
+        order_user_ref: None,
+        token: Token::new("thatToken".to_string()),
+    };
+
+    let message = Message {
+        method: "cancel_order".to_string(),
+        params: cancel_order,
+        req_id: 0,
+    };
+
+    CallResponseTest::builder()
+        .match_on(expected_request)
+        .respond_with(response)
+        .send(message)
+        .expect(expected_response)
+        .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_cancel_order_by_client_order_id() {
+    let expected_request = json!({"method":"cancel_order","params":{"cl_ord_id":["a-uuid"],"token":"thatToken"},"req_id":0});
+    let response = r#"{"method":"cancel_order","req_id":0,"result":{"cl_ord_id":"a-uuid"},"success":true,"time_in":"2024-05-19T19:18:44.987402Z","time_out":"2024-05-19T19:18:44.989756Z"}"#.to_string();
+    let expected_response = WssMessage::Method(CancelOrder(ResultResponse {
+        result: Some(CancelOrderResult {
+            order_id: None,
+            warning: None,
+            client_order_id: Some("a-uuid".to_string()),
+        }),
+        error: None,
+        success: true,
+        req_id: 0,
+        time_in: "2024-05-19T19:18:44.987402Z".to_string(),
+        time_out: "2024-05-19T19:18:44.989756Z".to_string(),
+    }));
+
+    let cancel_order = CancelOrderParams {
+        order_id: None,
+        client_order_id: Some(vec!["a-uuid".to_string()]),
         order_user_ref: None,
         token: Token::new("thatToken".to_string()),
     };

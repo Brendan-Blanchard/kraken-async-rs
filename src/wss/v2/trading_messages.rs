@@ -151,7 +151,7 @@ pub struct CancelOrderParams {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct CancelOrderResult {
-    pub order_id: String,
+    pub order_id: Option<String>,
     pub warning: Option<Vec<String>>,
     #[serde(rename = "cl_ord_id")]
     pub client_order_id: Option<String>,
