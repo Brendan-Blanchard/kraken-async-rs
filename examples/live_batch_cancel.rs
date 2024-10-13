@@ -1,7 +1,7 @@
 use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
-use kraken_async_rs::request_types::{AddOrderRequest, CancelBatchOrdersRequest, OrderRequest};
+use kraken_async_rs::request_types::{AddOrderRequest, CancelBatchOrdersRequest};
 use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
 use kraken_async_rs::test_support::set_up_logging;
