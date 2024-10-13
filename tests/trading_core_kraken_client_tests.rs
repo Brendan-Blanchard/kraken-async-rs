@@ -7,14 +7,15 @@ use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 
 use crate::resources::kraken_responses::trading_response_json::{
-    get_add_order_batch_json, get_add_order_json, get_cancel_all_orders_after_json,
-    get_cancel_all_orders_json, get_cancel_order_batch_json, get_cancel_order_json,
-    get_edit_order_json,
+    get_add_order_batch_json, get_add_order_json, get_amend_order_json,
+    get_cancel_all_orders_after_json, get_cancel_all_orders_json, get_cancel_order_batch_json,
+    get_cancel_order_json, get_edit_order_json,
 };
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::{
-    AddBatchedOrderRequest, AddOrderRequest, BatchedOrderRequest, CancelAllOrdersAfterRequest,
-    CancelBatchOrdersRequest, CancelOrderRequest, EditOrderRequest, IntOrString, OrderFlags,
+    AddBatchedOrderRequest, AddOrderRequest, AmendOrderRequest, BatchedOrderRequest,
+    CancelAllOrdersAfterRequest, CancelBatchOrdersRequest, CancelOrderRequest, EditOrderRequest,
+    IntOrString, OrderFlags,
 };
 use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use wiremock::matchers::{body_partial_json, body_string_contains, header_exists, method, path};
@@ -99,6 +100,36 @@ async fn test_add_order_batch() {
         .await;
 
     test_core_endpoint!(secrets_provider, mock_server, add_order_batch, &request);
+}
+
+#[tokio::test]
+async fn test_amend_order() {
+    let secrets_provider = get_null_secrets_provider();
+
+    let amend_request = AmendOrderRequest::builder()
+        .tx_id("tx-id".to_string())
+        .order_qty(dec!(5.25))
+        .limit_price(dec!(0.96).to_string())
+        .post_only(true)
+        .build();
+
+    let mock_server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(path("/0/private/AmendOrder"))
+        .and(header_exists("User-Agent"))
+        .and(header_exists("API-Key"))
+        .and(header_exists("API-Sign"))
+        .and(body_string_contains(r#""txid":"tx-id""#))
+        .and(body_string_contains(r#""order_qty":"5.25""#))
+        .and(body_string_contains(r#""limit_price":"0.96""#))
+        .and(body_string_contains(r#""post_only":true"#))
+        .respond_with(ResponseTemplate::new(200).set_body_json(get_amend_order_json()))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    test_core_endpoint!(secrets_provider, mock_server, amend_order, &amend_request);
 }
 
 #[tokio::test]

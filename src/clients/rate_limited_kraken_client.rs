@@ -322,6 +322,15 @@ where
         response
     }
 
+    async fn amend_order(
+        &mut self,
+        request: &AmendOrderRequest,
+    ) -> Result<ResultErrorResponse<AmendOrder>, ClientError> {
+        // TODO: Need to support amend_order limiting separately, it has a distinct penalty set:
+        //  - https://docs.kraken.com/api/docs/guides/spot-ratelimits/
+        self.core_client.amend_order(&request).await
+    }
+
     async fn edit_order(
         &mut self,
         request: &EditOrderRequest,

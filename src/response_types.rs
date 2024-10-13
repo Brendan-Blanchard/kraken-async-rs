@@ -955,6 +955,11 @@ pub struct AddOrderBatch {
     pub orders: Vec<BatchedOrder>,
 }
 
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct AmendOrder {
+    pub amend_id: String,
+}
+
 /// Response type for an edited order
 #[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct OrderEdit {

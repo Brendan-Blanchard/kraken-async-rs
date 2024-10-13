@@ -46,6 +46,7 @@ pub mod endpoints {
 
     pub const ADD_ORDER_ENDPOINT: &str = "/0/private/AddOrder";
     pub const ADD_ORDER_BATCH_ENDPOINT: &str = "/0/private/AddOrderBatch";
+    pub const AMEND_ORDER_ENDPOINT: &str = "/0/private/AmendOrder";
     pub const EDIT_ORDER_ENDPOINT: &str = "/0/private/EditOrder";
     pub const CANCEL_ORDER_ENDPOINT: &str = "/0/private/CancelOrder";
     pub const CANCEL_ALL_ORDERS_ENDPOINT: &str = "/0/private/CancelAll";
@@ -285,7 +286,10 @@ pub trait KrakenClient: Send + Sync {
         request: &AddBatchedOrderRequest,
     ) -> impl Future<Output = Result<ResultErrorResponse<AddOrderBatch>, ClientError>>;
 
-    // TODO: amend order endpoint
+    fn amend_order(
+        &mut self,
+        request: &AmendOrderRequest,
+    ) -> impl Future<Output = Result<ResultErrorResponse<AmendOrder>, ClientError>>;
 
     /// Edit the volume or price of an existing order, excluding contingent orders like stop/profit orders.
     fn edit_order(

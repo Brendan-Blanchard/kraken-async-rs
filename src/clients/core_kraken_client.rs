@@ -357,6 +357,14 @@ impl KrakenClient for CoreKrakenClient {
     }
 
     #[tracing::instrument(ret, err(Debug), skip(self))]
+    async fn amend_order(
+        &mut self,
+        request: &AmendOrderRequest,
+    ) -> Result<ResultErrorResponse<AmendOrder>, ClientError> {
+        self.private_json_post(AMEND_ORDER_ENDPOINT, request).await
+    }
+
+    #[tracing::instrument(ret, err(Debug), skip(self))]
     async fn edit_order(
         &mut self,
         request: &EditOrderRequest,

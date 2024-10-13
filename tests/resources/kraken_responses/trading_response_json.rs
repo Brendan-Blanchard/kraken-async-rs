@@ -31,6 +31,10 @@ pub fn get_add_order_batch_json() -> Value {
     })
 }
 
+pub fn get_amend_order_json() -> Value {
+    json!({"error":[],"result":{"amend_id":"TVB4ER-X5QP3-ADURMW"}})
+}
+
 pub fn get_edit_order_json() -> Value {
     json!({
         "error":[],

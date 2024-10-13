@@ -674,6 +674,20 @@ pub struct BatchedOrderRequest {
     pub expire_time: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Builder)]
+pub struct AmendOrderRequest {
+    #[serde(rename = "txid")]
+    pub tx_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
+    pub order_qty: Option<Decimal>,
+    pub display_qty: Option<Decimal>,
+    pub limit_price: Option<String>,
+    pub trigger_price: Option<String>,
+    pub post_only: Option<bool>,
+    pub deadline: Option<String>, // RFC-3339
+}
+
 /// A request to edit an existing order.
 #[derive(Debug, Clone, QueryParams, Builder)]
 pub struct EditOrderRequest {
