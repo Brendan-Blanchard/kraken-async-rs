@@ -686,8 +686,10 @@ pub struct AmendOrderRequest {
     pub tx_id: Option<String>,
     #[serde(rename = "cl_ord_id")]
     pub client_order_id: Option<String>,
-    pub order_qty: Option<Decimal>,
-    pub display_qty: Option<Decimal>,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Option<Decimal>,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
     pub limit_price: Option<String>,
     pub trigger_price: Option<String>,
     pub post_only: Option<bool>,

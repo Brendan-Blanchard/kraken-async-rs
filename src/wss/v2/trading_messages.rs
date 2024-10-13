@@ -108,10 +108,12 @@ pub struct AmendOrderParams {
     pub order_id: Option<String>,
     #[serde(rename = "cl_ord_id")]
     pub client_order_id: Option<String>,
+    #[serde(rename = "order_qty")]
     #[serde(with = "float")]
     #[builder(required)]
-    pub order_qty: Decimal,
-    pub display_qty: Option<Decimal>,
+    pub order_quantity: Decimal,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
     #[serde(with = "float_option")]
     pub limit_price: Option<Decimal>,
     pub limit_price_type: Option<PriceType>,

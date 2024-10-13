@@ -108,7 +108,7 @@ async fn test_amend_order() {
 
     let amend_request = AmendOrderRequest::builder()
         .tx_id("tx-id".to_string())
-        .order_qty(dec!(5.25))
+        .order_quantity(dec!(5.25))
         .limit_price(dec!(0.96).to_string())
         .post_only(true)
         .build();

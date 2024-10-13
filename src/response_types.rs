@@ -815,9 +815,12 @@ pub struct OrderAmends {
 pub struct OrderAmend {
     pub amend_id: String,
     pub amend_type: AmendType,
-    pub order_qty: Decimal,
-    pub display_qty: Option<Decimal>,
-    pub remaining_qty: Decimal,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Decimal,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
+    #[serde(rename = "remaining_qty")]
+    pub remaining_quantity: Decimal,
     pub limit_price: Decimal,
     pub trigger_price: Option<Decimal>,
     pub reason: Option<String>,

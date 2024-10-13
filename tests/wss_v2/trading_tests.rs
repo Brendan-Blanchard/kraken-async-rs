@@ -105,8 +105,8 @@ async fn test_amend_order() {
         deadline: None,
         token: Token::new("aToken".to_string()),
         client_order_id: None,
-        order_qty: dec!(5.1),
-        display_qty: None,
+        order_quantity: dec!(5.1),
+        display_quantity: None,
     };
 
     let message = Message {

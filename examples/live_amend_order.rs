@@ -63,7 +63,7 @@ async fn main() {
 
     let amend_request = AmendOrderRequest::builder()
         .tx_id(order_id.clone())
-        .order_qty(dec!(5.25))
+        .order_quantity(dec!(5.25))
         .limit_price(dec!(0.96).to_string())
         .post_only(true)
         .build();
