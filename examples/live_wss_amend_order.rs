@@ -1,16 +1,14 @@
 use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
-use kraken_async_rs::crypto::secrets::Token;
 use kraken_async_rs::request_types::{SelfTradePrevention, TimeInForceV2};
 use kraken_async_rs::response_types::{BuySell, OrderType};
 use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
 use kraken_async_rs::test_support::set_up_logging;
-use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, ResultResponse, WssMessage};
+use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, WssMessage};
 use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
 use kraken_async_rs::wss::v2::trading_messages::{
-    AddOrderParams, AddOrderResult, AmendOrderParams, CancelOrderParams, EditOrderParams,
-    FeePreference,
+    AddOrderParams, AmendOrderParams, CancelOrderParams, FeePreference,
 };
 use rust_decimal_macros::dec;
 use std::sync::Arc;
