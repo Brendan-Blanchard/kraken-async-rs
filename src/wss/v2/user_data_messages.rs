@@ -128,26 +128,21 @@ pub struct SubscriptionRequest<T> {
 pub struct ExecutionSubscription {
     pub channel: String,
     pub token: Token,
-    pub rate_counter: Option<bool>,
-    pub snap_trades: Option<bool>,
-    pub snap_orders: Option<bool>,
-    #[deprecated]
-    pub snapshot: Option<bool>,
-    #[deprecated]
+    #[serde(rename = "snap_trades")]
     pub snapshot_trades: Option<bool>,
+    #[serde(rename = "snap_orders")]
+    pub snapshot_order: Option<bool>,
+    pub rate_counter: Option<bool>,
 }
 
 impl ExecutionSubscription {
-    #[allow(deprecated)]
     pub fn new(token: Token) -> Self {
         ExecutionSubscription {
             channel: "executions".to_string(),
             token,
             snapshot_trades: None,
+            snapshot_order: None,
             rate_counter: None,
-            snap_trades: None,
-            snap_orders: None,
-            snapshot: None,
         }
     }
 }

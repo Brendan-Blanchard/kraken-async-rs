@@ -258,6 +258,7 @@ pub struct BatchOrderParams {
     pub orders: Vec<BatchOrder>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize)]
 pub struct BatchCancelParams {
     pub orders: Vec<IntOrString>,
