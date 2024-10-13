@@ -11,19 +11,20 @@ use kraken_async_rs::request_types::{
     CancelOrderRequest, ClosedOrdersRequest, CreateSubAccountRequest, DeleteExportRequest,
     DepositAddressesRequest, DepositMethodsRequest, EarnAllocationStatusRequest, EditOrderRequest,
     ExportReportRequest, ExportReportStatusRequest, LedgersInfoRequest, ListEarnAllocationsRequest,
-    ListEarnStrategiesRequest, OHLCRequest, OpenOrdersRequest, OpenPositionsRequest, OrderRequest,
-    OrderbookRequest, QueryLedgerRequest, RecentSpreadsRequest, RecentTradesRequest,
-    RetrieveExportReportRequest, StatusOfDepositWithdrawRequest, TickerRequest,
-    TradableAssetPairsRequest, TradeBalanceRequest, TradeInfoRequest, TradeVolumeRequest,
-    TradesHistoryRequest, WalletTransferRequest, WithdrawCancelRequest, WithdrawFundsRequest,
-    WithdrawalAddressesRequest, WithdrawalInfoRequest, WithdrawalMethodsRequest,
+    ListEarnStrategiesRequest, OHLCRequest, OpenOrdersRequest, OpenPositionsRequest,
+    OrderAmendsRequest, OrderRequest, OrderbookRequest, QueryLedgerRequest, RecentSpreadsRequest,
+    RecentTradesRequest, RetrieveExportReportRequest, StatusOfDepositWithdrawRequest,
+    TickerRequest, TradableAssetPairsRequest, TradeBalanceRequest, TradeInfoRequest,
+    TradeVolumeRequest, TradesHistoryRequest, WalletTransferRequest, WithdrawCancelRequest,
+    WithdrawFundsRequest, WithdrawalAddressesRequest, WithdrawalInfoRequest,
+    WithdrawalMethodsRequest,
 };
 use kraken_async_rs::response_types::{
     AccountBalances, AccountTransfer, AddOrder, AddOrderBatch, AllocationStatus, AmendOrder,
     AssetInfo, CancelAllOrdersAfter, CancelOrder, ClosedOrders, ConfirmationRefId,
     DeleteExportReport, DepositAddress, DepositMethod, DepositWithdrawResponse, DepositWithdrawal,
     EarnAllocations, EarnStrategies, ExportReport, ExportReportStatus, ExtendedBalances,
-    LedgerInfo, OhlcResponse, OpenOrders, OpenPositions, Order, OrderEdit, Orderbook,
+    LedgerInfo, OhlcResponse, OpenOrders, OpenPositions, Order, OrderAmends, OrderEdit, Orderbook,
     QueryLedgerInfo, RecentSpreads, RecentTrades, RestTickerInfo, SystemStatusInfo, SystemTime,
     TradableAssetPair, TradeBalances, TradeVolume, TradesHistory, TradesInfo, VerificationTier,
     WebsocketToken, WithdrawMethod, Withdrawal, WithdrawalAddress,
@@ -164,6 +165,13 @@ impl KrakenClient for TestClientErr {
         &mut self,
         _request: &OrderRequest,
     ) -> Result<ResultErrorResponse<HashMap<String, Order>>, ClientError> {
+        Err(ClientError::Parse("StubbedForTesting"))
+    }
+
+    async fn get_order_amends(
+        &mut self,
+        _request: &OrderAmendsRequest,
+    ) -> Result<ResultErrorResponse<OrderAmends>, ClientError> {
         Err(ClientError::Parse("StubbedForTesting"))
     }
 

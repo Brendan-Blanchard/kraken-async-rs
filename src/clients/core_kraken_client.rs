@@ -254,6 +254,14 @@ impl KrakenClient for CoreKrakenClient {
     }
 
     #[tracing::instrument(err(Debug), skip(self))]
+    async fn get_order_amends(
+        &mut self,
+        request: &OrderAmendsRequest,
+    ) -> Result<ResultErrorResponse<OrderAmends>, ClientError> {
+        self.private_json_post(ORDER_AMENDS_ENDPOINT, request).await
+    }
+
+    #[tracing::instrument(err(Debug), skip(self))]
     async fn get_trades_history(
         &mut self,
         request: &TradesHistoryRequest,

@@ -220,6 +220,14 @@ where
         self.core_client.query_orders_info(request).await
     }
 
+    async fn get_order_amends(
+        &mut self,
+        request: &OrderAmendsRequest,
+    ) -> Result<ResultErrorResponse<OrderAmends>, ClientError> {
+        self.private_rate_limiter.wait_with_cost(100).await;
+        self.core_client.get_order_amends(request).await
+    }
+
     async fn get_trades_history(
         &mut self,
         request: &TradesHistoryRequest,

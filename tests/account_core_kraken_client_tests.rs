@@ -6,7 +6,7 @@ use crate::resources::kraken_responses::account_response_json::{
     get_account_balance_json, get_closed_orders_json, get_delete_export_report_json,
     get_export_report_response, get_export_report_status_json, get_extended_balance_json,
     get_ledgers_info_json, get_open_orders_json, get_open_positions_json,
-    get_open_positions_json_do_calc_optional_fields, get_query_ledgers_json,
+    get_open_positions_json_do_calc_optional_fields, get_order_amends_json, get_query_ledgers_json,
     get_query_order_info_json, get_query_trades_info_json, get_request_export_report_json,
     get_trade_balance_json, get_trade_volume_json, get_trades_history_json,
 };
@@ -16,8 +16,9 @@ use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProv
 use kraken_async_rs::request_types::{
     ClosedOrdersRequestBuilder, DeleteExportRequest, DeleteExportType, ExportReportRequest,
     ExportReportStatusRequest, LedgersInfoRequest, OpenOrdersRequest, OpenPositionsRequest,
-    OrderRequest, QueryLedgerRequest, ReportFormatType, ReportType, RetrieveExportReportRequest,
-    StringCSV, TradeBalanceRequest, TradeInfoRequest, TradeVolumeRequest, TradesHistoryRequest,
+    OrderAmendsRequest, OrderRequest, QueryLedgerRequest, ReportFormatType, ReportType,
+    RetrieveExportReportRequest, StringCSV, TradeBalanceRequest, TradeInfoRequest,
+    TradeVolumeRequest, TradesHistoryRequest,
 };
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -163,6 +164,28 @@ async fn test_query_orders_info() {
         .await;
 
     test_core_endpoint!(secrets_provider, mock_server, query_orders_info, &request);
+}
+
+#[tokio::test]
+async fn test_get_order_amends() {
+    let secrets_provider = get_null_secrets_provider();
+
+    let request = OrderAmendsRequest::builder("some-tx-id".to_string()).build();
+
+    let mock_server = MockServer::start().await;
+
+    Mock::given(method(Method::POST))
+        .and(path("/0/private/OrderAmends"))
+        .and(header_exists("User-Agent"))
+        .and(header_exists("API-Key"))
+        .and(header_exists("API-Sign"))
+        .and(body_string_contains(r#""order_id":"some-tx-id""#))
+        .respond_with(ResponseTemplate::new(200).set_body_json(get_order_amends_json()))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    test_core_endpoint!(secrets_provider, mock_server, get_order_amends, &request);
 }
 
 #[tokio::test]

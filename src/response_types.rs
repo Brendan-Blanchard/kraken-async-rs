@@ -392,6 +392,15 @@ pub enum LockType {
     Instant,
 }
 
+/// The type of Order Amend
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum AmendType {
+    Original,
+    User,
+    Restated,
+}
+
 /// Kraken server time given in both unix timestamp and RFC1123
 #[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct SystemTime {
@@ -794,6 +803,26 @@ pub type TradesInfo = HashMap<String, Trade>;
 pub struct TradesHistory {
     pub trades: TradesInfo,
     pub count: i64,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct OrderAmends {
+    pub amends: Vec<OrderAmend>,
+    pub count: u32,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct OrderAmend {
+    pub amend_id: String,
+    pub amend_type: AmendType,
+    pub order_qty: Decimal,
+    pub display_qty: Option<Decimal>,
+    pub remaining_qty: Decimal,
+    pub limit_price: Decimal,
+    pub trigger_price: Option<Decimal>,
+    pub reason: Option<String>,
+    pub post_only: bool,
+    pub timestamp: u64,
 }
 
 /// Mapping of position id: OpenPosition

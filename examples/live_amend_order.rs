@@ -2,7 +2,7 @@ use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::{
-    AddOrderRequest, AmendOrderRequest, CancelOrderRequest, EditOrderRequest, OrderRequest,
+    AddOrderRequest, AmendOrderRequest, CancelOrderRequest, OrderAmendsRequest, OrderRequest,
 };
 use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
@@ -76,6 +76,12 @@ async fn main() {
         .unwrap();
 
     info!("{:?}", amended_order);
+
+    let order_amend = client
+        .get_order_amends(&OrderAmendsRequest::builder(order_id.clone()).build())
+        .await;
+
+    info!("{:?}", order_amend);
 
     let cancel_request = CancelOrderRequest::builder(order_id.clone().into()).build();
 

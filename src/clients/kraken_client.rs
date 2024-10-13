@@ -33,6 +33,7 @@ pub mod endpoints {
     pub const OPEN_ORDERS_ENDPOINT: &str = "/0/private/OpenOrders";
     pub const CLOSED_ORDERS_ENDPOINT: &str = "/0/private/ClosedOrders";
     pub const QUERY_ORDERS_ENDPOINT: &str = "/0/private/QueryOrders";
+    pub const ORDER_AMENDS_ENDPOINT: &str = "/0/private/OrderAmends";
     pub const TRADES_HISTORY_ENDPOINT: &str = "/0/private/TradesHistory";
     pub const QUERY_TRADES_ENDPOINT: &str = "/0/private/QueryTrades";
     pub const OPEN_POSITIONS_ENDPOINT: &str = "/0/private/OpenPositions";
@@ -207,7 +208,10 @@ pub trait KrakenClient: Send + Sync {
         request: &OrderRequest,
     ) -> impl Future<Output = Result<ResultErrorResponse<HashMap<String, Order>>, ClientError>>;
 
-    // TODO: get order amends endpoint
+    fn get_order_amends(
+        &mut self,
+        request: &OrderAmendsRequest,
+    ) -> impl Future<Output = Result<ResultErrorResponse<OrderAmends>, ClientError>>;
 
     /// Get trades from the full history your account, up to 50 at a time.
     ///

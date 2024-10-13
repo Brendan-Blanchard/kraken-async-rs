@@ -459,6 +459,12 @@ pub struct OrderRequest {
     pub consolidate_taker: Option<bool>,
 }
 
+#[derive(Debug, Clone, Serialize, Builder)]
+pub struct OrderAmendsRequest {
+    #[builder(required)]
+    order_id: String,
+}
+
 /// A request for any historical trades for the account.
 ///
 /// This request is fully paginated by epoch time using the `start` and `end` parameters, in

@@ -444,6 +444,19 @@ pub fn get_query_order_info_json() -> Value {
     })
 }
 
+pub fn get_order_amends_json() -> Value {
+    serde_json::from_str(r#"{
+        "error":[],
+        "result": {
+            "amends": [
+                {"amend_id":"TST2AA-CTCTU-MVJDHR","amend_type":"original","order_qty":"5.12340000","remaining_qty":"5.12340000","limit_price":"0.9500","post_only":true,"timestamp":1728821182545},
+                {"amend_id":"TXH3X2-E4ADJ-CH53N2","amend_type":"user","order_qty":"5.25000000","remaining_qty":"5.25000000","limit_price":"0.9600","reason":"User requested","post_only":true,"timestamp":1728821182969}
+            ],
+            "count": 2
+        }
+    }"#).unwrap()
+}
+
 pub fn get_trades_history_json() -> Value {
     json!({
         "error": [],
