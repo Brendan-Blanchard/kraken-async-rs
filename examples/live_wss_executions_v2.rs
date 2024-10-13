@@ -33,10 +33,10 @@ async fn main() {
     let mut client = KrakenWSSClient::new();
     let mut kraken_stream = client.connect_auth::<WssMessage>().await.unwrap();
 
-    let mut exeuction_params = ExecutionSubscription::new(token);
-    exeuction_params.snap_orders = Some(true);
-    exeuction_params.snap_trades = Some(true);
-    let subscription = Message::new_subscription(exeuction_params, 0);
+    let mut execution = ExecutionSubscription::new(token);
+    execution.snapshot_orders = Some(true);
+    execution.snapshot_trades = Some(true);
+    let subscription = Message::new_subscription(execution, 0);
 
     let result = kraken_stream.send(&subscription).await;
     assert!(result.is_ok());

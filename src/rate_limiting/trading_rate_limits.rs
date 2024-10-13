@@ -1,5 +1,5 @@
 use crate::rate_limiting::ttl_cache::{TtlCache, TtlEntry};
-use crate::request_types::{AddBatchedOrderRequest, AmendOrderRequest, EditOrderRequest};
+use crate::request_types::{AddBatchedOrderRequest, EditOrderRequest};
 use crate::response_types::VerificationTier;
 use async_rate_limit::limiters::VariableCostRateLimiter;
 use async_rate_limit::token_bucket::{TokenBucketRateLimiter, TokenBucketState};

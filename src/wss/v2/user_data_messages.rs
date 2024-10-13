@@ -131,7 +131,7 @@ pub struct ExecutionSubscription {
     #[serde(rename = "snap_trades")]
     pub snapshot_trades: Option<bool>,
     #[serde(rename = "snap_orders")]
-    pub snapshot_order: Option<bool>,
+    pub snapshot_orders: Option<bool>,
     pub rate_counter: Option<bool>,
 }
 
@@ -141,7 +141,7 @@ impl ExecutionSubscription {
             channel: "executions".to_string(),
             token,
             snapshot_trades: None,
-            snapshot_order: None,
+            snapshot_orders: None,
             rate_counter: None,
         }
     }
