@@ -9,7 +9,6 @@ use kraken_async_rs::wss::v2::user_data_messages::{
     WalletId, WalletType,
 };
 use rust_decimal_macros::dec;
-
 // TODO: need a realistic partial fill message
 
 #[tokio::test]
@@ -495,6 +494,86 @@ async fn test_execution_order_update_new() {
     ParseIncomingTest::new()
         .with_incoming(new)
         .expect_message(expected_update_new)
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_execution_order_amended() {
+    let amend = r#"{
+        "channel":"executions",
+        "type":"update",
+        "data":[
+            {
+                "timestamp":"2024-10-13T13:38:39.273886Z",
+                "exec_type":"amended",
+                "order_status":"new",
+                "cum_qty":0.00000000,
+                "reason":"User requested",
+                "amended":true,
+                "order_qty":5.10000000,
+                "limit_price":0.9600,
+                "limit_price_type":"static",
+                "order_userref":0,
+                "order_id":"6LYQGW-FH922-U6JTUM"
+            }
+        ],
+        "sequence":20
+    }"#;
+
+    let expected_execution = WssMessage::Channel(ChannelMessage::Execution(Response {
+        data: vec![ExecutionResult {
+            amended: Some(true),
+            execution_type: ExecutionType::Amended,
+            cash_order_quantity: None,
+            client_order_id: None,
+            contingent: None,
+            cost: None,
+            execution_id: None,
+            fees: None,
+            liquidity_indicator: None,
+            last_price: None,
+            last_quantity: None,
+            average_price: None,
+            reason: Some("User requested".to_string()),
+            cumulative_cost: None,
+            cumulative_quantity: Some(dec!(0)),
+            display_quantity: None,
+            effective_time: None,
+            expire_time: None,
+            ext_ord_id: None,
+            ext_exec_id: None,
+            fee_preference: None,
+            fee_usd_equivalent: None,
+            limit_price: Some(dec!(0.9600)),
+            limit_price_type: Some(PriceType::Static),
+            liquidated: None,
+            margin: None,
+            margin_borrow: None,
+            no_market_price_protection: None,
+            order_ref_id: None,
+            order_id: "6LYQGW-FH922-U6JTUM".to_string(),
+            order_quantity: Some(dec!(5.10000000)),
+            order_type: None,
+            order_status: OrderStatusV2::New,
+            order_user_ref: Some(0),
+            post_only: None,
+            position_status: None,
+            reduce_only: None,
+            sender_sub_id: None,
+            side: None,
+            symbol: None,
+            time_in_force: None,
+            timestamp: "2024-10-13T13:38:39.273886Z".to_string(),
+            trade_id: None,
+            triggers: None,
+        }],
+        sequence: 20,
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(amend.to_string())
+        .expect_message(expected_execution)
         .test()
         .await;
 }

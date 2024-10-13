@@ -1,14 +1,16 @@
-use crate::wss_v2::shared::CallResponseTest;
+use crate::wss_v2::shared::{CallResponseTest, ParseIncomingTest};
 use kraken_async_rs::crypto::secrets::Token;
 use kraken_async_rs::request_types::TimeInForceV2;
 use kraken_async_rs::response_types::{BuySell, OrderType};
-use kraken_async_rs::wss::v2::base_messages::MethodMessage::{AddOrder, CancelOrder, EditOrder};
+use kraken_async_rs::wss::v2::base_messages::MethodMessage::{
+    AddOrder, AmendOrder, CancelOrder, EditOrder,
+};
 use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, ResultResponse, WssMessage};
 use kraken_async_rs::wss::v2::trading_messages::{
-    AddOrderParams, AddOrderResult, BatchCancelParams, BatchCancelResponse, BatchOrder,
-    BatchOrderParams, CancelAllOrdersParams, CancelAllOrdersResult, CancelOnDisconnectParams,
-    CancelOnDisconnectResult, CancelOrderParams, CancelOrderResult, EditOrderParams,
-    EditOrderResult, FeePreference,
+    AddOrderParams, AddOrderResult, AmendOrderParams, AmendOrderResult, BatchCancelParams,
+    BatchCancelResponse, BatchOrder, BatchOrderParams, CancelAllOrdersParams,
+    CancelAllOrdersResult, CancelOnDisconnectParams, CancelOnDisconnectResult, CancelOrderParams,
+    CancelOrderResult, EditOrderParams, EditOrderResult, FeePreference,
 };
 use rust_decimal_macros::dec;
 use serde_json::json;
@@ -71,6 +73,74 @@ async fn test_add_order() {
         .send(message)
         .expect(expected_response)
         .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_amend_order() {
+    let expected_request = json!({"method":"amend_order","params":{"order_id":"BQS60L-EGW18-UPAK9U","order_qty":5.1,"limit_price":0.96,"post_only":false,"token":"aToken"},"req_id":0});
+    let response = r#"{"method":"amend_order","req_id":0,"result":{"amend_id":"1M2JV8-OEJZD-G5GSBF","order_id":"BQS60L-EGW18-UPAK9U"},"success":true,"time_in":"2024-10-11T12:12:21.003873Z","time_out":"2024-10-11T12:12:21.005064Z"}"#.to_string();
+    let expected_response = WssMessage::Method(AmendOrder(ResultResponse {
+        result: Some(AmendOrderResult {
+            amend_id: "1M2JV8-OEJZD-G5GSBF".to_string(),
+            order_id: Some("BQS60L-EGW18-UPAK9U".to_string()),
+            client_order_id: None,
+            warnings: None,
+        }),
+        error: None,
+        success: true,
+        req_id: 0,
+        time_in: "2024-10-11T12:12:21.003873Z".to_string(),
+        time_out: "2024-10-11T12:12:21.005064Z".to_string(),
+    }));
+
+    let amend_order = AmendOrderParams {
+        order_id: Some("BQS60L-EGW18-UPAK9U".to_string()),
+        limit_price: Some(dec!(0.96)),
+        limit_price_type: None,
+        post_only: Some(false),
+        trigger_price: None,
+        trigger_price_type: None,
+        deadline: None,
+        token: Token::new("aToken".to_string()),
+        client_order_id: None,
+        order_qty: dec!(5.1),
+        display_qty: None,
+    };
+
+    let message = Message {
+        method: "amend_order".to_string(),
+        params: amend_order,
+        req_id: 0,
+    };
+
+    CallResponseTest::builder()
+        .match_on(expected_request)
+        .respond_with(response)
+        .send(message)
+        .expect(expected_response)
+        .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_amend_order_error_response() {
+    let response = r#"{"error":"Limit_price field must be a number_float","method":"amend_order","req_id":0,"success":false,"time_in":"2024-10-13T13:31:28.636431Z","time_out":"2024-10-13T13:31:28.636488Z"}"#;
+
+    let expected_message = WssMessage::Method(AmendOrder(ResultResponse {
+        result: None,
+        error: Some("Limit_price field must be a number_float".to_string()),
+        success: false,
+        req_id: 0,
+        time_in: "2024-10-13T13:31:28.636431Z".to_string(),
+        time_out: "2024-10-13T13:31:28.636488Z".to_string(),
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(response.to_string())
+        .expect_message(expected_message)
         .test()
         .await;
 }

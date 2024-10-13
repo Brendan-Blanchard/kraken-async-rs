@@ -5,6 +5,7 @@ use rust_decimal::serde::{float, float_option};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
+use simple_builder::Builder;
 
 #[derive(Debug, Eq, PartialEq, Clone, Deserialize)]
 pub enum AddOrderStatus {
@@ -101,9 +102,36 @@ pub struct AddOrderResult {
     pub client_order_id: Option<String>,
 }
 
-// TODO: AmendOrderParams
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, Builder)]
+pub struct AmendOrderParams {
+    pub order_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
+    #[serde(with = "float")]
+    #[builder(required)]
+    pub order_qty: Decimal,
+    pub display_qty: Option<Decimal>,
+    #[serde(with = "float_option")]
+    pub limit_price: Option<Decimal>,
+    pub limit_price_type: Option<PriceType>,
+    pub post_only: Option<bool>,
+    #[serde(with = "float_option")]
+    pub trigger_price: Option<Decimal>,
+    pub trigger_price_type: Option<PriceType>,
+    pub deadline: Option<String>,
+    #[builder(required)]
+    pub token: Token,
+}
 
-// TODO: AmendOrderResult
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct AmendOrderResult {
+    pub amend_id: String,
+    pub order_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
+    pub warnings: Option<Vec<String>>,
+}
 
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
