@@ -336,7 +336,7 @@ where
         request: &AmendOrderRequest,
     ) -> Result<ResultErrorResponse<AmendOrder>, ClientError> {
         self.trading_rate_limiter
-            .amend_order(request.tx_id.clone(), request.client_order_id.clone())
+            .amend_order(&request.tx_id, &request.client_order_id)
             .await;
         let response = self.core_client.amend_order(request).await;
         self.notify_amend_order(&request.tx_id, &request.client_order_id.clone())

@@ -55,7 +55,7 @@ impl KrakenTradingRateLimiter {
     /// Determine the cost of amending an order and wait if necessary
     ///
     /// This is inclusive of penalties for orders amended soon after creation or their last amendment.
-    pub async fn amend_order(&mut self, tx_id: Option<String>, client_order_id: Option<String>) {
+    pub async fn amend_order(&mut self, tx_id: &Option<String>, client_order_id: &Option<String>) {
         let now_seconds = OffsetDateTime::now_utc().unix_timestamp();
 
         // any request should have a tx_id or client_order_id, but should one not have it,
@@ -63,7 +63,7 @@ impl KrakenTradingRateLimiter {
         //  like a single order
         let request_id = tx_id
             .clone()
-            .or(client_order_id)
+            .or(client_order_id.clone())
             .unwrap_or("default_order".to_string());
 
         let order_lifetime = self
@@ -343,6 +343,27 @@ mod tests {
         //  the remaining 3 sets of 4 should take another 3s
         assert!(elapsed > Duration::from_secs(4));
         assert!(elapsed < Duration::from_secs(5));
+    }
+
+    #[test]
+    fn test_amend_order_penalties() {
+        let cases = vec![
+            (0, 3),
+            (4, 3),
+            (5, 2),
+            (9, 2),
+            (10, 1),
+            (14, 1),
+            (15, 0),
+            (i64::MAX, 0),
+        ];
+
+        for (lifetime, expected) in cases {
+            assert_eq!(
+                expected,
+                KrakenTradingRateLimiter::amend_order_penalty(lifetime)
+            );
+        }
     }
 
     #[test]
