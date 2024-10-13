@@ -314,7 +314,8 @@ where
     ) -> Result<ResultErrorResponse<AddOrder>, ClientError> {
         self.trading_rate_limiter.add_order().await;
         let response = self.core_client.add_order(request).await;
-        self.notify_add_order(&response, request.user_ref).await;
+        self.notify_add_order(&response, request.user_ref, &request.client_order_id)
+            .await;
 
         response
     }
@@ -334,9 +335,14 @@ where
         &mut self,
         request: &AmendOrderRequest,
     ) -> Result<ResultErrorResponse<AmendOrder>, ClientError> {
-        // TODO: Need to support amend_order limiting separately, it has a distinct penalty set:
-        //  - https://docs.kraken.com/api/docs/guides/spot-ratelimits/
-        self.core_client.amend_order(request).await
+        self.trading_rate_limiter
+            .amend_order(request.tx_id.clone(), request.client_order_id.clone())
+            .await;
+        let response = self.core_client.amend_order(request).await;
+        self.notify_amend_order(&request.tx_id, &request.client_order_id.clone())
+            .await;
+
+        response
     }
 
     async fn edit_order(
@@ -566,6 +572,7 @@ where
         &mut self,
         order_response: &Result<ResultErrorResponse<AddOrder>, ClientError>,
         user_ref: Option<i64>,
+        client_order_id: &Option<String>,
     ) {
         if let Ok(ResultErrorResponse {
             result: Some(result),
@@ -578,10 +585,27 @@ where
                         tx_id.clone(),
                         OffsetDateTime::now_utc().unix_timestamp(),
                         user_ref,
+                        client_order_id,
                     )
                     .await;
             }
         }
+    }
+
+    /// Notify the trading rate limiter that an order was amended at this time, this timestamp is
+    /// used for determining the order's lifetime for amend, edit, and cancel penalties.
+    async fn notify_amend_order(
+        &mut self,
+        tx_id: &Option<String>,
+        client_order_id: &Option<String>,
+    ) {
+        self.trading_rate_limiter
+            .notify_amend_order(
+                tx_id,
+                OffsetDateTime::now_utc().unix_timestamp(),
+                client_order_id,
+            )
+            .await;
     }
 
     /// Notify the trading rate limiter of all orders created in this batch so it can determine
@@ -602,6 +626,7 @@ where
                         order.tx_id.clone(),
                         OffsetDateTime::now_utc().unix_timestamp(),
                         request.user_ref,
+                        &request.client_order_id,
                     )
                     .await
             }
@@ -625,6 +650,7 @@ where
                     result.tx_id.clone(),
                     OffsetDateTime::now_utc().unix_timestamp(),
                     user_ref,
+                    &None,
                 )
                 .await
         }

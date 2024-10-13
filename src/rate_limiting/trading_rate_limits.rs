@@ -1,5 +1,5 @@
 use crate::rate_limiting::ttl_cache::{TtlCache, TtlEntry};
-use crate::request_types::{AddBatchedOrderRequest, EditOrderRequest};
+use crate::request_types::{AddBatchedOrderRequest, AmendOrderRequest, EditOrderRequest};
 use crate::response_types::VerificationTier;
 use async_rate_limit::limiters::VariableCostRateLimiter;
 use async_rate_limit::token_bucket::{TokenBucketRateLimiter, TokenBucketState};
@@ -24,9 +24,9 @@ pub struct KrakenTradingRateLimiter {
 /// Detailed documentation is available from several locations, including the [overview rate-limiting page],
 /// [api rate-limiting page] and [trading rate-limiting page].
 ///
-/// [overview rate-limiting page]: https://docs.kraken.com/rest/#section/Rate-Limits/Matching-Engine-Rate-Limits
+/// [overview rate-limiting page]: https://docs.kraken.com/api/docs/guides/spot-rest-ratelimits
 /// [api rate-limiting page]: https://support.kraken.com/hc/en-us/articles/206548367-What-are-the-API-rate-limits-#3
-/// [trading rate-limiting page]: https://support.kraken.com/hc/en-us/articles/360045239571-Trading-rate-limits
+/// [trading rate-limiting page]: https://docs.kraken.com/api/docs/guides/spot-ratelimits/
 impl KrakenTradingRateLimiter {
     /// Create a new instance for a user with the given [VerificationTier]
     pub fn new(user_verification: VerificationTier) -> KrakenTradingRateLimiter {
@@ -52,16 +52,46 @@ impl KrakenTradingRateLimiter {
             .await;
     }
 
+    /// Determine the cost of amending an order and wait if necessary
+    ///
+    /// This is inclusive of penalties for orders amended soon after creation or their last amendment.
+    pub async fn amend_order(&mut self, tx_id: Option<String>, client_order_id: Option<String>) {
+        let now_seconds = OffsetDateTime::now_utc().unix_timestamp();
+
+        // any request should have a tx_id or client_order_id, but should one not have it,
+        //  "default_order" is used, which would penalize very conservatively by treating all orders
+        //  like a single order
+        let request_id = tx_id
+            .clone()
+            .or(client_order_id)
+            .unwrap_or("default_order".to_string());
+
+        let order_lifetime = self
+            .ttl_ref_id_cache
+            .lock()
+            .await
+            .get(&request_id)
+            .map(|ttl_entry| now_seconds - ttl_entry.data)
+            .unwrap_or(i64::MAX);
+
+        let penalty = Self::amend_order_penalty(order_lifetime);
+        let cost = (penalty + 1) * 100;
+
+        self.rate_limiter.wait_with_cost(cost as usize).await
+    }
+
     /// Determine the cost of editing an order and wait if necessary
     ///
     /// This is inclusive of penalties for orders edited soon after creation.
     pub async fn edit_order(&mut self, edit_order_request: &EditOrderRequest) {
         let now_seconds = OffsetDateTime::now_utc().unix_timestamp();
-        let request_id = edit_order_request.tx_id.clone();
+        let tx_id = edit_order_request.tx_id.clone();
 
-        let mut cache_guard = self.ttl_ref_id_cache.lock().await;
-        let order_lifetime = cache_guard
-            .get(&request_id)
+        let order_lifetime = self
+            .ttl_ref_id_cache
+            .lock()
+            .await
+            .get(&tx_id)
             .map(|ttl_entry| now_seconds - ttl_entry.data)
             .unwrap_or(i64::MAX);
 
@@ -93,12 +123,13 @@ impl KrakenTradingRateLimiter {
     pub async fn cancel_order_user_ref(&mut self, id: &i64) {
         let now_seconds = OffsetDateTime::now_utc().unix_timestamp();
 
-        let mut cache_guard = self.ttl_user_ref_cache.lock().await;
-        let order_lifetime = cache_guard
+        let order_lifetime = self
+            .ttl_user_ref_cache
+            .lock()
+            .await
             .get(id)
             .map(|ttl_entry| now_seconds - ttl_entry.data)
             .unwrap_or(i64::MAX);
-        drop(cache_guard);
 
         self.cancel_with_penalty(order_lifetime).await;
     }
@@ -119,16 +150,52 @@ impl KrakenTradingRateLimiter {
         tx_id: String,
         placement_time: i64,
         user_ref: Option<i64>,
+        client_order_id: &Option<String>,
     ) {
         let ttl_ref_entry = TtlEntry::new(tx_id, ORDER_TTL_US, placement_time);
 
-        let mut cache_guard = self.ttl_ref_id_cache.lock().await;
-        cache_guard.insert(ttl_ref_entry);
+        self.ttl_ref_id_cache.lock().await.insert(ttl_ref_entry);
 
         if let Some(user_ref) = user_ref {
             let ttl_user_ref_entry = TtlEntry::new(user_ref, ORDER_TTL_US, placement_time);
-            let mut cache_guard = self.ttl_user_ref_cache.lock().await;
-            cache_guard.insert(ttl_user_ref_entry);
+            self.ttl_user_ref_cache
+                .lock()
+                .await
+                .insert(ttl_user_ref_entry);
+        }
+
+        if let Some(client_id) = client_order_id {
+            let ttl_client_entry = TtlEntry::new(client_id.clone(), ORDER_TTL_US, placement_time);
+            self.ttl_ref_id_cache.lock().await.insert(ttl_client_entry);
+        }
+    }
+
+    /// Notify the cache that an order was amended at the given time -- this is essential to the rate limiting scheme!
+    pub async fn notify_amend_order(
+        &mut self,
+        tx_id: &Option<String>,
+        placement_time: i64,
+        client_order_id: &Option<String>,
+    ) {
+        if let Some(id) = tx_id {
+            let ttl_client_entry = TtlEntry::new(id.clone(), ORDER_TTL_US, placement_time);
+            self.ttl_ref_id_cache.lock().await.insert(ttl_client_entry);
+        }
+        if let Some(client_id) = client_order_id {
+            let ttl_client_entry = TtlEntry::new(client_id.clone(), ORDER_TTL_US, placement_time);
+            self.ttl_ref_id_cache.lock().await.insert(ttl_client_entry);
+        }
+    }
+
+    fn amend_order_penalty(lifetime_seconds: i64) -> i64 {
+        if lifetime_seconds < 5 {
+            3
+        } else if lifetime_seconds < 10 {
+            2
+        } else if lifetime_seconds < 15 {
+            1
+        } else {
+            0
         }
     }
 
