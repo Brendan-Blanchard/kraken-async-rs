@@ -392,6 +392,15 @@ pub enum LockType {
     Instant,
 }
 
+/// The type of Order Amend
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum AmendType {
+    Original,
+    User,
+    Restated,
+}
+
 /// Kraken server time given in both unix timestamp and RFC1123
 #[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub struct SystemTime {
@@ -679,6 +688,8 @@ pub struct Order {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
     pub userref: Option<i64>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     pub status: OrderStatus,
     #[serde(rename = "opentm")]
     pub open_time: f64,
@@ -700,12 +711,14 @@ pub struct Order {
     pub stop_price: Decimal,
     #[serde(rename = "limitprice")]
     pub limit_price: Decimal,
+    pub trigger: Option<TriggerType>,
+    pub margin: Option<bool>,
     pub misc: String,
+    pub sender_sub_id: Option<String>,
     #[serde(rename = "oflags")]
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
     pub order_flags: Vec<OrderFlag>,
     pub trades: Option<Vec<String>>,
-    pub trigger: Option<TriggerType>,
     pub reason: Option<String>,
 }
 
@@ -716,6 +729,8 @@ pub struct ClosedOrder {
     #[serde(rename = "refid")]
     pub ref_id: Option<String>,
     pub userref: Option<i64>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     pub status: OrderStatus,
     #[serde(rename = "opentm")]
     pub open_time: f64,
@@ -736,12 +751,14 @@ pub struct ClosedOrder {
     pub stop_price: Decimal,
     #[serde(rename = "limitprice")]
     pub limit_price: Decimal,
+    pub trigger: Option<TriggerType>,
+    pub margin: Option<bool>,
     pub misc: String,
     #[serde(rename = "oflags")]
     #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
     pub order_flags: Vec<OrderFlag>,
     pub trades: Option<Vec<String>>,
-    pub trigger: Option<TriggerType>,
+    pub sender_sub_id: Option<String>,
     pub reason: Option<String>,
 }
 
@@ -786,6 +803,29 @@ pub type TradesInfo = HashMap<String, Trade>;
 pub struct TradesHistory {
     pub trades: TradesInfo,
     pub count: i64,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct OrderAmends {
+    pub amends: Vec<OrderAmend>,
+    pub count: u32,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct OrderAmend {
+    pub amend_id: String,
+    pub amend_type: AmendType,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Decimal,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
+    #[serde(rename = "remaining_qty")]
+    pub remaining_quantity: Decimal,
+    pub limit_price: Decimal,
+    pub trigger_price: Option<Decimal>,
+    pub reason: Option<String>,
+    pub post_only: bool,
+    pub timestamp: u64,
 }
 
 /// Mapping of position id: OpenPosition
@@ -945,6 +985,11 @@ pub struct BatchedOrder {
 #[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct AddOrderBatch {
     pub orders: Vec<BatchedOrder>,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Clone)]
+pub struct AmendOrder {
+    pub amend_id: String,
 }
 
 /// Response type for an edited order

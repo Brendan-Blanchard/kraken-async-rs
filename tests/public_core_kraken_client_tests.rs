@@ -90,11 +90,15 @@ async fn test_get_tradable_asset_pairs() {
     let mock_server = MockServer::start().await;
 
     let pairs = StringCSV::new(vec!["ETHUSD".to_string()]);
-    let request = TradableAssetPairsRequest::builder().pair(pairs).build();
+    let request = TradableAssetPairsRequest::builder()
+        .pair(pairs)
+        .country_code("US:TX".to_string())
+        .build();
 
     Mock::given(method("GET"))
         .and(path("/0/public/AssetPairs"))
         .and(query_param("pair", "ETHUSD"))
+        .and(query_param("country_code", "US:TX"))
         .respond_with(ResponseTemplate::new(200).set_body_json(get_tradable_asset_pairs_json()))
         .expect(1)
         .mount(&mock_server)

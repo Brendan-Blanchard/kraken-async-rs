@@ -180,6 +180,7 @@ pub fn get_open_orders_json() -> Value {
                 "604X4L-ANXHT-JV0ZQT": {
                     "refid":null,
                     "userref":0,
+                    "cl_ord_id": "some-uuid",
                     "status": "open",
                     "opentm": 1676384710.121142,
                     "starttm":0,
@@ -201,6 +202,8 @@ pub fn get_open_orders_json() -> Value {
                     "price": "0.00000000",
                     "stopprice": "0.00000000",
                     "limitprice": "0.00000000",
+                    "trigger": "index",
+                    "margin": false,
                     "misc": "",
                     "oflags": "fciq"
                 },
@@ -371,6 +374,7 @@ pub fn get_closed_orders_json() -> Value {
               "price": "0.00000",
               "stopprice": "0.00000",
               "limitprice": "0.00000",
+              "margin": false,
               "misc": "",
               "oflags": "fciq",
               "trigger": "index"
@@ -392,6 +396,7 @@ pub fn get_closed_orders_json() -> Value {
               "price": "0.00000",
               "stopprice": "0.00000",
               "limitprice": "0.00000",
+              "margin": true,
               "misc": "",
               "oflags": "fciq",
               "trigger": "index"
@@ -437,6 +442,19 @@ pub fn get_query_order_info_json() -> Value {
                 "closetm": 1699792641.705669}
         }
     })
+}
+
+pub fn get_order_amends_json() -> Value {
+    serde_json::from_str(r#"{
+        "error":[],
+        "result": {
+            "amends": [
+                {"amend_id":"TST2AA-CTCTU-MVJDHR","amend_type":"original","order_qty":"5.12340000","remaining_qty":"5.12340000","limit_price":"0.9500","post_only":true,"timestamp":1728821182545},
+                {"amend_id":"TXH3X2-E4ADJ-CH53N2","amend_type":"user","order_qty":"5.25000000","remaining_qty":"5.25000000","limit_price":"0.9600","reason":"User requested","post_only":true,"timestamp":1728821182969}
+            ],
+            "count": 2
+        }
+    }"#).unwrap()
 }
 
 pub fn get_trades_history_json() -> Value {

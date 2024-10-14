@@ -353,6 +353,7 @@ pub struct AssetInfoRequest {
 pub struct TradableAssetPairsRequest {
     pub pair: Option<StringCSV>,
     pub info: Option<AssetPairInfo>,
+    pub country_code: Option<String>,
 }
 
 /// A request for common ticker info for one or many pairs.
@@ -423,6 +424,8 @@ pub struct TradeBalanceRequest {
 pub struct OpenOrdersRequest {
     pub trades: Option<bool>,
     pub userref: Option<i64>,
+    #[query(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 /// A request to retrieve historical orders, 50 at a time.
@@ -439,6 +442,8 @@ pub struct ClosedOrdersRequest {
     pub offset: Option<i64>,
     #[query(rename = "closetime")]
     pub close_time: Option<CloseTime>,
+    #[query(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 /// A request for the details of up to 50 orders by id.
@@ -452,6 +457,12 @@ pub struct OrderRequest {
     pub trades: Option<bool>,
     pub userref: Option<i64>,
     pub consolidate_taker: Option<bool>,
+}
+
+#[derive(Debug, Clone, Serialize, Builder)]
+pub struct OrderAmendsRequest {
+    #[builder(required)]
+    order_id: String,
 }
 
 /// A request for any historical trades for the account.
@@ -574,6 +585,8 @@ pub struct DeleteExportRequest {
 pub struct AddOrderRequest {
     #[query(rename = "userref")]
     pub user_ref: Option<i64>,
+    #[query(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     #[builder(required)]
     #[query(required, rename = "ordertype")]
     pub order_type: OrderType,
@@ -635,6 +648,8 @@ pub struct AddBatchedOrderRequest {
 pub struct BatchedOrderRequest {
     #[serde(rename = "userref")]
     pub user_ref: Option<i64>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     #[builder(required)]
     #[serde(rename = "ordertype")]
     pub order_type: OrderType,
@@ -663,6 +678,22 @@ pub struct BatchedOrderRequest {
     pub start_time: Option<String>,
     #[serde(rename = "expiretm")]
     pub expire_time: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Builder)]
+pub struct AmendOrderRequest {
+    #[serde(rename = "txid")]
+    pub tx_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
+    #[serde(rename = "order_qty")]
+    pub order_quantity: Option<Decimal>,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
+    pub limit_price: Option<String>,
+    pub trigger_price: Option<String>,
+    pub post_only: Option<bool>,
+    pub deadline: Option<String>, // RFC-3339
 }
 
 /// A request to edit an existing order.
@@ -697,6 +728,8 @@ pub struct CancelOrderRequest {
     #[query(required, rename = "txid")]
     #[builder(required)]
     pub tx_id: IntOrString,
+    #[query(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
 }
 
 /// A "dead man's switch" for all active orders.
@@ -715,18 +748,29 @@ pub struct CancelAllOrdersAfterRequest {
 pub struct CancelBatchOrdersRequest {
     #[builder(required)]
     pub orders: Vec<IntOrString>,
+    #[serde(rename = "cl_ord_ids")]
+    pub client_order_ids: Option<Vec<String>>,
 }
 
 impl CancelBatchOrdersRequest {
     pub fn from_user_refs(refs: Vec<i64>) -> CancelBatchOrdersRequest {
         CancelBatchOrdersRequest {
             orders: refs.into_iter().map(IntOrString::Int).collect(),
+            client_order_ids: None,
         }
     }
 
     pub fn from_tx_ids(ids: Vec<String>) -> CancelBatchOrdersRequest {
         CancelBatchOrdersRequest {
             orders: ids.into_iter().map(IntOrString::String).collect(),
+            client_order_ids: None,
+        }
+    }
+
+    pub fn from_client_order_ids(ids: Vec<String>) -> CancelBatchOrdersRequest {
+        CancelBatchOrdersRequest {
+            orders: vec![],
+            client_order_ids: Some(ids),
         }
     }
 }

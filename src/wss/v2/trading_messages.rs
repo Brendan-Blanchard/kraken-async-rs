@@ -5,6 +5,7 @@ use rust_decimal::serde::{float, float_option};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
+use simple_builder::Builder;
 
 #[derive(Debug, Eq, PartialEq, Clone, Deserialize)]
 pub enum AddOrderStatus {
@@ -68,9 +69,11 @@ pub struct AddOrderParams {
     pub margin: Option<bool>,
     pub post_only: Option<bool>,
     pub reduce_only: Option<bool>,
-    pub effective_time: Option<String>, // RFC3339
     pub expire_time: Option<String>,
     pub deadline: Option<String>,
+    pub effective_time: Option<String>, // RFC3339
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     #[serde(rename = "order_userref")]
     pub order_user_ref: Option<i64>,
     pub conditional: Option<ConditionalParams>,
@@ -85,9 +88,8 @@ pub struct AddOrderParams {
     #[serde(rename = "cash_order_qty")]
     pub cash_order_quantity: Option<Decimal>,
     pub validate: Option<bool>,
+    pub sender_sub_id: Option<String>,
     pub token: Token,
-    #[serde(rename = "cl_ord_id")]
-    pub client_order_id: Option<String>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -98,6 +100,39 @@ pub struct AddOrderResult {
     pub warning: Option<Vec<String>>,
     #[serde(rename = "cl_ord_id")]
     pub client_order_id: Option<String>,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, Builder)]
+pub struct AmendOrderParams {
+    pub order_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
+    #[serde(rename = "order_qty")]
+    #[serde(with = "float")]
+    #[builder(required)]
+    pub order_quantity: Decimal,
+    #[serde(rename = "display_qty")]
+    pub display_quantity: Option<Decimal>,
+    #[serde(with = "float_option")]
+    pub limit_price: Option<Decimal>,
+    pub limit_price_type: Option<PriceType>,
+    pub post_only: Option<bool>,
+    #[serde(with = "float_option")]
+    pub trigger_price: Option<Decimal>,
+    pub trigger_price_type: Option<PriceType>,
+    pub deadline: Option<String>,
+    #[builder(required)]
+    pub token: Token,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct AmendOrderResult {
+    pub amend_id: String,
+    pub order_id: Option<String>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
+    pub warnings: Option<Vec<String>>,
 }
 
 #[skip_serializing_none]

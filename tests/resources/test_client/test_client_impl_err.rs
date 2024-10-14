@@ -7,26 +7,27 @@ use kraken_async_rs::clients::rate_limited_kraken_client::RateLimitedKrakenClien
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::{
     AccountTransferRequest, AddBatchedOrderRequest, AddOrderRequest, AllocateEarnFundsRequest,
-    AssetInfoRequest, CancelAllOrdersAfterRequest, CancelBatchOrdersRequest, CancelOrderRequest,
-    ClosedOrdersRequest, CreateSubAccountRequest, DeleteExportRequest, DepositAddressesRequest,
-    DepositMethodsRequest, EarnAllocationStatusRequest, EditOrderRequest, ExportReportRequest,
-    ExportReportStatusRequest, LedgersInfoRequest, ListEarnAllocationsRequest,
-    ListEarnStrategiesRequest, OHLCRequest, OpenOrdersRequest, OpenPositionsRequest, OrderRequest,
-    OrderbookRequest, QueryLedgerRequest, RecentSpreadsRequest, RecentTradesRequest,
-    RetrieveExportReportRequest, StatusOfDepositWithdrawRequest, TickerRequest,
-    TradableAssetPairsRequest, TradeBalanceRequest, TradeInfoRequest, TradeVolumeRequest,
-    TradesHistoryRequest, WalletTransferRequest, WithdrawCancelRequest, WithdrawFundsRequest,
-    WithdrawalAddressesRequest, WithdrawalInfoRequest, WithdrawalMethodsRequest,
+    AmendOrderRequest, AssetInfoRequest, CancelAllOrdersAfterRequest, CancelBatchOrdersRequest,
+    CancelOrderRequest, ClosedOrdersRequest, CreateSubAccountRequest, DeleteExportRequest,
+    DepositAddressesRequest, DepositMethodsRequest, EarnAllocationStatusRequest, EditOrderRequest,
+    ExportReportRequest, ExportReportStatusRequest, LedgersInfoRequest, ListEarnAllocationsRequest,
+    ListEarnStrategiesRequest, OHLCRequest, OpenOrdersRequest, OpenPositionsRequest,
+    OrderAmendsRequest, OrderRequest, OrderbookRequest, QueryLedgerRequest, RecentSpreadsRequest,
+    RecentTradesRequest, RetrieveExportReportRequest, StatusOfDepositWithdrawRequest,
+    TickerRequest, TradableAssetPairsRequest, TradeBalanceRequest, TradeInfoRequest,
+    TradeVolumeRequest, TradesHistoryRequest, WalletTransferRequest, WithdrawCancelRequest,
+    WithdrawFundsRequest, WithdrawalAddressesRequest, WithdrawalInfoRequest,
+    WithdrawalMethodsRequest,
 };
 use kraken_async_rs::response_types::{
-    AccountBalances, AccountTransfer, AddOrder, AddOrderBatch, AllocationStatus, AssetInfo,
-    CancelAllOrdersAfter, CancelOrder, ClosedOrders, ConfirmationRefId, DeleteExportReport,
-    DepositAddress, DepositMethod, DepositWithdrawResponse, DepositWithdrawal, EarnAllocations,
-    EarnStrategies, ExportReport, ExportReportStatus, ExtendedBalances, LedgerInfo, OhlcResponse,
-    OpenOrders, OpenPositions, Order, OrderEdit, Orderbook, QueryLedgerInfo, RecentSpreads,
-    RecentTrades, RestTickerInfo, SystemStatusInfo, SystemTime, TradableAssetPair, TradeBalances,
-    TradeVolume, TradesHistory, TradesInfo, VerificationTier, WebsocketToken, WithdrawMethod,
-    Withdrawal, WithdrawalAddress,
+    AccountBalances, AccountTransfer, AddOrder, AddOrderBatch, AllocationStatus, AmendOrder,
+    AssetInfo, CancelAllOrdersAfter, CancelOrder, ClosedOrders, ConfirmationRefId,
+    DeleteExportReport, DepositAddress, DepositMethod, DepositWithdrawResponse, DepositWithdrawal,
+    EarnAllocations, EarnStrategies, ExportReport, ExportReportStatus, ExtendedBalances,
+    LedgerInfo, OhlcResponse, OpenOrders, OpenPositions, Order, OrderAmends, OrderEdit, Orderbook,
+    QueryLedgerInfo, RecentSpreads, RecentTrades, RestTickerInfo, SystemStatusInfo, SystemTime,
+    TradableAssetPair, TradeBalances, TradeVolume, TradesHistory, TradesInfo, VerificationTier,
+    WebsocketToken, WithdrawMethod, Withdrawal, WithdrawalAddress,
 };
 use kraken_async_rs::secrets::secrets_provider::SecretsProvider;
 use std::collections::HashMap;
@@ -167,6 +168,13 @@ impl KrakenClient for TestClientErr {
         Err(ClientError::Parse("StubbedForTesting"))
     }
 
+    async fn get_order_amends(
+        &mut self,
+        _request: &OrderAmendsRequest,
+    ) -> Result<ResultErrorResponse<OrderAmends>, ClientError> {
+        Err(ClientError::Parse("StubbedForTesting"))
+    }
+
     async fn get_trades_history(
         &mut self,
         _request: &TradesHistoryRequest,
@@ -248,6 +256,13 @@ impl KrakenClient for TestClientErr {
         &mut self,
         _request: &AddBatchedOrderRequest,
     ) -> Result<ResultErrorResponse<AddOrderBatch>, ClientError> {
+        Err(ClientError::Parse("StubbedForTesting"))
+    }
+
+    async fn amend_order(
+        &mut self,
+        _request: &AmendOrderRequest,
+    ) -> Result<ResultErrorResponse<AmendOrder>, ClientError> {
         Err(ClientError::Parse("StubbedForTesting"))
     }
 

@@ -15,7 +15,7 @@ mod execution_subscription {
     };
 
     fn get_expected_execution_subscription() -> Value {
-        json!({"method":"subscribe","params":{"channel":"executions","token":"someToken","snap_trades":true},"req_id":0})
+        json!({"method":"subscribe","params":{"channel":"executions","token":"someToken","snap_orders":true,"snap_trades":true},"req_id":0})
     }
 
     fn get_execution_subscription_response() -> String {
@@ -48,7 +48,7 @@ mod execution_subscription {
     async fn test_execution_subscription() {
         let mut execution_params = ExecutionSubscription::new(Token::new("someToken".to_string()));
         execution_params.snapshot_trades = Some(true);
-        execution_params.snapshot_order = None;
+        execution_params.snapshot_orders = Some(true);
 
         let subscription = Message::new_subscription(execution_params, 0);
 

@@ -33,6 +33,7 @@ pub mod endpoints {
     pub const OPEN_ORDERS_ENDPOINT: &str = "/0/private/OpenOrders";
     pub const CLOSED_ORDERS_ENDPOINT: &str = "/0/private/ClosedOrders";
     pub const QUERY_ORDERS_ENDPOINT: &str = "/0/private/QueryOrders";
+    pub const ORDER_AMENDS_ENDPOINT: &str = "/0/private/OrderAmends";
     pub const TRADES_HISTORY_ENDPOINT: &str = "/0/private/TradesHistory";
     pub const QUERY_TRADES_ENDPOINT: &str = "/0/private/QueryTrades";
     pub const OPEN_POSITIONS_ENDPOINT: &str = "/0/private/OpenPositions";
@@ -46,6 +47,7 @@ pub mod endpoints {
 
     pub const ADD_ORDER_ENDPOINT: &str = "/0/private/AddOrder";
     pub const ADD_ORDER_BATCH_ENDPOINT: &str = "/0/private/AddOrderBatch";
+    pub const AMEND_ORDER_ENDPOINT: &str = "/0/private/AmendOrder";
     pub const EDIT_ORDER_ENDPOINT: &str = "/0/private/EditOrder";
     pub const CANCEL_ORDER_ENDPOINT: &str = "/0/private/CancelOrder";
     pub const CANCEL_ALL_ORDERS_ENDPOINT: &str = "/0/private/CancelAll";
@@ -206,6 +208,11 @@ pub trait KrakenClient: Send + Sync {
         request: &OrderRequest,
     ) -> impl Future<Output = Result<ResultErrorResponse<HashMap<String, Order>>, ClientError>>;
 
+    fn get_order_amends(
+        &mut self,
+        request: &OrderAmendsRequest,
+    ) -> impl Future<Output = Result<ResultErrorResponse<OrderAmends>, ClientError>>;
+
     /// Get trades from the full history your account, up to 50 at a time.
     ///
     /// Pagination is done using the `start`, `end` and `ofs` (offset) parameters.
@@ -282,6 +289,11 @@ pub trait KrakenClient: Send + Sync {
         &mut self,
         request: &AddBatchedOrderRequest,
     ) -> impl Future<Output = Result<ResultErrorResponse<AddOrderBatch>, ClientError>>;
+
+    fn amend_order(
+        &mut self,
+        request: &AmendOrderRequest,
+    ) -> impl Future<Output = Result<ResultErrorResponse<AmendOrder>, ClientError>>;
 
     /// Edit the volume or price of an existing order, excluding contingent orders like stop/profit orders.
     fn edit_order(

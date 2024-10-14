@@ -5,9 +5,16 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
-### v0.4.x
+### v0.5.0
 
+- Update to Spot REST V1, Spot Websockets V2.0.9 as of 26 September 2024 changelog notes
+    - Adds `cl_ord_id` (client_order_id) to many types
+    - Adds AmendOrder endpoint, WS request/responses for amending orders, and updates to many request and response types
+    - Adds get_order_amends endpoint to retrieve amendments made to a particular order
+    - Updated rate limiting to support amending orders and correcting their lifetimes for correct penalties
+- Bump various dependencies
 - Fix `StatusUpdate.connection_id` after observing it's not always populated
+- Add test-support default feature for common example and testing code
 
 ### v0.4.2
 

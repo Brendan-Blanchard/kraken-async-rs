@@ -2,7 +2,7 @@ use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::{
-    AddOrderRequest, CancelOrderRequest, EditOrderRequest, OrderRequest,
+    AddOrderRequest, AmendOrderRequest, CancelOrderRequest, OrderAmendsRequest, OrderRequest,
 };
 use kraken_async_rs::response_types::{BuySell, OrderFlag, OrderType};
 use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
@@ -12,7 +12,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::info;
 
-/// This places an order, queries, edits, then cancels it.
+/// This places an order, queries, amends, then cancels it.
 ///
 /// Of course, *don't use expect and unwrap in production code*, unless you want it to fail.
 #[tokio::main]
@@ -35,8 +35,7 @@ async fn main() {
         dec!(5.1234),
         "USDCUSD".into(),
     )
-    .price(dec!(0.99))
-    // individual OrderFlag variants have a From<OrderFlag> for OrderFlags conversion for convenience
+    .price(dec!(0.95))
     .order_flags(OrderFlag::Post.into())
     .build();
 
@@ -51,7 +50,6 @@ async fn main() {
 
     let order_id = new_order.tx_id.first().unwrap();
 
-    // there's an impl From<&str/&String/String> conversion for StringCSV when requesting a single id
     let order_query = OrderRequest::builder(order_id.into()).build();
 
     let order_details = client
@@ -63,21 +61,29 @@ async fn main() {
 
     info!("{:?}", order_details);
 
-    let edit_query = EditOrderRequest::builder(order_id.clone(), dec!(5.0), "USDCUSD".to_string())
-        .price(dec!(0.99))
+    let amend_request = AmendOrderRequest::builder()
+        .tx_id(order_id.clone())
+        .order_quantity(dec!(5.25))
+        .limit_price(dec!(0.96).to_string())
+        .post_only(true)
         .build();
 
-    let edit = client
-        .edit_order(&edit_query)
+    let amended_order = client
+        .amend_order(&amend_request)
         .await
-        .expect("failed to edit order")
+        .expect("failed to amend order")
         .result
         .unwrap();
 
-    info!("{:?}", edit);
+    info!("{:?}", amended_order);
 
-    // edit.tx_id.into() uses a convenience impl From<String> for IntOrString
-    let cancel_request = CancelOrderRequest::builder(edit.tx_id.into()).build();
+    let order_amend = client
+        .get_order_amends(&OrderAmendsRequest::builder(order_id.clone()).build())
+        .await;
+
+    info!("{:?}", order_amend);
+
+    let cancel_request = CancelOrderRequest::builder(order_id.clone().into()).build();
 
     let cancel = client
         .cancel_order(&cancel_request)

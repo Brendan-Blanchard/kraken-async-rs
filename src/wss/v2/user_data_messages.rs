@@ -100,10 +100,13 @@ pub enum WalletId {
 pub enum ExecutionType {
     PendingNew,
     New,
+    Trade,
     Filled,
     Canceled,
     Expired,
-    Trade,
+    Amended,
+    Restated,
+    Status,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -128,7 +131,7 @@ pub struct ExecutionSubscription {
     #[serde(rename = "snap_trades")]
     pub snapshot_trades: Option<bool>,
     #[serde(rename = "snap_orders")]
-    pub snapshot_order: Option<bool>,
+    pub snapshot_orders: Option<bool>,
     pub rate_counter: Option<bool>,
 }
 
@@ -138,7 +141,7 @@ impl ExecutionSubscription {
             channel: "executions".to_string(),
             token,
             snapshot_trades: None,
-            snapshot_order: None,
+            snapshot_orders: None,
             rate_counter: None,
         }
     }
@@ -214,10 +217,13 @@ pub struct TriggerDescription {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct ExecutionResult {
+    pub amended: Option<bool>,
     #[serde(rename = "exec_type")]
     pub execution_type: ExecutionType,
     #[serde(rename = "cash_order_qty")]
     pub cash_order_quantity: Option<Decimal>,
+    #[serde(rename = "cl_ord_id")]
+    pub client_order_id: Option<String>,
     pub contingent: Option<ConditionalParams>,
     pub cost: Option<Decimal>,
     #[serde(rename = "exec_id")]
@@ -239,13 +245,17 @@ pub struct ExecutionResult {
     pub display_quantity: Option<Decimal>,
     pub effective_time: Option<String>,
     pub expire_time: Option<String>,
+    pub ext_ord_id: Option<String>,
+    pub ext_exec_id: Option<String>,
     #[serde(rename = "fee_ccy_pref")]
     pub fee_preference: Option<FeePreference>,
     #[serde(rename = "fee_usd_equiv")]
     pub fee_usd_equivalent: Option<Decimal>,
     pub limit_price: Option<Decimal>,
     pub limit_price_type: Option<PriceType>,
+    pub liquidated: Option<bool>,
     pub margin: Option<bool>,
+    pub margin_borrow: Option<bool>,
     #[serde(rename = "no_mpp")]
     pub no_market_price_protection: Option<bool>,
     #[serde(rename = "ord_ref_id")]
@@ -260,14 +270,13 @@ pub struct ExecutionResult {
     pub post_only: Option<bool>,
     pub position_status: Option<PositionStatusV2>,
     pub reduce_only: Option<bool>,
+    pub sender_sub_id: Option<String>,
     pub side: Option<BuySell>,
     pub symbol: Option<String>,
     pub time_in_force: Option<TimeInForce>,
     pub timestamp: String,
     pub trade_id: Option<i64>,
     pub triggers: Option<TriggerDescription>,
-    #[serde(rename = "cl_ord_id")]
-    pub client_order_id: Option<String>,
 }
 
 #[skip_serializing_none]
@@ -307,7 +316,7 @@ pub enum BalanceResponse {
 pub struct Balance {
     pub asset: String,
     pub balance: Decimal,
-    pub wallets: Option<Vec<Wallet>>,
+    pub wallets: Vec<Wallet>,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -319,6 +328,7 @@ pub struct LedgerUpdate {
     pub ledger_id: String,
     pub ref_id: String,
     pub timestamp: String,
+    pub asset_class: String,
     #[serde(rename = "type")]
     pub ledger_type: LedgerEntryTypeV2,
     pub sub_type: Option<LedgerEntrySubType>,
@@ -334,8 +344,9 @@ mod tests {
 
     #[test]
     fn test_deserializing_execution_trade() {
-        let message = r#"{"order_id":"O7IBL5-O2V6X-EEXY4U","exec_id":"TJE7HC-DKBTI-5BFVKE","exec_type":"trade","trade_id":365573,"symbol":"KAR/USD","side":"buy","last_qty":105.02014889,"last_price":0.121,"liquidity_ind":"t","cost":12.70744,"order_status":"filled","order_type":"limit","timestamp":"2024-05-18T05:41:33.480251Z","fee_usd_equiv":0.05083,"fees":[{"asset":"USD","qty":0.05083}]}"#;
+        let message = r#"{"order_id":"O7IBL5-O2V6X-EEXY4U","exec_id":"TJE7HC-DKBTI-5BFVKE","exec_type":"trade","ext_ord_id":"some-uuid","ext_exec_id":"another-uuid","trade_id":365573,"symbol":"KAR/USD","side":"buy","last_qty":105.02014889,"last_price":0.121,"liquidity_ind":"t","cost":12.70744,"order_status":"filled","order_type":"limit","timestamp":"2024-05-18T05:41:33.480251Z","fee_usd_equiv":0.05083,"fees":[{"asset":"USD","qty":0.05083}]}"#;
         let expected = ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::Trade,
             cash_order_quantity: None,
             contingent: None,
@@ -355,11 +366,15 @@ mod tests {
             display_quantity: None,
             effective_time: None,
             expire_time: None,
+            ext_ord_id: Some("some-uuid".to_string()),
+            ext_exec_id: Some("another-uuid".to_string()),
             fee_preference: None,
             fee_usd_equivalent: Some(dec!(0.05083)),
             limit_price: None,
             limit_price_type: None,
+            liquidated: None,
             margin: None,
+            margin_borrow: None,
             no_market_price_protection: None,
             order_ref_id: None,
             order_id: "O7IBL5-O2V6X-EEXY4U".to_string(),
@@ -370,6 +385,7 @@ mod tests {
             post_only: None,
             position_status: None,
             reduce_only: None,
+            sender_sub_id: None,
             side: Some(BuySell::Buy),
             symbol: Some("KAR/USD".to_string()),
             time_in_force: None,
@@ -387,6 +403,7 @@ mod tests {
     fn test_deserializing_execution_new_update() {
         let message = r#"{"timestamp":"2024-05-18T11:00:37.240691Z","order_status":"new","exec_type":"new","order_userref":0,"order_id":"OLADEP-E5D5S-IKEHMF"}"#;
         let expected = ExecutionResult {
+            amended: None,
             execution_type: ExecutionType::New,
             cash_order_quantity: None,
             contingent: None,
@@ -403,11 +420,15 @@ mod tests {
             display_quantity: None,
             effective_time: None,
             expire_time: None,
+            ext_ord_id: None,
+            ext_exec_id: None,
             fee_preference: None,
             fee_usd_equivalent: None,
             limit_price: None,
             limit_price_type: None,
+            liquidated: None,
             margin: None,
+            margin_borrow: None,
             no_market_price_protection: None,
             order_ref_id: None,
             order_id: "OLADEP-E5D5S-IKEHMF".to_string(),
@@ -418,6 +439,7 @@ mod tests {
             post_only: None,
             position_status: None,
             reduce_only: None,
+            sender_sub_id: None,
             side: None,
             symbol: None,
             time_in_force: None,

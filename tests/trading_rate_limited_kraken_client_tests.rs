@@ -10,8 +10,8 @@ use crate::resources::test_client::test_client_impl::{
 use crate::resources::test_client::test_client_impl_err::get_rate_limit_test_client_err;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::request_types::{
-    AddBatchedOrderRequest, AddOrderRequest, BatchedOrderRequest, CancelBatchOrdersRequest,
-    CancelOrderRequest, EditOrderRequest, IntOrString, OrderFlags,
+    AddBatchedOrderRequest, AddOrderRequest, AmendOrderRequest, BatchedOrderRequest,
+    CancelBatchOrdersRequest, CancelOrderRequest, EditOrderRequest, IntOrString, OrderFlags,
 };
 use kraken_async_rs::response_types::VerificationTier::{Intermediate, Pro};
 use kraken_async_rs::response_types::{AddOrder, BuySell, OrderFlag, OrderType, VerificationTier};
@@ -42,6 +42,35 @@ async fn test_adding_order_limits() {
 
     assert!(elapsed > Duration::from_secs(4));
     assert!(elapsed < Duration::from_secs(5));
+}
+
+#[tokio::test]
+async fn test_amend_order_max_penalty() {
+    pause();
+    let verification = Intermediate;
+    let mut client = get_rate_limit_test_client(verification);
+
+    let orders = max_out_rate_limits(&mut client, verification).await;
+
+    let amend_start = Instant::now();
+
+    // 4 instant amends costs 400 each, for 1600 total, 1600 / 234 = ~6.83 (requires 7s wait)
+    for i in 0..4 {
+        let amend_request = get_amend_for_order(&orders, i);
+        let _ = client.amend_order(&amend_request).await;
+    }
+
+    let amend_elapsed = amend_start.elapsed();
+    println!("{:?}", amend_elapsed);
+
+    assert!(amend_elapsed > Duration::from_secs(7));
+    assert!(amend_elapsed < Duration::from_secs(8));
+}
+
+fn get_amend_for_order(orders: &Vec<AddOrder>, i: usize) -> AmendOrderRequest {
+    AmendOrderRequest::builder()
+        .tx_id(orders.get(i).unwrap().tx_id.first().unwrap().clone()) // TODO: cleanup
+        .build()
 }
 
 #[tokio::test]
@@ -162,7 +191,10 @@ async fn test_cancel_order_batch_with_max_penalty() {
     );
     order_ids.push(IntOrString::Int(user_ref_request.user_ref.unwrap()));
 
-    let batch_cancel_request = CancelBatchOrdersRequest { orders: order_ids };
+    let batch_cancel_request = CancelBatchOrdersRequest {
+        orders: order_ids,
+        client_order_ids: None,
+    };
 
     // 1 additional order w/ user ref costs 100, 5 instant cancels cost 800 each, for 4100 total,
     // making 4100 / 234 = ~17.52 (requires 18s wait)
@@ -277,5 +309,6 @@ fn edit_from_order(order: &AddOrder) -> EditOrderRequest {
 fn cancel_from_order(order: &AddOrder) -> CancelOrderRequest {
     CancelOrderRequest {
         tx_id: IntOrString::String(order.tx_id.first().unwrap().clone()),
+        client_order_id: None,
     }
 }

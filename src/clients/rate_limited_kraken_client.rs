@@ -220,6 +220,14 @@ where
         self.core_client.query_orders_info(request).await
     }
 
+    async fn get_order_amends(
+        &mut self,
+        request: &OrderAmendsRequest,
+    ) -> Result<ResultErrorResponse<OrderAmends>, ClientError> {
+        self.private_rate_limiter.wait_with_cost(100).await;
+        self.core_client.get_order_amends(request).await
+    }
+
     async fn get_trades_history(
         &mut self,
         request: &TradesHistoryRequest,
@@ -306,7 +314,8 @@ where
     ) -> Result<ResultErrorResponse<AddOrder>, ClientError> {
         self.trading_rate_limiter.add_order().await;
         let response = self.core_client.add_order(request).await;
-        self.notify_add_order(&response, request.user_ref).await;
+        self.notify_add_order(&response, request.user_ref, &request.client_order_id)
+            .await;
 
         response
     }
@@ -318,6 +327,20 @@ where
         self.trading_rate_limiter.add_order_batch(request).await;
         let response = self.core_client.add_order_batch(request).await;
         self.notify_add_order_batched(&response, request).await;
+
+        response
+    }
+
+    async fn amend_order(
+        &mut self,
+        request: &AmendOrderRequest,
+    ) -> Result<ResultErrorResponse<AmendOrder>, ClientError> {
+        self.trading_rate_limiter
+            .amend_order(&request.tx_id, &request.client_order_id)
+            .await;
+        let response = self.core_client.amend_order(request).await;
+        self.notify_amend_order(&request.tx_id, &request.client_order_id.clone())
+            .await;
 
         response
     }
@@ -549,6 +572,7 @@ where
         &mut self,
         order_response: &Result<ResultErrorResponse<AddOrder>, ClientError>,
         user_ref: Option<i64>,
+        client_order_id: &Option<String>,
     ) {
         if let Ok(ResultErrorResponse {
             result: Some(result),
@@ -561,10 +585,27 @@ where
                         tx_id.clone(),
                         OffsetDateTime::now_utc().unix_timestamp(),
                         user_ref,
+                        client_order_id,
                     )
                     .await;
             }
         }
+    }
+
+    /// Notify the trading rate limiter that an order was amended at this time, this timestamp is
+    /// used for determining the order's lifetime for amend, edit, and cancel penalties.
+    async fn notify_amend_order(
+        &mut self,
+        tx_id: &Option<String>,
+        client_order_id: &Option<String>,
+    ) {
+        self.trading_rate_limiter
+            .notify_amend_order(
+                tx_id,
+                OffsetDateTime::now_utc().unix_timestamp(),
+                client_order_id,
+            )
+            .await;
     }
 
     /// Notify the trading rate limiter of all orders created in this batch so it can determine
@@ -585,6 +626,7 @@ where
                         order.tx_id.clone(),
                         OffsetDateTime::now_utc().unix_timestamp(),
                         request.user_ref,
+                        &request.client_order_id,
                     )
                     .await
             }
@@ -608,6 +650,7 @@ where
                     result.tx_id.clone(),
                     OffsetDateTime::now_utc().unix_timestamp(),
                     user_ref,
+                    &None,
                 )
                 .await
         }

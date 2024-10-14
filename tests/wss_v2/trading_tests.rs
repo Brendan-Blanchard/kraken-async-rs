@@ -1,28 +1,30 @@
-use crate::wss_v2::shared::CallResponseTest;
+use crate::wss_v2::shared::{CallResponseTest, ParseIncomingTest};
 use kraken_async_rs::crypto::secrets::Token;
 use kraken_async_rs::request_types::TimeInForceV2;
 use kraken_async_rs::response_types::{BuySell, OrderType};
-use kraken_async_rs::wss::v2::base_messages::MethodMessage::{AddOrder, CancelOrder, EditOrder};
+use kraken_async_rs::wss::v2::base_messages::MethodMessage::{
+    AddOrder, AmendOrder, CancelOrder, EditOrder,
+};
 use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, ResultResponse, WssMessage};
 use kraken_async_rs::wss::v2::trading_messages::{
-    AddOrderParams, AddOrderResult, BatchCancelParams, BatchCancelResponse, BatchOrder,
-    BatchOrderParams, CancelAllOrdersParams, CancelAllOrdersResult, CancelOnDisconnectParams,
-    CancelOnDisconnectResult, CancelOrderParams, CancelOrderResult, EditOrderParams,
-    EditOrderResult, FeePreference,
+    AddOrderParams, AddOrderResult, AmendOrderParams, AmendOrderResult, BatchCancelParams,
+    BatchCancelResponse, BatchOrder, BatchOrderParams, CancelAllOrdersParams,
+    CancelAllOrdersResult, CancelOnDisconnectParams, CancelOnDisconnectResult, CancelOrderParams,
+    CancelOrderResult, EditOrderParams, EditOrderResult, FeePreference,
 };
 use rust_decimal_macros::dec;
 use serde_json::json;
 
 #[tokio::test]
 async fn test_add_order() {
-    let expected_request = json!({"method":"add_order","params":{"order_type":"limit","side":"buy","symbol":"USDC/USD","limit_price":0.95,"time_in_force":"ioc","order_qty":5.0,"post_only":false,"fee_preference":"quote","token":"aToken"},"req_id":0});
-    let response = r#"{"method":"add_order","req_id":0,"result":{"order_id":"OPS23M-VS41G-DDE5Z2"},"success":true,"time_in":"2024-05-18T12:05:50.293682Z","time_out":"2024-05-18T12:05:50.300542Z"}"#.to_string();
+    let expected_request = json!({"method":"add_order","params":{"order_type":"limit","side":"buy","symbol":"USDC/USD","limit_price":0.95,"time_in_force":"ioc","order_qty":5.0,"post_only":false,"fee_preference":"quote","token":"aToken","cl_ord_id":"client-zero","sender_sub_id":"sender-one"},"req_id":0});
+    let response = r#"{"method":"add_order","req_id":0,"result":{"order_id":"OPS23M-VS41G-DDE5Z2","cl_ord_id":"client-zero"},"success":true,"time_in":"2024-05-18T12:05:50.293682Z","time_out":"2024-05-18T12:05:50.300542Z"}"#.to_string();
     let expected_response = WssMessage::Method(AddOrder(ResultResponse {
         result: Some(AddOrderResult {
             order_id: "OPS23M-VS41G-DDE5Z2".to_string(),
             order_user_ref: None,
             warning: None,
-            client_order_id: None,
+            client_order_id: Some("client-zero".to_string()),
         }),
         error: None,
         success: true,
@@ -54,8 +56,9 @@ async fn test_add_order() {
         stp_type: None,
         cash_order_quantity: None,
         validate: None,
+        sender_sub_id: Some("sender-one".to_string()),
         token: Token::new("aToken".to_string()),
-        client_order_id: None,
+        client_order_id: Some("client-zero".to_string()),
     };
 
     let message = Message {
@@ -70,6 +73,74 @@ async fn test_add_order() {
         .send(message)
         .expect(expected_response)
         .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_amend_order() {
+    let expected_request = json!({"method":"amend_order","params":{"order_id":"BQS60L-EGW18-UPAK9U","order_qty":5.1,"limit_price":0.96,"post_only":false,"token":"aToken"},"req_id":0});
+    let response = r#"{"method":"amend_order","req_id":0,"result":{"amend_id":"1M2JV8-OEJZD-G5GSBF","order_id":"BQS60L-EGW18-UPAK9U"},"success":true,"time_in":"2024-10-11T12:12:21.003873Z","time_out":"2024-10-11T12:12:21.005064Z"}"#.to_string();
+    let expected_response = WssMessage::Method(AmendOrder(ResultResponse {
+        result: Some(AmendOrderResult {
+            amend_id: "1M2JV8-OEJZD-G5GSBF".to_string(),
+            order_id: Some("BQS60L-EGW18-UPAK9U".to_string()),
+            client_order_id: None,
+            warnings: None,
+        }),
+        error: None,
+        success: true,
+        req_id: 0,
+        time_in: "2024-10-11T12:12:21.003873Z".to_string(),
+        time_out: "2024-10-11T12:12:21.005064Z".to_string(),
+    }));
+
+    let amend_order = AmendOrderParams {
+        order_id: Some("BQS60L-EGW18-UPAK9U".to_string()),
+        limit_price: Some(dec!(0.96)),
+        limit_price_type: None,
+        post_only: Some(false),
+        trigger_price: None,
+        trigger_price_type: None,
+        deadline: None,
+        token: Token::new("aToken".to_string()),
+        client_order_id: None,
+        order_quantity: dec!(5.1),
+        display_quantity: None,
+    };
+
+    let message = Message {
+        method: "amend_order".to_string(),
+        params: amend_order,
+        req_id: 0,
+    };
+
+    CallResponseTest::builder()
+        .match_on(expected_request)
+        .respond_with(response)
+        .send(message)
+        .expect(expected_response)
+        .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_amend_order_error_response() {
+    let response = r#"{"error":"Limit_price field must be a number_float","method":"amend_order","req_id":0,"success":false,"time_in":"2024-10-13T13:31:28.636431Z","time_out":"2024-10-13T13:31:28.636488Z"}"#;
+
+    let expected_message = WssMessage::Method(AmendOrder(ResultResponse {
+        result: None,
+        error: Some("Limit_price field must be a number_float".to_string()),
+        success: false,
+        req_id: 0,
+        time_in: "2024-10-13T13:31:28.636431Z".to_string(),
+        time_out: "2024-10-13T13:31:28.636488Z".to_string(),
+    }));
+
+    ParseIncomingTest::new()
+        .with_incoming(response.to_string())
+        .expect_message(expected_message)
         .test()
         .await;
 }
@@ -144,6 +215,46 @@ async fn test_cancel_order() {
     let cancel_order = CancelOrderParams {
         order_id: Some(vec!["1V7PZA-L5RIM-RX2G6B".into()]),
         client_order_id: None,
+        order_user_ref: None,
+        token: Token::new("thatToken".to_string()),
+    };
+
+    let message = Message {
+        method: "cancel_order".to_string(),
+        params: cancel_order,
+        req_id: 0,
+    };
+
+    CallResponseTest::builder()
+        .match_on(expected_request)
+        .respond_with(response)
+        .send(message)
+        .expect(expected_response)
+        .build()
+        .test()
+        .await;
+}
+
+#[tokio::test]
+async fn test_cancel_order_by_client_order_id() {
+    let expected_request = json!({"method":"cancel_order","params":{"cl_ord_id":["a-uuid"],"token":"thatToken"},"req_id":0});
+    let response = r#"{"method":"cancel_order","req_id":0,"result":{"cl_ord_id":"a-uuid"},"success":true,"time_in":"2024-05-19T19:18:44.987402Z","time_out":"2024-05-19T19:18:44.989756Z"}"#.to_string();
+    let expected_response = WssMessage::Method(CancelOrder(ResultResponse {
+        result: Some(CancelOrderResult {
+            order_id: None,
+            warning: None,
+            client_order_id: Some("a-uuid".to_string()),
+        }),
+        error: None,
+        success: true,
+        req_id: 0,
+        time_in: "2024-05-19T19:18:44.987402Z".to_string(),
+        time_out: "2024-05-19T19:18:44.989756Z".to_string(),
+    }));
+
+    let cancel_order = CancelOrderParams {
+        order_id: None,
+        client_order_id: Some(vec!["a-uuid".to_string()]),
         order_user_ref: None,
         token: Token::new("thatToken".to_string()),
     };

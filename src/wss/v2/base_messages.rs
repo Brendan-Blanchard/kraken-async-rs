@@ -1,8 +1,8 @@
 use crate::wss::v2::admin_messages::StatusUpdate;
 use crate::wss::v2::market_data_messages::{Instruments, Ohlc, Ticker, Trade, L2, L3};
 use crate::wss::v2::trading_messages::{
-    AddOrderResult, BatchCancelResponse, CancelAllOrdersResult, CancelOnDisconnectResult,
-    CancelOrderResult, EditOrderResult,
+    AddOrderResult, AmendOrderResult, BatchCancelResponse, CancelAllOrdersResult,
+    CancelOnDisconnectResult, CancelOrderResult, EditOrderResult,
 };
 use crate::wss::v2::user_data_messages::{BalanceResponse, ExecutionResult, SubscriptionResult};
 use serde::{de, Deserialize, Deserializer, Serialize};
@@ -25,6 +25,8 @@ pub enum MethodMessage {
     AddOrder(ResultResponse<AddOrderResult>),
     #[serde(rename = "edit_order")]
     EditOrder(ResultResponse<EditOrderResult>),
+    #[serde(rename = "amend_order")]
+    AmendOrder(ResultResponse<AmendOrderResult>),
     #[serde(rename = "cancel_order")]
     CancelOrder(ResultResponse<CancelOrderResult>),
     #[serde(rename = "cancel_all")]
