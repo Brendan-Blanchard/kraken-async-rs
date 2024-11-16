@@ -26,7 +26,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use to_query_params::{QueryParams, ToQueryParams};
 use tokio::sync::Mutex;
-use tracing::debug;
+use tracing::{debug, trace, warn};
 use url::{form_urlencoded, Url};
 
 #[derive(QueryParams, Default)]
@@ -91,6 +91,7 @@ pub struct CoreKrakenClient {
     nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     http_client: Client<HttpsConnector<HttpConnector>, String>,
     user_agent: Option<String>,
+    trace_inbound: bool,
 }
 
 impl KrakenClient for CoreKrakenClient {
@@ -98,6 +99,10 @@ impl KrakenClient for CoreKrakenClient {
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     ) -> Self {
+        if cfg!(feature = "debug-inbound") {
+            warn!("Feature `debug-inbound` is deprecated - use `new_with_tracing` method to set tracing flag")
+        }
+
         let https = HttpsConnector::new();
         let http_client: Client<HttpsConnector<HttpConnector>, String> =
             Client::builder(TokioExecutor::new()).build(https);
@@ -107,6 +112,7 @@ impl KrakenClient for CoreKrakenClient {
             nonce_provider,
             http_client,
             user_agent: None,
+            trace_inbound: false,
         }
     }
 
@@ -123,6 +129,24 @@ impl KrakenClient for CoreKrakenClient {
             nonce_provider,
             http_client,
             user_agent: None,
+            trace_inbound: false,
+        }
+    }
+
+    fn new_with_tracing(
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
+        nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
+        trace_inbound: bool,
+    ) -> Self {
+        let https = HttpsConnector::new();
+        let http_client = Client::builder(TokioExecutor::new()).build(https);
+        CoreKrakenClient {
+            api_url: KRAKEN_BASE_URL.into(),
+            secrets_provider,
+            nonce_provider,
+            http_client,
+            user_agent: None,
+            trace_inbound,
         }
     }
 
@@ -779,6 +803,10 @@ impl CoreKrakenClient {
         } else {
             if cfg!(feature = "debug-inbound") {
                 debug!("Received: {}", text);
+            }
+
+            if self.trace_inbound {
+                trace!("Received: {}", text);
             }
 
             Ok(text)

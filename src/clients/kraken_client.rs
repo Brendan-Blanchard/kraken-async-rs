@@ -99,6 +99,14 @@ pub trait KrakenClient: Send + Sync {
         url: String,
     ) -> Self;
 
+    /// Creates a new instance with the given [SecretsProvider] and [NonceProvider], optionally
+    /// enabling tracing for inbound messages.
+    fn new_with_tracing(
+        secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
+        nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
+        trace_inbound: bool,
+    ) -> Self;
+
     /// Set the user-agent that will be sent in HTTP headers to Kraken. This is not required to be
     /// set.
     fn set_user_agent(&mut self, user_agent: String) -> impl Future<Output = ()>;

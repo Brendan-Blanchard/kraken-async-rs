@@ -4,18 +4,21 @@ use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::TradableAssetPairsRequest;
 use kraken_async_rs::secrets::secrets_provider::{SecretsProvider, StaticSecretsProvider};
+use kraken_async_rs::test_support::set_up_logging;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
 /// This retrieves the asset pair details for BTC-USD, showing a simple public endpoint request.
 #[tokio::main]
 async fn main() {
+    set_up_logging("live_public_endpoint.log");
+
     // credentials aren't needed for public endpoints
     let secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>> =
         Box::new(Arc::new(Mutex::new(StaticSecretsProvider::new("", ""))));
     let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
         Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
-    let mut client = CoreKrakenClient::new(secrets_provider, nonce_provider);
+    let mut client = CoreKrakenClient::new_with_tracing(secrets_provider, nonce_provider, true);
 
     let request = TradableAssetPairsRequest::builder()
         .pair("BTCUSD".into())

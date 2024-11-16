@@ -1,6 +1,6 @@
 [package]
 name = "kraken-async-rs"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 authors = ["Brendan Blanchard"]
 description = "An async REST and WSS client for the Kraken Pro APIs"
@@ -14,20 +14,20 @@ exclude = [".idea", ".gitignore", ".github", ".env", "*.log", "scripts"]
 base64 = "0.22.1"
 hmac = "0.12.1"
 hyper = { version = "1.5.0", features = ["full"] }
-hyper-util = { version = "0.1.9", features = ["full", "client-legacy", "tokio"] }
+hyper-util = { version = "0.1.10", features = ["full", "client-legacy", "tokio"] }
 http-body-util = "0.1.2"
 hyper-tls = "0.6.0"
 sha2 = "0.10.8"
-tokio = { version = "1.40.0", features = ["full"] }
+tokio = { version = "1.41.1", features = ["full"] }
 dotenvy = "0.15.7"
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = { version = "1.0.132", features = [] }
-url = "2.5.2"
+url = "2.5.3"
 serde_with = { version = "3.11.0", features = ["time_0_3"] }
-serde_tuple = "1.0.0"
+serde_tuple = "1.1.0"
 tracing = "0.1.40"
 secrecy = { version = "0.8.0", features = ["default", "serde"] }
-async-rate-limit = "0.1.0"
+async-rate-limit = "0.1.1"
 simple-builder = "0.0.2"
 to-query-params = "0.0.4"
 tokio-tungstenite = { version = "0.24.0", features = ["native-tls"] }
@@ -45,6 +45,8 @@ ws-mock = "0.2.1"
 
 [features]
 default = ["test-support", "debug-inbound", "debug-outbound"]
+# deprecated - use `new_with_tracing` methods on REST and websocket clients
 debug-inbound = []
+# deprecated - use `new_with_tracing` methods on REST and websocket clients
 debug-outbound = []
 test-support = ["dep:tracing-subscriber"]

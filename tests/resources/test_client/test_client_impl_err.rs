@@ -67,6 +67,14 @@ impl KrakenClient for TestClientErr {
         Self {}
     }
 
+    fn new_with_tracing(
+        _secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
+        _nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
+        _trace_inbound: bool,
+    ) -> Self {
+        Self {}
+    }
+
     async fn set_user_agent(&mut self, _user_agent: String) {}
 
     async fn get_server_time(&mut self) -> Result<ResultErrorResponse<SystemTime>, ClientError> {

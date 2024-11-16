@@ -5,6 +5,12 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
+### v0.6.0
+
+- Deprecate `debug-inbound` and `debug-outbound` features
+- Add `new_with_tracing` method to `KrakenClient` to allow setting a flag for tracing inbound REST messages
+-
+
 ### v0.5.0
 
 - Update to Spot REST V1, Spot Websockets V2.0.9 as of 26 September 2024 changelog notes
