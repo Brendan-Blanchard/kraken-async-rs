@@ -44,7 +44,7 @@ wiremock = "0.6.2"
 ws-mock = "0.2.1"
 
 [features]
-default = ["test-support", "debug-inbound", "debug-outbound"]
+default = ["test-support"]
 # deprecated - use `new_with_tracing` methods on REST and websocket clients
 debug-inbound = []
 # deprecated - use `new_with_tracing` methods on REST and websocket clients

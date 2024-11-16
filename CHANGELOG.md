@@ -9,6 +9,7 @@
 
 - Deprecate `debug-inbound` and `debug-outbound` features
 - Add `new_with_tracing` method to `KrakenClient` to allow setting a flag for tracing inbound REST messages
+- Add `new_with_tracing` method to `KrakenWSSClient` to allow setting a flag for tracing inbound websocket messages
 -
 
 ### v0.5.0

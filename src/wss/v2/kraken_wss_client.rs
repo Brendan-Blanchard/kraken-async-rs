@@ -11,7 +11,7 @@ use tokio::net::TcpStream;
 use tokio_stream::Stream;
 use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
 use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
-use tracing::{debug, trace};
+use tracing::{debug, trace, warn};
 use url::Url;
 
 const WS_KRAKEN: &str = "wss://ws.kraken.com/v2";
@@ -24,6 +24,8 @@ type RawStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 pub struct KrakenWSSClient {
     base_url: String,
     auth_url: String,
+    trace_inbound: bool,
+    trace_outbound: bool,
 }
 
 impl Default for KrakenWSSClient {
@@ -35,9 +37,19 @@ impl Default for KrakenWSSClient {
 impl KrakenWSSClient {
     /// Create a client using the default Kraken URLs.
     pub fn new() -> KrakenWSSClient {
+        if cfg!(feature = "debug-inbound") {
+            warn!("Feature `debug-inbound` is deprecated - please use `new_with_tracing` method on `KrakenWSSClient`")
+        }
+
+        if cfg!(feature = "debug-outbound") {
+            warn!("Feature `debug-outbound` is deprecated - please use `new_with_tracing` method on `KrakenWSSClient`")
+        }
+
         KrakenWSSClient {
             base_url: WS_KRAKEN.to_string(),
             auth_url: WS_KRAKEN_AUTH.to_string(),
+            trace_inbound: false,
+            trace_outbound: false,
         }
     }
 
@@ -45,7 +57,21 @@ impl KrakenWSSClient {
     ///
     /// This is most useful for use with a proxy, or for testing.
     pub fn new_with_urls(base_url: String, auth_url: String) -> KrakenWSSClient {
-        KrakenWSSClient { base_url, auth_url }
+        KrakenWSSClient {
+            base_url,
+            auth_url,
+            trace_inbound: false,
+            trace_outbound: false,
+        }
+    }
+
+    pub fn new_with_tracing(trace_inbound: bool, trace_outbound: bool) -> KrakenWSSClient {
+        KrakenWSSClient {
+            base_url: WS_KRAKEN.to_string(),
+            auth_url: WS_KRAKEN_AUTH.to_string(),
+            trace_inbound,
+            trace_outbound,
+        }
     }
 
     /// Connect to the Kraken public websocket channel, returning a [`Result`] containing a
@@ -77,6 +103,8 @@ impl KrakenWSSClient {
         Ok(KrakenMessageStream {
             stream: raw_stream,
             phantom: PhantomData,
+            trace_inbound: self.trace_inbound,
+            trace_outbound: self.trace_outbound,
         })
     }
 }
@@ -100,6 +128,8 @@ where
 {
     stream: WebSocketStream<MaybeTlsStream<TcpStream>>,
     phantom: PhantomData<T>,
+    trace_inbound: bool,
+    trace_outbound: bool,
 }
 
 impl<T> Unpin for KrakenMessageStream<T>
@@ -119,11 +149,11 @@ where
     where
         M: Serialize + Debug,
     {
-        Self::send_as_str(&mut self.stream, message).await
+        self.send_as_str(message).await
     }
 
-    #[tracing::instrument(skip(stream))]
-    async fn send_as_str<M>(stream: &mut RawStream, message: &Message<M>) -> Result<(), WSSError>
+    #[tracing::instrument(skip(self))]
+    async fn send_as_str<M>(&mut self, message: &Message<M>) -> Result<(), WSSError>
     where
         M: Serialize + Debug,
     {
@@ -133,7 +163,11 @@ where
             debug!("Sending: {}", message_json);
         }
 
-        stream
+        if self.trace_outbound {
+            trace!("Sending: {}", message_json);
+        }
+
+        self.stream
             .send(TungsteniteMessage::Binary(message_json.as_bytes().to_vec()))
             .await?;
         Ok(())
@@ -150,6 +184,9 @@ where
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         if let Poll::Ready(Some(message)) = Pin::new(&mut self.stream).poll_next(cx)? {
             if cfg!(feature = "debug-inbound") {
+                trace!("Received: {}", message.to_string());
+            }
+            if self.trace_inbound {
                 trace!("Received: {}", message.to_string());
             }
             let parsed: T = serde_json::from_str(message.to_text()?)?;

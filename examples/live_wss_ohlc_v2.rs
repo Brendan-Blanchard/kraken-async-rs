@@ -11,7 +11,7 @@ use tracing::{info, warn};
 async fn main() {
     set_up_logging("wss_ohlc_v2.log");
 
-    let mut client = KrakenWSSClient::new();
+    let mut client = KrakenWSSClient::new_with_tracing(true, true);
     let mut kraken_stream = client.connect::<WssMessage>().await.unwrap();
 
     let ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
