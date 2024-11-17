@@ -42,6 +42,7 @@ tracing-subscriber = { version = "0.3.18", optional = true }
 [dev-dependencies]
 wiremock = "0.6.2"
 ws-mock = "0.2.1"
+tracing-test = "0.2.5"
 
 [features]
 default = ["test-support"]

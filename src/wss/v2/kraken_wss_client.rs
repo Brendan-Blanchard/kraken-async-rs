@@ -200,6 +200,13 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::Duration;
+    use tokio::time::timeout;
+    use tokio_stream::StreamExt;
+    use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
+    use tracing_test::traced_test;
+    use ws_mock::matchers::Any;
+    use ws_mock::ws_mock_server::{WsMock, WsMockServer};
 
     #[test]
     fn test_wss_client_creates() {
@@ -223,5 +230,59 @@ mod tests {
             KrakenWSSClient::new_with_urls(mock_url.to_string(), mock_auth_url.to_string());
         assert_eq!(mock_url, client.base_url);
         assert_eq!(mock_auth_url, client.auth_url);
+    }
+
+    #[traced_test]
+    #[tokio::test]
+    async fn test_tracing_flags_disabled_by_default() {
+        let mock_server = WsMockServer::start().await;
+        let uri = mock_server.uri().await;
+        let mut client = KrakenWSSClient::new_with_urls(uri.clone(), uri);
+
+        WsMock::new()
+            .matcher(Any::new())
+            .respond_with(TungsteniteMessage::text("response"))
+            .mount(&mock_server)
+            .await;
+
+        let mut stream = client.connect::<String>().await.unwrap();
+
+        stream.send(&Message::new_subscription(0, 0)).await.unwrap();
+
+        let _message = timeout(Duration::from_secs(1), stream.next())
+            .await
+            .unwrap();
+
+        assert!(!logs_contain(r#"Sending:"#));
+        assert!(!logs_contain("Received:"));
+    }
+
+    #[traced_test]
+    #[tokio::test]
+    async fn test_tracing_flags_enabled() {
+        let mock_server = WsMockServer::start().await;
+        let uri = mock_server.uri().await;
+        let mut client = KrakenWSSClient::new_with_urls(uri.clone(), uri);
+        client.trace_inbound = true;
+        client.trace_outbound = true;
+
+        WsMock::new()
+            .matcher(Any::new())
+            .respond_with(TungsteniteMessage::text("response"))
+            .mount(&mock_server)
+            .await;
+
+        let mut stream = client.connect::<String>().await.unwrap();
+
+        stream.send(&Message::new_subscription(0, 0)).await.unwrap();
+
+        let _message = timeout(Duration::from_secs(1), stream.next())
+            .await
+            .unwrap();
+
+        assert!(logs_contain(
+            r#"Sending: {"method":"subscribe","params":0,"req_id":0}"#
+        ));
+        assert!(logs_contain("Received: response"));
     }
 }
