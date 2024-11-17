@@ -126,7 +126,7 @@ pub struct KrakenMessageStream<T>
 where
     T: for<'a> Deserialize<'a>,
 {
-    stream: WebSocketStream<MaybeTlsStream<TcpStream>>,
+    stream: RawStream,
     phantom: PhantomData<T>,
     trace_inbound: bool,
     trace_outbound: bool,
