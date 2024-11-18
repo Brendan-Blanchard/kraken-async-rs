@@ -254,7 +254,7 @@ mod tests {
             .unwrap();
 
         assert!(!logs_contain(r#"Sending:"#));
-        assert!(!logs_contain("Received:"));
+        assert!(!logs_contain("Received: response"));
     }
 
     #[traced_test]

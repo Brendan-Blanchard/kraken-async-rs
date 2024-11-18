@@ -4,6 +4,7 @@ use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProv
 
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use tracing_test::traced_test;
 
 mod resources;
 
@@ -302,6 +303,42 @@ async fn test_cancel_order_batch_error() {
         resp,
         Err(ClientError::Kraken(KrakenError::PermissionDenied))
     ));
+}
+
+#[traced_test]
+#[tokio::test]
+async fn test_client_tracing_enabled() {
+    get_time_with_tracing_flag(true).await;
+
+    assert!(logs_contain(r#"Received: {"error":[],"result":{"rfc1123""#));
+}
+
+#[traced_test]
+#[tokio::test]
+async fn test_client_tracing_disabled() {
+    get_time_with_tracing_flag(false).await;
+
+    assert!(!logs_contain("Received:"));
+}
+
+async fn get_time_with_tracing_flag(trace_inbound: bool) {
+    let secrets_provider = get_null_secrets_provider();
+    let mock_server = MockServer::start().await;
+
+    let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
+        Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
+    let mut client =
+        CoreKrakenClient::new_with_tracing(secrets_provider, nonce_provider, trace_inbound);
+    client.api_url = mock_server.uri();
+
+    Mock::given(method("GET"))
+        .and(path("/0/public/Time"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(get_server_time_json()))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    let _resp = client.get_server_time().await.unwrap();
 }
 
 fn get_test_client(mock_server: &MockServer) -> CoreKrakenClient {
