@@ -258,7 +258,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert!(!logs_contain(r#"Sending:"#));
+        assert!(!logs_contain("Sending:"));
         assert!(!logs_contain("Received: response"));
     }
 

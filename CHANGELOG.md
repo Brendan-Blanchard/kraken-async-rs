@@ -4,13 +4,15 @@
 
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
+- Will drop V1 websockets support in upcoming version
+- Secrecy had a major breaking change (if moving to 0.10.3), which will force breaking changes to the `Secrets` struct
+  and `SecretsProvider` trait
 
 ### v0.6.0
 
 - Deprecate `debug-inbound` and `debug-outbound` features
 - Add `new_with_tracing` method to `KrakenClient` to allow setting a flag for tracing inbound REST messages
 - Add `new_with_tracing` method to `KrakenWSSClient` to allow setting a flag for tracing inbound websocket messages
--
 
 ### v0.5.0
 
