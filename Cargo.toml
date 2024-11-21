@@ -13,7 +13,7 @@ exclude = [".idea", ".gitignore", ".github", ".env", "*.log", "scripts"]
 [dependencies]
 base64 = "0.22.1"
 hmac = "0.12.1"
-hyper = { version = "1.5.1", features = ["full"] }
+hyper = { version = "1.5.0", features = ["full"] }
 hyper-util = { version = "0.1.10", features = ["full", "client-legacy", "tokio"] }
 http-body-util = "0.1.2"
 hyper-tls = "0.6.0"
