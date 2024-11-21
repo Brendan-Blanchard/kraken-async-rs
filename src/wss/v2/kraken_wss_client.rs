@@ -14,8 +14,8 @@ use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
 use tracing::{debug, trace, warn};
 use url::Url;
 
-const WS_KRAKEN: &str = "wss://ws.kraken.com/v2";
-const WS_KRAKEN_AUTH: &str = "wss://ws-auth.kraken.com/v2";
+pub const WS_KRAKEN: &str = "wss://ws.kraken.com/v2";
+pub const WS_KRAKEN_AUTH: &str = "wss://ws-auth.kraken.com/v2";
 
 type RawStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
@@ -65,10 +65,15 @@ impl KrakenWSSClient {
         }
     }
 
-    pub fn new_with_tracing(trace_inbound: bool, trace_outbound: bool) -> KrakenWSSClient {
+    pub fn new_with_tracing(
+        base_url: &str,
+        auth_url: &str,
+        trace_inbound: bool,
+        trace_outbound: bool,
+    ) -> KrakenWSSClient {
         KrakenWSSClient {
-            base_url: WS_KRAKEN.to_string(),
-            auth_url: WS_KRAKEN_AUTH.to_string(),
+            base_url: base_url.to_string(),
+            auth_url: auth_url.to_string(),
             trace_inbound,
             trace_outbound,
         }
