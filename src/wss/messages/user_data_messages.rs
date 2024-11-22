@@ -1,11 +1,11 @@
 use crate::crypto::secrets::Token;
 use crate::request_types::{TimeInForce, TriggerType};
 use crate::response_types::{BuySell, OrderStatusV2, OrderType, PositionStatusV2};
-use crate::wss::v2::market_data_messages::{
+use crate::wss::{
     BookSubscriptionResponse, OhlcSubscriptionResponse, TickerSubscriptionResponse,
     TradeSubscriptionResponse,
 };
-use crate::wss::v2::trading_messages::{ConditionalParams, FeePreference, PriceType};
+use crate::wss::{ConditionalParams, FeePreference, PriceType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;

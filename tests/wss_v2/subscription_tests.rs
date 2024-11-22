@@ -1,17 +1,12 @@
 use crate::wss_v2::shared::CallResponseTest;
-use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, ResultResponse, WssMessage};
-use kraken_async_rs::wss::v2::market_data_messages::{
-    EventTrigger, TickerSubscription, TickerSubscriptionResponse,
-};
-use kraken_async_rs::wss::v2::user_data_messages::SubscriptionResult;
 use serde_json::{json, Value};
 
 mod execution_subscription {
     use super::*;
     use kraken_async_rs::crypto::secrets::Token;
-
-    use kraken_async_rs::wss::v2::user_data_messages::{
-        ExecutionSubscription, ExecutionsSubscriptionResult,
+    use kraken_async_rs::wss::{
+        ExecutionSubscription, ExecutionsSubscriptionResult, Message, MethodMessage,
+        ResultResponse, SubscriptionResult, WssMessage,
     };
 
     fn get_expected_execution_subscription() -> Value {
@@ -66,9 +61,9 @@ mod execution_subscription {
 mod balances_subscription {
     use super::*;
     use kraken_async_rs::crypto::secrets::Token;
-
-    use kraken_async_rs::wss::v2::user_data_messages::{
-        BalanceSubscriptionResult, BalancesSubscription,
+    use kraken_async_rs::wss::{
+        BalanceSubscriptionResult, BalancesSubscription, Message, MethodMessage, ResultResponse,
+        SubscriptionResult, WssMessage,
     };
 
     fn get_expected_balances_subscription() -> Value {
@@ -113,6 +108,10 @@ mod balances_subscription {
 
 mod ticker_subscription {
     use super::*;
+    use kraken_async_rs::wss::{
+        EventTrigger, Message, MethodMessage, ResultResponse, SubscriptionResult,
+        TickerSubscription, TickerSubscriptionResponse, WssMessage,
+    };
 
     fn get_expected_ticker_subscription() -> Value {
         json!({"method":"subscribe","params":{"channel":"ticker","symbol":["BTC/USD"]},"req_id":42})
@@ -156,8 +155,9 @@ mod ticker_subscription {
 
 mod book_subscription {
     use super::*;
-    use kraken_async_rs::wss::v2::market_data_messages::{
-        BookSubscription, BookSubscriptionResponse,
+    use kraken_async_rs::wss::{
+        BookSubscription, BookSubscriptionResponse, Message, MethodMessage, ResultResponse,
+        SubscriptionResult, WssMessage,
     };
 
     fn get_expected_book_subscription() -> Value {
@@ -206,8 +206,9 @@ mod book_subscription {
 mod l3_subscription {
     use super::*;
     use kraken_async_rs::crypto::secrets::Token;
-    use kraken_async_rs::wss::v2::market_data_messages::{
-        BookSubscription, BookSubscriptionResponse,
+    use kraken_async_rs::wss::{
+        BookSubscription, BookSubscriptionResponse, Message, MethodMessage, ResultResponse,
+        SubscriptionResult, WssMessage,
     };
 
     fn get_expected_l3_subscription() -> Value {
@@ -255,8 +256,9 @@ mod l3_subscription {
 
 mod ohlc_subscription {
     use super::*;
-    use kraken_async_rs::wss::v2::market_data_messages::{
-        OhlcSubscription, OhlcSubscriptionResponse,
+    use kraken_async_rs::wss::{
+        Message, MethodMessage, OhlcSubscription, OhlcSubscriptionResponse, ResultResponse,
+        SubscriptionResult, WssMessage,
     };
 
     fn get_expected_ohlc_subscription() -> Value {
@@ -302,8 +304,9 @@ mod ohlc_subscription {
 
 mod trade_subscription {
     use super::*;
-    use kraken_async_rs::wss::v2::market_data_messages::{
-        TradeSubscriptionResponse, TradesSubscription,
+    use kraken_async_rs::wss::{
+        Message, MethodMessage, ResultResponse, SubscriptionResult, TradeSubscriptionResponse,
+        TradesSubscription, WssMessage,
     };
 
     fn get_expected_trade_subscription() -> Value {
@@ -348,9 +351,10 @@ mod trade_subscription {
 
 mod instruments_subscription {
     use super::*;
-    use kraken_async_rs::wss::v2::market_data_messages::InstrumentsSubscription;
-    use kraken_async_rs::wss::v2::user_data_messages::InstrumentSubscriptionResult;
-
+    use kraken_async_rs::wss::{
+        InstrumentSubscriptionResult, InstrumentsSubscription, Message, MethodMessage,
+        ResultResponse, SubscriptionResult, WssMessage,
+    };
     fn get_expected_instruments_subscription() -> Value {
         json!({"method":"subscribe","params":{"channel":"instrument","snapshot":true},"req_id":0})
     }

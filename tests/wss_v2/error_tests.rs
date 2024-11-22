@@ -1,6 +1,6 @@
 use crate::wss_v2::shared::{parse_for_test, ParseIncomingTest};
 use kraken_async_rs::wss::errors::WSSError;
-use kraken_async_rs::wss::v2::base_messages::{MethodMessage, ResultResponse, WssMessage};
+use kraken_async_rs::wss::{MethodMessage, ResultResponse, WssMessage};
 
 #[tokio::test]
 async fn test_cloudflare_error() {

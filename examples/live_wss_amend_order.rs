@@ -5,10 +5,10 @@ use kraken_async_rs::request_types::{SelfTradePrevention, TimeInForceV2};
 use kraken_async_rs::response_types::{BuySell, OrderType};
 use kraken_async_rs::secrets::secrets_provider::{EnvSecretsProvider, SecretsProvider};
 use kraken_async_rs::test_support::set_up_logging;
-use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, WssMessage};
-use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
-use kraken_async_rs::wss::v2::trading_messages::{
-    AddOrderParams, AmendOrderParams, CancelOrderParams, FeePreference,
+use kraken_async_rs::wss::KrakenWSSClient;
+use kraken_async_rs::wss::{
+    AddOrderParams, AmendOrderParams, CancelOrderParams, FeePreference, Message, MethodMessage,
+    WssMessage,
 };
 use rust_decimal_macros::dec;
 use std::sync::Arc;

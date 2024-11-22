@@ -10,6 +10,9 @@
 ### v0.7.0
 
 - Remove V1 websockets, `KrakenWSSClient` and all associated tests and data
+    - Upgrade path for existing V2 users:
+        - Remove all imports with `::v2::` in them
+        - Follow build failures and re-import removed imports
 
 ### v0.6.0
 

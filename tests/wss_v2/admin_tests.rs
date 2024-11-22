@@ -1,8 +1,7 @@
 use crate::wss_v2::shared::{CallResponseTest, ParseIncomingTest};
 use kraken_async_rs::response_types::SystemStatus;
-use kraken_async_rs::wss::v2::admin_messages::StatusUpdate;
-use kraken_async_rs::wss::v2::base_messages::ChannelMessage::{Heartbeat, Status};
-use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, SingleResponse, WssMessage};
+use kraken_async_rs::wss::ChannelMessage::{Heartbeat, Status};
+use kraken_async_rs::wss::{SingleResponse, StatusUpdate, WssMessage};
 use serde_json::{json, Number, Value};
 use std::str::FromStr;
 
@@ -31,7 +30,7 @@ async fn test_admin_messages() {
 
 mod ping_pong {
     use super::*;
-    use kraken_async_rs::wss::v2::base_messages::PongResponse;
+    use kraken_async_rs::wss::{Message, MethodMessage, PongResponse};
 
     fn get_expected_ping() -> Value {
         json!({"method":"ping","req_id":1})

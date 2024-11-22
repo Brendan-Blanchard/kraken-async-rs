@@ -4,4 +4,8 @@
 //! [KrakenMessageStream].
 //!
 pub mod errors;
-pub mod v2;
+mod kraken_wss_client;
+mod messages;
+
+pub use kraken_wss_client::{KrakenMessageStream, KrakenWSSClient, WS_KRAKEN, WS_KRAKEN_AUTH};
+pub use messages::*;

@@ -1,8 +1,7 @@
 use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::test_support::set_up_logging;
-use kraken_async_rs::wss::v2::base_messages::{Message, WssMessage};
-use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
-use kraken_async_rs::wss::v2::market_data_messages::BookSubscription;
+use kraken_async_rs::wss::KrakenWSSClient;
+use kraken_async_rs::wss::{BookSubscription, Message, WssMessage};
 use std::time::Duration;
 use tokio::time::timeout;
 use tokio_stream::StreamExt;

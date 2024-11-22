@@ -1,12 +1,9 @@
 use crate::wss_v2::shared::ParseIncomingTest;
 use kraken_async_rs::response_types::BuySell;
-use kraken_async_rs::wss::v2::base_messages::{
-    ChannelMessage, MarketDataResponse, SingleResponse, WssMessage,
-};
-use kraken_async_rs::wss::v2::market_data_messages::{
-    Asset, AssetStatus, BidAsk, Instruments, L3BidAsk, L3BidAskUpdate, L3Orderbook,
-    L3OrderbookUpdate, MarketLimit, Ohlc, Orderbook, OrderbookEvent, OrderbookUpdate, Pair,
-    PairStatus, Ticker, Trade, L2, L3,
+use kraken_async_rs::wss::{
+    Asset, AssetStatus, BidAsk, ChannelMessage, Instruments, L3BidAsk, L3BidAskUpdate, L3Orderbook,
+    L3OrderbookUpdate, MarketDataResponse, MarketLimit, Ohlc, Orderbook, OrderbookEvent,
+    OrderbookUpdate, Pair, PairStatus, SingleResponse, Ticker, Trade, WssMessage, L2, L3,
 };
 use rust_decimal_macros::dec;
 

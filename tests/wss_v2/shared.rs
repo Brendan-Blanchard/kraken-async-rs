@@ -1,7 +1,7 @@
 use futures_util::StreamExt;
 use kraken_async_rs::wss::errors::WSSError;
-use kraken_async_rs::wss::v2::base_messages::{Message, WssMessage};
-use kraken_async_rs::wss::v2::kraken_wss_client::KrakenWSSClient;
+use kraken_async_rs::wss::KrakenWSSClient;
+use kraken_async_rs::wss::{Message, WssMessage};
 use serde::Serialize;
 use serde_json::Value;
 use simple_builder::Builder;

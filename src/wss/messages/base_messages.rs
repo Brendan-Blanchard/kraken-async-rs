@@ -1,10 +1,10 @@
-use crate::wss::v2::admin_messages::StatusUpdate;
-use crate::wss::v2::market_data_messages::{Instruments, Ohlc, Ticker, Trade, L2, L3};
-use crate::wss::v2::trading_messages::{
+use crate::wss::StatusUpdate;
+use crate::wss::{
     AddOrderResult, AmendOrderResult, BatchCancelResponse, CancelAllOrdersResult,
     CancelOnDisconnectResult, CancelOrderResult, EditOrderResult,
 };
-use crate::wss::v2::user_data_messages::{BalanceResponse, ExecutionResult, SubscriptionResult};
+use crate::wss::{BalanceResponse, ExecutionResult, SubscriptionResult};
+use crate::wss::{Instruments, Ohlc, Ticker, Trade, L2, L3};
 use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_json::Value::Null;
 use std::collections::VecDeque;
@@ -170,10 +170,8 @@ pub struct PongResponse {
 #[cfg(test)]
 mod tests {
     use crate::response_types::SystemStatus;
-    use crate::wss::v2::admin_messages::StatusUpdate;
-    use crate::wss::v2::base_messages::{
-        ChannelMessage, ErrorResponse, SingleResponse, WssMessage,
-    };
+    use crate::wss::StatusUpdate;
+    use crate::wss::{ChannelMessage, ErrorResponse, SingleResponse, WssMessage};
     use serde_json::Number;
     use std::str::FromStr;
 

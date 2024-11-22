@@ -2,15 +2,13 @@ use crate::wss_v2::shared::{CallResponseTest, ParseIncomingTest};
 use kraken_async_rs::crypto::secrets::Token;
 use kraken_async_rs::request_types::TimeInForceV2;
 use kraken_async_rs::response_types::{BuySell, OrderType};
-use kraken_async_rs::wss::v2::base_messages::MethodMessage::{
-    AddOrder, AmendOrder, CancelOrder, EditOrder,
-};
-use kraken_async_rs::wss::v2::base_messages::{Message, MethodMessage, ResultResponse, WssMessage};
-use kraken_async_rs::wss::v2::trading_messages::{
+use kraken_async_rs::wss::MethodMessage::{AddOrder, AmendOrder, CancelOrder, EditOrder};
+use kraken_async_rs::wss::{
     AddOrderParams, AddOrderResult, AmendOrderParams, AmendOrderResult, BatchCancelParams,
     BatchCancelResponse, BatchOrder, BatchOrderParams, CancelAllOrdersParams,
     CancelAllOrdersResult, CancelOnDisconnectParams, CancelOnDisconnectResult, CancelOrderParams,
-    CancelOrderResult, EditOrderParams, EditOrderResult, FeePreference,
+    CancelOrderResult, EditOrderParams, EditOrderResult, FeePreference, Message, MethodMessage,
+    ResultResponse, WssMessage,
 };
 use rust_decimal_macros::dec;
 use serde_json::json;

@@ -1,7 +1,6 @@
 use kraken_async_rs::test_support::set_up_logging;
-use kraken_async_rs::wss::v2::base_messages::{Message, WssMessage};
-use kraken_async_rs::wss::v2::kraken_wss_client::{KrakenWSSClient, WS_KRAKEN, WS_KRAKEN_AUTH};
-use kraken_async_rs::wss::v2::market_data_messages::OhlcSubscription;
+use kraken_async_rs::wss::{KrakenWSSClient, WS_KRAKEN, WS_KRAKEN_AUTH};
+use kraken_async_rs::wss::{Message, OhlcSubscription, WssMessage};
 use std::time::Duration;
 use tokio::time::timeout;
 use tokio_stream::StreamExt;

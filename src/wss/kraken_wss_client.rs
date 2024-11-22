@@ -1,6 +1,6 @@
 //! Kraken WSS client and message streams
 use crate::wss::errors::WSSError;
-use crate::wss::v2::base_messages::Message;
+use crate::wss::Message;
 use futures_util::SinkExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;

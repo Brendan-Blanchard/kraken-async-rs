@@ -1,12 +1,10 @@
 use crate::wss_v2::shared::ParseIncomingTest;
 use kraken_async_rs::request_types::{TimeInForce, TriggerType};
 use kraken_async_rs::response_types::{BuySell, OrderStatusV2, OrderType};
-use kraken_async_rs::wss::v2::base_messages::{ChannelMessage, Response, WssMessage};
-use kraken_async_rs::wss::v2::trading_messages::{FeePreference, PriceType};
-use kraken_async_rs::wss::v2::user_data_messages::{
-    Balance, BalanceResponse, ExecutionResult, ExecutionType, Fee, LedgerCategory,
-    LedgerEntryTypeV2, LedgerUpdate, MakerTaker, TriggerDescription, TriggerStatus, Wallet,
-    WalletId, WalletType,
+use kraken_async_rs::wss::{
+    Balance, BalanceResponse, ChannelMessage, ExecutionResult, ExecutionType, Fee, FeePreference,
+    LedgerCategory, LedgerEntryTypeV2, LedgerUpdate, MakerTaker, PriceType, Response,
+    TriggerDescription, TriggerStatus, Wallet, WalletId, WalletType, WssMessage,
 };
 use rust_decimal_macros::dec;
 // TODO: need a realistic partial fill message
