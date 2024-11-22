@@ -7,29 +7,9 @@ use kraken_async_rs::request_types::{
 use kraken_async_rs::response_types::{
     BuySell, ExportReportStatusType, LedgerEntryType, OrderFlag, OrderType,
 };
-use kraken_async_rs::wss::private::trading_messages::OrderRequestStatus;
-use kraken_async_rs::wss::subscribe_messages::SubscriptionName;
 use std::str::FromStr;
 
 mod resources;
-
-#[test]
-fn test_order_status_request_display() {
-    test_display_output(OrderRequestStatus::Ok, "ok");
-    test_display_output(OrderRequestStatus::Error, "error");
-}
-
-#[test]
-fn test_subscription_name_display() {
-    test_display_output(SubscriptionName::Book, "book");
-    test_display_output(SubscriptionName::Ohlc, "ohlc");
-    test_display_output(SubscriptionName::OpenOrders, "openOrders");
-    test_display_output(SubscriptionName::OwnTrades, "ownTrades");
-    test_display_output(SubscriptionName::Spread, "spread");
-    test_display_output(SubscriptionName::Ticker, "ticker");
-    test_display_output(SubscriptionName::Trade, "trade");
-    test_display_output(SubscriptionName::All, "*");
-}
 
 #[test]
 fn test_close_time_display() {

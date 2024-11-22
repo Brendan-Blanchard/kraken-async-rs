@@ -1,10 +1,5 @@
 //! Top level errors produced by [KrakenWSSClient] and [KrakenMessageStream]
 //!
-#[allow(unused)]
-use crate::wss::kraken_wss_client::KrakenMessageStream;
-#[allow(unused)]
-#[allow(deprecated)]
-use crate::wss::kraken_wss_client::KrakenWSSClient;
 pub use serde_json::Error as SerdeError;
 use std::error::Error;
 use std::fmt::{Display, Formatter};

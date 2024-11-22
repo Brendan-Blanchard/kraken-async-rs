@@ -4,9 +4,12 @@
 
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
-- Will drop V1 websockets support in upcoming version
 - Secrecy had a major breaking change (if moving to 0.10.3), which will force breaking changes to the `Secrets` struct
   and `SecretsProvider` trait
+
+### v0.7.0
+
+- Remove V1 websockets, `KrakenWSSClient` and all associated tests and data
 
 ### v0.6.0
 

@@ -15,17 +15,3 @@ pub fn get_null_secrets_provider<'a>() -> Box<Arc<Mutex<dyn SecretsProvider>>> {
         NULL_SECRET,
     ))))
 }
-
-pub fn get_env_secrets_provider<'a>() -> Box<Arc<Mutex<dyn SecretsProvider>>> {
-    Box::new(Arc::new(Mutex::new(EnvSecretsProvider::new(
-        "KRAKEN_KEY",
-        "KRAKEN_SECRET",
-    ))))
-}
-
-pub fn get_export_env_secrets_provider<'a>() -> Box<Arc<Mutex<dyn SecretsProvider>>> {
-    Box::new(Arc::new(Mutex::new(EnvSecretsProvider::new(
-        "KRAKEN_EXPORT_KEY",
-        "KRAKEN_EXPORT_SECRET",
-    ))))
-}
