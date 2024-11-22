@@ -2,15 +2,11 @@
 
 ![badge](https://github.com/Brendan-Blanchard/kraken-async-rs/actions/workflows/main.yml/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs/graph/badge.svg?token=30Y7BIDSNK)](https://codecov.io/gh/Brendan-Blanchard/kraken-async-rs)
 
-A complete[^3] wrapper of the Kraken Pro trading API (v1 and v2 websockets), written in asynchronous Rust.
+A complete[^3] wrapper of the Kraken Pro trading API (v2 websockets), written in asynchronous Rust.
 
 It's not expected that you'll be able to use Kraken-Async-Rs without consulting
-the [Kraken API](https://docs.kraken.com/rest/#section/General-Usage)
-and [Websocket](https://docs.kraken.com/websockets/#overview)
-documentation. Going forward, you should reference the new API docs:
-[Kraken REST API](https://docs.kraken.com/api/docs/rest-api/get-server-time),
-[Kraken Websockets V1](https://docs.kraken.com/api/docs/websocket-v1/addorder),
-and [Kraken Websockets V2](https://docs.kraken.com/api/docs/websocket-v2/add_order).
+the [Kraken REST API](https://docs.kraken.com/api/docs/rest-api/get-server-time) docs,
+and [Kraken Websockets V2](https://docs.kraken.com/api/docs/websocket-v2/add_order) docs.
 
 There are many details and interdependencies[^1] to each request that are not documented or enforced in
 the library since they're outside this library's control and subject to change.
@@ -88,7 +84,7 @@ async fn main() {
 Public websockets require no authentication, so it's as easy as creating a `v2::KrakenWSSClient`, connecting, and
 sending any subscription methods and then awaiting the `.next()` method of the returned `KrakenMessageStream`.
 
-You can also visit the [full example](examples/live_wss_ohlc_v2.rs) with logging and imports.
+You can also visit the [full example](examples/live_wss_ohlc) with logging and imports.
 
 ```rust
 #[tokio::main]
@@ -108,45 +104,6 @@ async fn main() {
         } else {
             println!("Message failed: {:?}", message);
         }
-    }
-}
-```
-
-### Example: Listening to Websockets (V1 - Deprecated)
-
-_Kraken released a V2 version of their APIs with simplified data types, new functionality, and more standardized
-documentation.
-You should use the V2 API instead if at all possible, since the V1 endpoints will be maintained but not improved._
-
-Public websockets require no authentication, so it's as easy as creating a `KrakenWSSClient`, connecting, and sending
-any subscription methods and then awaiting the `.next()` method of the returned `KrakenMessageStream`.
-
-You can also visit the [full example](examples/live_public_wss_listening.rs) with logging and imports.
-
-```rust
-#[tokio::main]
-async fn main() {
-    let subscriptions = [
-        // many of these have additional options that could be set
-        Subscription::new_trades_subscription(),
-        Subscription::new_book_subscription(Some(10)), // use a depth of 10 for simplicity
-        Subscription::new_ticker_subscription(),
-        Subscription::new_ohlc_subscription(None),
-        Subscription::new_spread_subscription(),
-    ];
-
-    let mut client = KrakenWSSClient::new();
-    let mut kraken_stream: KrakenMessageStream<PublicMessage> = client.connect().await.unwrap();
-
-    for subscription in subscriptions {
-        // for more valid pairs for WSS requests, consult the `ws_name` field of `get_tradable_asset_pairs`
-        let subscribe_message =
-            SubscribeMessage::new(0, Some(vec!["XBT/USD".into()]), subscription);
-        kraken_stream.subscribe(&subscribe_message).await.expect("failed to subscribe");
-    }
-
-    while let Some(message) = kraken_stream.next().await {
-        println!("{:?}", message.unwrap());
     }
 }
 ```

@@ -22,7 +22,7 @@ use tracing::{info, warn};
 /// amends the order on receipt of its confirmation, and cancels once it's been amended.
 #[tokio::main]
 async fn main() {
-    set_up_logging("wss_trading_amend_order_v2.log");
+    set_up_logging("wss_trading_amend_order.log");
 
     let secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>> = Box::new(Arc::new(Mutex::new(
         EnvSecretsProvider::new("KRAKEN_KEY", "KRAKEN_SECRET"),
