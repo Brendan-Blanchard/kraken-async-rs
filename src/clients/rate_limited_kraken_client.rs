@@ -754,9 +754,16 @@ mod tests {
     use crate::clients::kraken_client::KrakenClient;
     use crate::clients::rate_limited_kraken_client::RateLimitedKrakenClient;
     use crate::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
+    use crate::response_types::VerificationTier::Pro;
     use crate::secrets::secrets_provider::StaticSecretsProvider;
+    use crate::test_data::get_null_secrets_provider;
+    use crate::test_data::TestRateLimitedClient;
+    use crate::test_rate_limited_endpoint;
     use std::sync::Arc;
+    use std::time::Duration;
     use tokio::sync::Mutex;
+    use tokio::time::pause;
+    use tokio::time::Instant;
 
     #[test]
     fn client_creates() {
@@ -769,5 +776,13 @@ mod tests {
         );
 
         assert_eq!(client.core_client.api_url, KRAKEN_BASE_URL);
+    }
+
+    #[tokio::test]
+    async fn test_get_websockets_token() {
+        pause();
+
+        // 23 calls costs 2300, requiring 3s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_websockets_token, 23, 3, 4, Pro);
     }
 }
