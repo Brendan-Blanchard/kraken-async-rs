@@ -1,6 +1,4 @@
-use kraken_async_rs::secrets::secrets_provider::{
-    SecretsProvider, StaticSecretsProvider,
-};
+use kraken_async_rs::secrets::secrets_provider::{SecretsProvider, StaticSecretsProvider};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
