@@ -11,6 +11,8 @@ pub mod rate_limiting;
 pub mod request_types;
 pub mod response_types;
 pub mod secrets;
+#[cfg(test)]
+pub mod test_data;
 #[cfg(feature = "test-support")]
 pub mod test_support;
 pub mod wss;
