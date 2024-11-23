@@ -205,17 +205,31 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::crypto::secrets::Token;
     use crate::response_types::{BuySell, SystemStatus};
     use crate::test_data::{
-        get_expected_ping, get_expected_pong_message, get_pong, parse_for_test, CallResponseTest,
-        ParseIncomingTest,
+        get_balances_subscription_response, get_book_subscription_response,
+        get_execution_subscription_response, get_expected_balances_message,
+        get_expected_balances_subscription, get_expected_book_message,
+        get_expected_book_subscription, get_expected_execution_message,
+        get_expected_execution_subscription, get_expected_instruments_message,
+        get_expected_instruments_subscription, get_expected_l3_message,
+        get_expected_l3_subscription, get_expected_ohlc_message, get_expected_ohlc_subscription,
+        get_expected_ping, get_expected_pong_message, get_expected_ticker_message,
+        get_expected_ticker_subscription, get_expected_trade_message,
+        get_expected_trade_subscription, get_instruments_subscription_response,
+        get_l3_subscription_response, get_ohlc_subscription_response, get_pong,
+        get_ticker_subscription_response, get_trade_subscription_response, parse_for_test,
+        CallResponseTest, ParseIncomingTest,
     };
     use crate::wss::ChannelMessage::{Heartbeat, Status};
     use crate::wss::{
-        Asset, AssetStatus, BidAsk, ChannelMessage, Instruments, L3BidAsk, L3BidAskUpdate,
+        Asset, AssetStatus, BalancesSubscription, BidAsk, BookSubscription, ChannelMessage,
+        ExecutionSubscription, Instruments, InstrumentsSubscription, L3BidAsk, L3BidAskUpdate,
         L3Orderbook, L3OrderbookUpdate, MarketDataResponse, MarketLimit, MethodMessage, Ohlc,
-        Orderbook, OrderbookEvent, OrderbookUpdate, Pair, PairStatus, ResultResponse,
-        SingleResponse, StatusUpdate, Ticker, Trade, WssMessage, L2, L3,
+        OhlcSubscription, Orderbook, OrderbookEvent, OrderbookUpdate, Pair, PairStatus,
+        ResultResponse, SingleResponse, StatusUpdate, Ticker, TickerSubscription, Trade,
+        TradesSubscription, WssMessage, L2, L3,
     };
     use rust_decimal_macros::dec;
     use serde_json::Number;
@@ -1039,6 +1053,141 @@ mod tests {
         ParseIncomingTest::new()
             .with_incoming(instrument_snapshot)
             .expect_message(expected_snapshot)
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_execution_subscription() {
+        let mut execution_params = ExecutionSubscription::new(Token::new("someToken".to_string()));
+        execution_params.snapshot_trades = Some(true);
+        execution_params.snapshot_orders = Some(true);
+
+        let subscription = Message::new_subscription(execution_params, 0);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_execution_subscription())
+            .respond_with(get_execution_subscription_response())
+            .send(subscription)
+            .expect(get_expected_execution_message())
+            .build()
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_balances_subscription() {
+        let mut balances_params = BalancesSubscription::new(Token::new("anotherToken".to_string()));
+        balances_params.snapshot = Some(true);
+
+        let subscription = Message::new_subscription(balances_params, 10312008);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_balances_subscription())
+            .respond_with(get_balances_subscription_response())
+            .send(subscription)
+            .expect(get_expected_balances_message())
+            .build()
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_ticker_subscription() {
+        let ticker_params = TickerSubscription::new(vec!["BTC/USD".into()]);
+
+        let subscription = Message::new_subscription(ticker_params, 42);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_ticker_subscription())
+            .respond_with(get_ticker_subscription_response())
+            .send(subscription)
+            .expect(get_expected_ticker_message())
+            .build()
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_book_subscription() {
+        let mut book_params = BookSubscription::new(vec!["BTC/USD".into()]);
+        book_params.depth = Some(10);
+        book_params.snapshot = Some(true);
+
+        let subscription = Message::new_subscription(book_params, 11);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_book_subscription())
+            .respond_with(get_book_subscription_response())
+            .send(subscription)
+            .expect(get_expected_book_message())
+            .build()
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_l3_subscription() {
+        let mut book_params =
+            BookSubscription::new_l3(vec!["BTC/USD".into()], Token::new("someToken".to_string()));
+        book_params.snapshot = Some(true);
+
+        let subscription = Message::new_subscription(book_params, 99);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_l3_subscription())
+            .respond_with(get_l3_subscription_response())
+            .send(subscription)
+            .expect(get_expected_l3_message())
+            .build()
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_ohlc_subscription() {
+        let ohlc_params = OhlcSubscription::new(vec!["ETH/USD".into()], 60);
+
+        let subscription = Message::new_subscription(ohlc_params, 121);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_ohlc_subscription())
+            .respond_with(get_ohlc_subscription_response())
+            .send(subscription)
+            .expect(get_expected_ohlc_message())
+            .build()
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_trade_subscription() {
+        let trade_params = TradesSubscription::new(vec!["BTC/USD".into()]);
+
+        let subscription = Message::new_subscription(trade_params, 0);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_trade_subscription())
+            .respond_with(get_trade_subscription_response())
+            .send(subscription)
+            .expect(get_expected_trade_message())
+            .build()
+            .test()
+            .await;
+    }
+
+    #[tokio::test]
+    async fn test_instruments_subscription() {
+        let instruments_params = InstrumentsSubscription::new(true);
+
+        let subscription = Message::new_subscription(instruments_params, 0);
+
+        CallResponseTest::builder()
+            .match_on(get_expected_instruments_subscription())
+            .respond_with(get_instruments_subscription_response())
+            .send(subscription)
+            .expect(get_expected_instruments_message())
+            .build()
             .test()
             .await;
     }
