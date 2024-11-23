@@ -35,6 +35,12 @@ pub struct ParseIncomingTest {
     expected_messages: Vec<WssMessage>,
 }
 
+impl Default for ParseIncomingTest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ParseIncomingTest {
     pub fn new() -> Self {
         ParseIncomingTest {
