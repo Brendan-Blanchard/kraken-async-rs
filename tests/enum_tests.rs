@@ -187,6 +187,8 @@ fn test_kraken_error_display() {
     test_display_output(KrakenError::ServiceUnavailable, "ServiceUnavailable");
     test_display_output(KrakenError::ServiceBusy, "ServiceBusy");
     test_display_output(KrakenError::InternalError, "InternalError");
+    test_display_output(KrakenError::TradeLocked, "TradeLocked");
+    test_display_output(KrakenError::FeatureDisabled, "FeatureDisabled");
 }
 
 #[test]
