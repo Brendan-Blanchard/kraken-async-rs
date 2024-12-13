@@ -754,16 +754,38 @@ mod tests {
     use crate::clients::kraken_client::KrakenClient;
     use crate::clients::rate_limited_kraken_client::RateLimitedKrakenClient;
     use crate::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
-    use crate::response_types::VerificationTier::Pro;
+    use crate::request_types::{
+        AccountTransferRequest, AddBatchedOrderRequest, AddOrderRequest, AllocateEarnFundsRequest,
+        AmendOrderRequest, AssetInfoRequestBuilder, BatchedOrderRequest, CancelBatchOrdersRequest,
+        CancelOrderRequest, CandlestickInterval, ClosedOrdersRequestBuilder,
+        CreateSubAccountRequest, DeleteExportRequest, DeleteExportType, DepositAddressesRequest,
+        DepositMethodsRequest, EarnAllocationStatusRequest, EditOrderRequest, ExportReportRequest,
+        ExportReportStatusRequest, IntOrString, LedgersInfoRequest, ListEarnAllocationsRequest,
+        ListEarnStrategiesRequest, OHLCRequest, OpenOrdersRequest, OpenPositionsRequest,
+        OrderFlags, OrderRequest, OrderbookRequest, QueryLedgerRequest, RecentSpreadsRequest,
+        RecentTradesRequest, ReportFormatType, ReportType, RetrieveExportReportRequest,
+        StatusOfDepositWithdrawRequest, StringCSV, TickerRequest, TradableAssetPairsRequest,
+        TradeBalanceRequest, TradeInfoRequest, TradeVolumeRequest, TradesHistoryRequest,
+        WalletTransferRequest, WithdrawCancelRequest, WithdrawFundsRequest,
+        WithdrawalAddressesRequest, WithdrawalInfoRequest, WithdrawalMethodsRequest,
+    };
+    use crate::response_types::VerificationTier::{Intermediate, Pro};
+    use crate::response_types::{AddOrder, BuySell, OrderFlag, OrderType, VerificationTier};
     use crate::secrets::secrets_provider::StaticSecretsProvider;
-    use crate::test_data::get_null_secrets_provider;
+    use crate::test_data::public_response_json::get_server_time_json;
     use crate::test_data::TestRateLimitedClient;
+    use crate::test_data::{
+        get_null_secrets_provider, get_rate_limit_test_client, get_rate_limit_test_client_err,
+    };
     use crate::test_rate_limited_endpoint;
+    use rust_decimal_macros::dec;
     use std::sync::Arc;
     use std::time::Duration;
     use tokio::sync::Mutex;
     use tokio::time::pause;
     use tokio::time::Instant;
+    use wiremock::matchers::{header, method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
 
     #[test]
     fn client_creates() {
@@ -776,6 +798,952 @@ mod tests {
         );
 
         assert_eq!(client.core_client.api_url, KRAKEN_BASE_URL);
+    }
+
+    #[tokio::test]
+    async fn client_user_agent() {
+        let secrets_provider = get_null_secrets_provider();
+        let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
+            Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
+        let mock_server = MockServer::start().await;
+        let mut client: RateLimitedKrakenClient<CoreKrakenClient> =
+            RateLimitedKrakenClient::new_with_url(
+                secrets_provider,
+                nonce_provider,
+                mock_server.uri(),
+            );
+
+        Mock::given(method("GET"))
+            .and(path("/0/public/Time"))
+            .and(header("user-agent", "KrakenAsyncRsClient"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(get_server_time_json()))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        let _resp = client.get_server_time().await;
+        mock_server.verify().await;
+
+        client.set_user_agent("Strategy#1".to_string()).await;
+
+        Mock::given(method("GET"))
+            .and(path("/0/public/Time"))
+            .and(header("user-agent", "Strategy#1"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(get_server_time_json()))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        let _resp = client.get_server_time().await;
+        mock_server.verify().await;
+    }
+
+    #[tokio::test]
+    async fn test_system_public_endpoints() {
+        pause();
+        let n_calls = 7;
+
+        // n calls are expected to take just over ~n-1 seconds to complete
+        test_rate_limited_endpoint!(get_server_time, n_calls, n_calls - 1, n_calls, Intermediate);
+
+        test_rate_limited_endpoint!(
+            get_system_status,
+            n_calls,
+            n_calls - 1,
+            n_calls,
+            Intermediate
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_asset_info() {
+        pause();
+        let n_calls = 7;
+
+        let pairs = StringCSV::new(vec![
+            "XBT".to_string(),
+            "ETH".to_string(),
+            "ZUSD".to_string(),
+        ]);
+        let request = AssetInfoRequestBuilder::new()
+            .asset(pairs)
+            .asset_class("currency".into())
+            .build();
+
+        // n calls are expected to take just over ~n-1 seconds to complete
+        test_rate_limited_endpoint!(
+            get_asset_info,
+            n_calls,
+            n_calls - 1,
+            n_calls,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_tradable_asset_pairs() {
+        pause();
+        let n_calls = 7;
+
+        let pairs = StringCSV::new(vec!["ETHUSD".to_string()]);
+        let request = TradableAssetPairsRequest::builder().pair(pairs).build();
+
+        // n calls are expected to take just over ~n-1 seconds to complete
+        test_rate_limited_endpoint!(
+            get_tradable_asset_pairs,
+            n_calls,
+            n_calls - 1,
+            n_calls,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_ticker_information() {
+        pause();
+        let n_calls = 7;
+
+        let pairs = StringCSV::new(vec![
+            "BTCUSD".to_string(),
+            "ETHUSD".to_string(),
+            "USDCUSD".to_string(),
+        ]);
+        let request = TickerRequest::builder().pair(pairs).build();
+
+        // n calls are expected to take just over ~n-1 seconds to complete
+        test_rate_limited_endpoint!(
+            get_ticker_information,
+            n_calls,
+            n_calls - 1,
+            n_calls,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_ohlc_and_recent_trades() {
+        pause();
+        let n_calls = 7;
+
+        let ohlc_request = OHLCRequest::builder("XETHZUSD".to_string())
+            .interval(CandlestickInterval::Hour)
+            .build();
+
+        let trades_request = RecentTradesRequest::builder("XXBTZUSD".to_string())
+            .count(10)
+            .build();
+
+        let secrets_provider = get_null_secrets_provider();
+        let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
+            Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
+
+        let mut client: TestRateLimitedClient = RateLimitedKrakenClient::new_with_verification_tier(
+            secrets_provider,
+            nonce_provider,
+            Pro,
+        );
+
+        let start = Instant::now();
+
+        // calling both in parallel should be fine, since they request different pairs
+        for _ in 0..n_calls {
+            let _ = client.get_ohlc(&ohlc_request).await;
+            let _ = client.get_recent_trades(&trades_request).await;
+        }
+
+        let end = Instant::now();
+        let elapsed = end - start;
+
+        println!("{:?}", elapsed);
+
+        assert!(elapsed > Duration::from_secs(n_calls - 1));
+        assert!(elapsed < Duration::from_secs(n_calls));
+    }
+
+    #[tokio::test]
+    async fn test_get_orderbook() {
+        pause();
+        let n_calls = 7;
+
+        let request = OrderbookRequest::builder("XXBTZUSD".to_string())
+            .count(10)
+            .build();
+
+        // n calls are expected to take just over ~n-1 seconds to complete
+        test_rate_limited_endpoint!(
+            get_orderbook,
+            n_calls,
+            n_calls - 1,
+            n_calls,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_recent_trades() {
+        pause();
+        let n_calls = 7;
+
+        let request = RecentTradesRequest::builder("XXBTZUSD".to_string())
+            .count(10)
+            .build();
+
+        // n calls are expected to take just over ~n-1 seconds to complete
+        test_rate_limited_endpoint!(
+            get_recent_trades,
+            n_calls,
+            n_calls - 1,
+            n_calls,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_recent_spreads() {
+        pause();
+        let n_calls = 7;
+
+        let request = RecentSpreadsRequest::builder("XXBTZUSD".to_string())
+            .since(0)
+            .build();
+        // n calls are expected to take just over ~n-1 seconds to complete
+        test_rate_limited_endpoint!(
+            get_recent_spreads,
+            n_calls,
+            n_calls - 1,
+            n_calls,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_account_balance() {
+        pause();
+
+        // 22 calls costs 2200, requiring 4s to replenish @ 50/s
+        test_rate_limited_endpoint!(get_account_balance, 22, 4, 5, Intermediate);
+    }
+
+    #[tokio::test]
+    async fn test_get_extended_balance() {
+        pause();
+
+        // 22 calls costs 2200, requiring 2s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_extended_balances, 22, 2, 3, Pro);
+    }
+
+    #[tokio::test]
+    async fn test_get_trade_balances() {
+        pause();
+
+        let request = TradeBalanceRequest::builder()
+            .asset("XXBTZUSD".to_string())
+            .build();
+
+        // 26 calls costs 2600, requiring 6s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_trade_balances, 26, 6, 7, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_open_orders() {
+        pause();
+
+        let request = OpenOrdersRequest::builder().trades(true).build();
+
+        // 23 calls costs 2300, requiring 6s to replenish @ 50/s
+        test_rate_limited_endpoint!(get_open_orders, 23, 6, 7, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_closed_orders() {
+        pause();
+
+        let request = ClosedOrdersRequestBuilder::new()
+            .trades(true)
+            .start(12340000)
+            .build();
+
+        // 13 calls costs 2600, requiring 6s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_closed_orders, 13, 6, 7, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_query_orders_info() {
+        pause();
+
+        let tx_ids = StringCSV::new(vec!["uuid_1".to_string()]);
+
+        let request = OrderRequest::builder(tx_ids)
+            .trades(true)
+            .consolidate_taker(false)
+            .build();
+
+        // 26 calls costs 2600, requiring 12s to replenish @ 50/s
+        test_rate_limited_endpoint!(query_orders_info, 26, 12, 13, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_trades_history() {
+        pause();
+
+        let request = TradesHistoryRequest::builder()
+            .start(0)
+            .end(1234)
+            .trades(true)
+            .consolidate_taker(false)
+            .build();
+
+        // 14 calls costs 2800, requiring 8s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_trades_history, 14, 8, 9, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_query_trades_info() {
+        pause();
+
+        let tx_ids = StringCSV::new(vec!["some-unique-id".to_string()]);
+
+        let request = TradeInfoRequest::builder(tx_ids).trades(true).build();
+
+        // 25 calls costs 2500, requiring 10s to replenish @ 50/s
+        test_rate_limited_endpoint!(query_trades_info, 25, 10, 11, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_open_positions() {
+        pause();
+
+        let request = OpenPositionsRequest::builder()
+            .do_calcs(true)
+            .consolidation("market".to_string())
+            .build();
+
+        // 25 calls costs 2500, requiring 5s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_open_positions, 25, 5, 6, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_ledgers_info() {
+        pause();
+
+        let request = LedgersInfoRequest::builder()
+            .start(0)
+            .asset(StringCSV(vec!["all".into()]))
+            .build();
+
+        // 12 calls costs 2400, requiring 8s to replenish @ 50/s
+        test_rate_limited_endpoint!(get_ledgers_info, 12, 8, 9, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_query_ledgers() {
+        pause();
+
+        let request = QueryLedgerRequest::builder(StringCSV(vec!["51AHCZ-XXZ64-YW34UP".into()]))
+            .trades(true)
+            .build();
+
+        // 24 calls costs 2400, requiring 4s to replenish @ 100/s
+        test_rate_limited_endpoint!(query_ledgers, 24, 4, 5, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_trade_volume() {
+        pause();
+
+        let request = TradeVolumeRequest::builder()
+            .pair(StringCSV(vec!["XXBTZUSD".to_string()]))
+            .build();
+
+        // 24 calls costs 2400, requiring 8s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_trade_volume, 24, 8, 9, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_request_export_report() {
+        pause();
+
+        let request = ExportReportRequest::builder(ReportType::Ledgers, "TestExport".to_string())
+            .format(ReportFormatType::Csv)
+            .build();
+
+        // 24 calls costs 2400, requiring 4s to replenish @ 100/s
+        test_rate_limited_endpoint!(request_export_report, 24, 4, 5, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_export_report_status() {
+        pause();
+
+        let request = ExportReportStatusRequest::builder(ReportType::Trades).build();
+
+        // 27 calls costs 2700, requiring 14s to replenish @ 50/s
+        test_rate_limited_endpoint!(get_export_report_status, 27, 14, 15, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_retrieve_export_report() {
+        pause();
+
+        let request =
+            RetrieveExportReportRequest::builder("HI1M0S-BCRBJ-P01V9R".to_string()).build();
+
+        // 24 calls costs 2400, requiring 4s to replenish @ 100/s
+        test_rate_limited_endpoint!(retrieve_export_report, 24, 4, 5, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_delete_export_report() {
+        pause();
+
+        let request =
+            DeleteExportRequest::builder("54E7".to_string(), DeleteExportType::Delete).build();
+
+        // 24 calls costs 2400, requiring 8s to replenish @ 50/s
+        test_rate_limited_endpoint!(delete_export_report, 24, 8, 9, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_adding_order_limits() {
+        pause();
+        let mut client = get_rate_limit_test_client(Pro);
+        let mut client_err = get_rate_limit_test_client_err(Pro);
+
+        let start = Instant::now();
+
+        let request = get_add_order_request();
+
+        // the first 180 orders exhaust all tokens, the remaining 15 require 4s of waiting
+        //  since the replenishment rate is 375 tokens/s * 4s = 1500
+        for _ in 0..(180 + 15) {
+            let _ = client.add_order(&request).await;
+            let _ = client_err.add_order(&request).await;
+        }
+
+        let end = Instant::now();
+        let elapsed = end - start;
+        println!("{:?}", elapsed);
+
+        assert!(elapsed > Duration::from_secs(4));
+        assert!(elapsed < Duration::from_secs(5));
+    }
+
+    #[tokio::test]
+    async fn test_amend_order_max_penalty() {
+        pause();
+        let verification = Intermediate;
+        let mut client = get_rate_limit_test_client(verification);
+
+        let orders = max_out_rate_limits(&mut client, verification).await;
+
+        let amend_start = Instant::now();
+
+        // 4 instant amends costs 400 each, for 1600 total, 1600 / 234 = ~6.83 (requires 7s wait)
+        for i in 0..4 {
+            let amend_request = get_amend_for_order(&orders, i);
+            let _ = client.amend_order(&amend_request).await;
+        }
+
+        let amend_elapsed = amend_start.elapsed();
+        println!("{:?}", amend_elapsed);
+
+        assert!(amend_elapsed > Duration::from_secs(7));
+        assert!(amend_elapsed < Duration::from_secs(8));
+    }
+
+    fn get_amend_for_order(orders: &Vec<AddOrder>, i: usize) -> AmendOrderRequest {
+        AmendOrderRequest::builder()
+            .tx_id(orders.get(i).unwrap().tx_id.first().unwrap().clone()) // TODO: cleanup
+            .build()
+    }
+
+    #[tokio::test]
+    async fn test_add_order_batch_limits() {
+        pause();
+        let mut client = get_rate_limit_test_client(Pro);
+        let mut client_err = get_rate_limit_test_client_err(Pro);
+
+        let start = Instant::now();
+
+        let request = get_batched_order_request(16);
+
+        // batched order of 16 should cost (1 + n / 2) * 100 = 900 each, so 21 * 900 = 18,900
+        // replenishing the 900 after the pro limit should take 3s
+        for _ in 0..21 {
+            let _ = client.add_order_batch(&request).await;
+            let _ = client_err.add_order_batch(&request).await;
+        }
+
+        let end = Instant::now();
+        let elapsed = end - start;
+        println!("{:?}", elapsed);
+
+        assert!(elapsed > Duration::from_secs(3));
+        assert!(elapsed < Duration::from_secs(4));
+    }
+
+    #[tokio::test]
+    async fn test_edit_order_max_penalty() {
+        pause();
+        let verification = Pro;
+        let mut client = get_rate_limit_test_client(verification);
+        let mut client_err = get_rate_limit_test_client_err(Pro);
+
+        let orders = max_out_rate_limits(&mut client, verification).await;
+
+        let edit_start = Instant::now();
+
+        // 6 instant edits costs 700 each, for 4200 total, 4200 / 375 = ~11.23 (requires 12s wait)
+        for i in 0..6 {
+            let edit_request = edit_from_order(orders.get(i).unwrap());
+            let _ = client.edit_order(&edit_request).await;
+        }
+
+        // initiating more edits for the error client has no effect, since each err return did not add
+        //  an order id / lifetime
+        for i in 0..12 {
+            let edit_request = edit_from_order(orders.get(i).unwrap());
+            let _ = client_err.edit_order(&edit_request).await;
+        }
+
+        let edit_end = Instant::now();
+        let edit_elapsed = edit_end - edit_start;
+        println!("{:?}", edit_elapsed);
+
+        assert!(edit_elapsed > Duration::from_secs(12));
+        assert!(edit_elapsed < Duration::from_secs(13));
+    }
+
+    #[tokio::test]
+    async fn test_cancel_order_max_penalty() {
+        pause();
+        let verification = Intermediate;
+        let mut client = get_rate_limit_test_client(verification);
+        let mut client_err = get_rate_limit_test_client_err(Pro);
+
+        let orders = max_out_rate_limits(&mut client, verification).await;
+
+        let edit_start = Instant::now();
+
+        // 4 instant cancels costs 800 each, for 3200 total, 3200 / 234 = ~13.67 (requires 14s wait)
+        for i in 0..4 {
+            let cancel_request = cancel_from_order(orders.get(i).unwrap());
+            let _ = client.cancel_order(&cancel_request).await;
+            let _ = client_err.cancel_order(&cancel_request).await;
+        }
+
+        // initiating more cancels for the error client has no effect, since each err return did not add
+        //  an order id / lifetime
+        for i in 0..12 {
+            let cancel_request = cancel_from_order(orders.get(i).unwrap());
+            let _ = client_err.cancel_order(&cancel_request).await;
+        }
+
+        let edit_end = Instant::now();
+        let edit_elapsed = edit_end - edit_start;
+        println!("{:?}", edit_elapsed);
+
+        assert!(edit_elapsed > Duration::from_secs(14));
+        assert!(edit_elapsed < Duration::from_secs(15));
+    }
+
+    #[tokio::test]
+    async fn test_cancel_order_batch_with_max_penalty() {
+        pause();
+        let verification = Intermediate;
+        let mut client = get_rate_limit_test_client(verification);
+        let mut client_err = get_rate_limit_test_client_err(Pro);
+
+        let mut orders = max_out_rate_limits(&mut client, verification).await;
+
+        let edit_start = Instant::now();
+
+        let mut order_ids = Vec::new();
+        for i in 0..4 {
+            let id = IntOrString::String(orders.get(i).unwrap().tx_id.first().unwrap().clone());
+            order_ids.push(id);
+        }
+
+        let user_ref_request = get_add_order_request_user_ref();
+        orders.push(
+            client
+                .add_order(&user_ref_request)
+                .await
+                .unwrap()
+                .result
+                .unwrap(),
+        );
+        order_ids.push(IntOrString::Int(user_ref_request.user_ref.unwrap()));
+
+        let batch_cancel_request = CancelBatchOrdersRequest {
+            orders: order_ids,
+            client_order_ids: None,
+        };
+
+        // 1 additional order w/ user ref costs 100, 5 instant cancels cost 800 each, for 4100 total,
+        // making 4100 / 234 = ~17.52 (requires 18s wait)
+        let _ = client.cancel_order_batch(&batch_cancel_request).await;
+
+        // failures don't add anything to wait
+        for _ in 0..5 {
+            let _ = client_err.cancel_order_batch(&batch_cancel_request).await;
+        }
+
+        let edit_end = Instant::now();
+        let edit_elapsed = edit_end - edit_start;
+        println!("{:?}", edit_elapsed);
+
+        assert!(edit_elapsed > Duration::from_secs(18));
+        assert!(edit_elapsed < Duration::from_secs(19));
+    }
+
+    /// Depending on the verification tier, submit enough orders to empty the rate limit bucket and
+    /// return the created orders. Also checks that it has not exceeded the limits (executes in < 10ms).
+    async fn max_out_rate_limits(
+        client: &mut TestRateLimitedClient,
+        verification_tier: VerificationTier,
+    ) -> Vec<AddOrder> {
+        let start = Instant::now();
+
+        let request = get_add_order_request();
+
+        let n_orders = match verification_tier {
+            Intermediate => 125,
+            Pro => 180,
+        };
+
+        // the first 180 orders exhaust all tokens
+        let mut orders = Vec::new();
+        for _ in 0..n_orders {
+            let order = client.add_order(&request).await.unwrap().result.unwrap();
+            orders.push(order);
+        }
+
+        let end = Instant::now();
+        let elapsed = end - start;
+        println!("{:?}", elapsed);
+
+        assert!(elapsed >= Duration::from_secs(0));
+        assert!(elapsed < Duration::from_millis(10));
+        orders
+    }
+
+    fn get_add_order_request() -> AddOrderRequest {
+        let order_flags =
+            OrderFlags::new(vec![OrderFlag::NoMarketPriceProtection, OrderFlag::Post]);
+
+        AddOrderRequest::builder(
+            OrderType::Market,
+            BuySell::Buy,
+            dec!(5.0),
+            "USDCUSD".to_string(),
+        )
+        .order_flags(order_flags)
+        .price(dec!(0.90))
+        .build()
+    }
+
+    fn get_add_order_request_user_ref() -> AddOrderRequest {
+        let order_flags =
+            OrderFlags::new(vec![OrderFlag::NoMarketPriceProtection, OrderFlag::Post]);
+
+        AddOrderRequest::builder(
+            OrderType::Market,
+            BuySell::Buy,
+            dec!(5.0),
+            "USDCUSD".to_string(),
+        )
+        .user_ref(42)
+        .order_flags(order_flags)
+        .price(dec!(0.90))
+        .build()
+    }
+
+    fn get_batched_order_request(n_orders: u64) -> AddBatchedOrderRequest {
+        let mut orders = Vec::new();
+
+        for _ in 0..n_orders {
+            let order = BatchedOrderRequest::builder(OrderType::Limit, BuySell::Buy, dec!(5.1))
+                .price(dec!(0.9))
+                .start_time("0".to_string())
+                .expire_time("+5".to_string())
+                .build();
+
+            orders.push(order);
+        }
+
+        AddBatchedOrderRequest::builder(orders, "USDCUSD".to_string()).build()
+    }
+
+    fn edit_from_order(order: &AddOrder) -> EditOrderRequest {
+        let edit_request = EditOrderRequest {
+            user_ref: None,
+            tx_id: order.tx_id.first().unwrap().clone(),
+            volume: dec!(0),
+            display_volume: None,
+            pair: "".to_string(),
+            price: None,
+            price_2: None,
+            order_flags: None,
+            deadline: None,
+            cancel_response: None,
+            validate: None,
+        };
+        edit_request
+    }
+
+    fn cancel_from_order(order: &AddOrder) -> CancelOrderRequest {
+        CancelOrderRequest {
+            tx_id: IntOrString::String(order.tx_id.first().unwrap().clone()),
+            client_order_id: None,
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_deposit_methods() {
+        pause();
+
+        let request = DepositMethodsRequest::builder("ETH".to_string()).build();
+
+        // 24 calls costs 2400, requiring 4s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_deposit_methods, 24, 4, 5, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_deposit_addresses() {
+        pause();
+
+        let request = DepositAddressesRequest::builder("BTC".to_string(), "Bitcoin".to_string())
+            .is_new(true)
+            .build();
+
+        // 24 calls costs 2400, requiring 8s to replenish @ 50/s
+        test_rate_limited_endpoint!(get_deposit_addresses, 24, 8, 9, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_status_of_recent_deposits() {
+        pause();
+
+        let request = StatusOfDepositWithdrawRequest::builder()
+            .asset_class("currency".to_string())
+            .build();
+
+        // 26 calls costs 2600, requiring 6s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_status_of_recent_deposits, 26, 6, 7, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_withdrawal_methods() {
+        pause();
+
+        let request = WithdrawalMethodsRequest::builder()
+            .asset_class("currency".to_string())
+            .build();
+
+        // 26 calls costs 2600, requiring 12s to replenish @ 50/s
+        test_rate_limited_endpoint!(get_withdrawal_methods, 26, 12, 13, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_withdrawal_addresses() {
+        pause();
+
+        let request = WithdrawalAddressesRequest::builder()
+            .asset_class("currency".to_string())
+            .build();
+
+        // 25 calls costs 2500, requiring 5s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_withdrawal_addresses, 25, 5, 6, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_withdrawal_info() {
+        pause();
+
+        let request = WithdrawalInfoRequest::builder(
+            "XBT".to_string(),
+            "Greenlisted Address".to_string(),
+            dec!(0.1),
+        )
+        .build();
+
+        // 25 calls costs 2500, requiring 5s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_withdrawal_info, 25, 5, 6, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_withdraw_funds() {
+        pause();
+
+        let request = WithdrawFundsRequest::builder(
+            "XBT".to_string(),
+            "Greenlisted Address".to_string(),
+            dec!(0.1),
+        )
+        .max_fee(dec!(0.00001))
+        .build();
+
+        // 25 calls costs 2500, requiring 10s to replenish @ 50/s
+        test_rate_limited_endpoint!(withdraw_funds, 25, 10, 11, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_status_of_recent_withdrawals() {
+        pause();
+
+        let request = StatusOfDepositWithdrawRequest::builder()
+            .asset_class("currency".to_string())
+            .build();
+
+        // 25 calls costs 2500, requiring 5s to replenish @ 100/s
+        test_rate_limited_endpoint!(get_status_of_recent_withdrawals, 25, 5, 6, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_request_withdrawal_cancellation() {
+        pause();
+
+        let request = WithdrawCancelRequest::builder("XBT".to_string(), "uuid".to_string()).build();
+
+        // 27 calls costs 2700, requiring 14s to replenish @ 50/s
+        test_rate_limited_endpoint!(
+            request_withdrawal_cancellation,
+            27,
+            14,
+            15,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_request_wallet_transfer() {
+        pause();
+
+        let request = WalletTransferRequest::builder(
+            "XBT".to_string(),
+            "Account One".to_string(),
+            "Account Two".to_string(),
+            dec!(0.25),
+        )
+        .build();
+
+        // 27 calls costs 2700, requiring 7s to replenish @ 100/s
+        test_rate_limited_endpoint!(request_wallet_transfer, 27, 7, 8, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_create_sub_account() {
+        pause();
+
+        let request =
+            CreateSubAccountRequest::builder("username".to_string(), "user@mail.com".to_string())
+                .build();
+
+        // 24 calls costs 2400, requiring 4s to replenish @ 100/s
+        test_rate_limited_endpoint!(create_sub_account, 24, 4, 5, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_account_transfer() {
+        pause();
+
+        let request = AccountTransferRequest::builder(
+            "BTC".to_string(),
+            dec!(1031.2008),
+            "SourceAccount".to_string(),
+            "DestAccount".to_string(),
+        )
+        .build();
+
+        // 24 calls costs 2400, requiring 8s to replenish @ 50/s
+        test_rate_limited_endpoint!(account_transfer, 24, 8, 9, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_allocate_earn_funds() {
+        pause();
+
+        let request =
+            AllocateEarnFundsRequest::builder(dec!(10.123), "W38S2C-Y1E0R-DUFM2T".to_string())
+                .build();
+
+        // 24 calls costs 2400, requiring 4s to replenish @ 100/s
+        test_rate_limited_endpoint!(allocate_earn_funds, 24, 4, 5, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_deallocate_earn_funds() {
+        pause();
+
+        let request =
+            AllocateEarnFundsRequest::builder(dec!(10.123), "W38S2C-Y1E0R-DUFM2T".to_string())
+                .build();
+
+        // 24 calls costs 2400, requiring 8s to replenish @ 50/s
+        test_rate_limited_endpoint!(deallocate_earn_funds, 24, 8, 9, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_allocation_status() {
+        pause();
+
+        let request =
+            EarnAllocationStatusRequest::builder("W38S2C-Y1E0R-DUFM2T".to_string()).build();
+
+        // 24 calls costs 2400, requiring 8s to replenish @ 50/s
+        test_rate_limited_endpoint!(get_earn_allocation_status, 24, 8, 9, Intermediate, &request);
+    }
+
+    #[tokio::test]
+    async fn test_get_deallocation_status() {
+        pause();
+
+        let request =
+            EarnAllocationStatusRequest::builder("W38S2C-Y1E0R-DUFM2T".to_string()).build();
+
+        // 24 calls costs 2400, requiring 8s to replenish @ 50/s
+        test_rate_limited_endpoint!(
+            get_earn_deallocation_status,
+            24,
+            8,
+            9,
+            Intermediate,
+            &request
+        );
+    }
+
+    #[tokio::test]
+    async fn test_list_earn_strategies() {
+        pause();
+
+        let request = ListEarnStrategiesRequest::builder()
+            .limit(64)
+            .ascending(true)
+            .build();
+
+        // 24 calls costs 2400, requiring 4s to replenish @ 100/s
+        test_rate_limited_endpoint!(list_earn_strategies, 24, 4, 5, Pro, &request);
+    }
+
+    #[tokio::test]
+    async fn test_list_earn_allocations() {
+        pause();
+
+        let request = ListEarnAllocationsRequest::builder()
+            .ascending(true)
+            .hide_zero_allocations(true)
+            .build();
+
+        // 29 calls costs 2900, requiring 18s to replenish @ 500/s
+        test_rate_limited_endpoint!(list_earn_allocations, 29, 18, 19, Intermediate, &request);
     }
 
     #[tokio::test]
