@@ -42,7 +42,7 @@ impl<'a> EnvSecretsProvider<'a> {
     }
 }
 
-impl<'a> SecretsProvider for EnvSecretsProvider<'a> {
+impl SecretsProvider for EnvSecretsProvider<'_> {
     fn get_secrets(&mut self) -> Secrets {
         if self.secrets.is_none() {
             self.set_secrets();
@@ -52,7 +52,7 @@ impl<'a> SecretsProvider for EnvSecretsProvider<'a> {
     }
 }
 
-impl<'a> EnvSecretsProvider<'a> {
+impl EnvSecretsProvider<'_> {
     fn set_secrets(&mut self) {
         dotenv().ok();
         let key = Secret::new(match env::var(self.key_name) {
@@ -88,7 +88,7 @@ impl<'a> StaticSecretsProvider<'a> {
     }
 }
 
-impl<'a> SecretsProvider for StaticSecretsProvider<'a> {
+impl SecretsProvider for StaticSecretsProvider<'_> {
     fn get_secrets(&mut self) -> Secrets {
         Secrets {
             key: Secret::new(self.key.to_string()),
