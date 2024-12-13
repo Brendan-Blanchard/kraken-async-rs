@@ -11,6 +11,5 @@ pub use rest_responses::*;
 pub use test_auth::*;
 pub use test_client_impl::*;
 pub use test_client_impl_err::*;
-pub use test_macros::*;
 pub use wss_messages::*;
 pub use wss_testing::*;
