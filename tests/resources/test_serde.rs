@@ -1,5 +1,4 @@
-use serde::Deserialize;
-use std::fmt::{Debug, Display};
+use std::fmt::Display;
 
 pub fn test_display_output<T>(variant: T, expected: &str)
 where
