@@ -9,10 +9,21 @@
 
 ### v0.7.0
 
+All changes are breaking unless otherwise noted and given upgrade instructions.
+
+- Relax type bounds for `KrakenWSSClient`'s `new_with_urls` and `new_with_tracing` (non-breaking)
 - Remove V1 websockets, `KrakenWSSClient` and all associated tests and data
     - Upgrade path for existing V2 users:
         - Remove all imports with `::v2::` in them
         - Follow build failures and re-import removed imports
+- Remove deprecated features `debug-inbound` and `debug-outbound`
+    - Upgrade path:
+        - Use the `new_with_tracing` methods on `KrakenWSSClient` and `KrakenClient` to enable tracing (disabled by
+          default)
+- Relax type bounds for `KrakenClient`'s `new_with_url` and `set_user_agent` methods to `impl ToString`
+    - Upgrade path:
+        - Update any implementations of the trait `KrakenClient` you've defined - otherwise, relaxing this type bound is
+          non-breaking
 
 ### v0.6.0
 

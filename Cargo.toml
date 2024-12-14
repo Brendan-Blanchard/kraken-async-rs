@@ -46,8 +46,4 @@ tracing-test = { version = "0.2.5", features = ["no-env-filter"] }
 
 [features]
 default = ["test-support"]
-# deprecated - use `new_with_tracing` methods on REST and websocket clients
-debug-inbound = []
-# deprecated - use `new_with_tracing` methods on REST and websocket clients
-debug-outbound = []
 test-support = ["dep:tracing-subscriber"]

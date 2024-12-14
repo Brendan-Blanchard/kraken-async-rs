@@ -69,7 +69,7 @@ impl KrakenClient for TestClient {
     fn new_with_url(
         _secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         _nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
-        _url: String,
+        _url: impl ToString,
     ) -> Self {
         Self { current_id: 0 }
     }
@@ -82,7 +82,7 @@ impl KrakenClient for TestClient {
         Self { current_id: 0 }
     }
 
-    async fn set_user_agent(&mut self, _user_agent: String) {}
+    async fn set_user_agent(&mut self, _user_agent: impl ToString) {}
 
     async fn get_server_time(&mut self) -> Result<ResultErrorResponse<SystemTime>, ClientError> {
         Err(ClientError::Parse("StubbedForTesting"))

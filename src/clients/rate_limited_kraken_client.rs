@@ -86,7 +86,7 @@ where
     fn new_with_url(
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
-        url: String,
+        url: impl ToString,
     ) -> Self {
         RateLimitedKrakenClient {
             core_client: C::new_with_url(secrets_provider, nonce_provider, url),
@@ -111,7 +111,7 @@ where
         }
     }
 
-    async fn set_user_agent(&mut self, user_agent: String) {
+    async fn set_user_agent(&mut self, user_agent: impl ToString) {
         self.core_client.set_user_agent(user_agent).await;
     }
 

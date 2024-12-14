@@ -96,7 +96,7 @@ pub trait KrakenClient: Send + Sync {
     fn new_with_url(
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
-        url: String,
+        url: impl ToString,
     ) -> Self;
 
     /// Creates a new instance with the given [SecretsProvider] and [NonceProvider], optionally
@@ -109,7 +109,7 @@ pub trait KrakenClient: Send + Sync {
 
     /// Set the user-agent that will be sent in HTTP headers to Kraken. This is not required to be
     /// set.
-    fn set_user_agent(&mut self, user_agent: String) -> impl Future<Output = ()>;
+    fn set_user_agent(&mut self, user_agent: impl ToString) -> impl Future<Output = ()>;
 
     /// Get the server time in two useful formats.
     fn get_server_time(

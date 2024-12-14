@@ -26,7 +26,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use to_query_params::{QueryParams, ToQueryParams};
 use tokio::sync::Mutex;
-use tracing::{debug, trace, warn};
+use tracing::trace;
 use url::{form_urlencoded, Url};
 
 #[derive(QueryParams, Default)]
@@ -99,10 +99,6 @@ impl KrakenClient for CoreKrakenClient {
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
     ) -> Self {
-        if cfg!(feature = "debug-inbound") {
-            warn!("Feature `debug-inbound` is deprecated - use `new_with_tracing` method to set tracing flag")
-        }
-
         let https = HttpsConnector::new();
         let http_client: Client<HttpsConnector<HttpConnector>, String> =
             Client::builder(TokioExecutor::new()).build(https);
@@ -119,12 +115,12 @@ impl KrakenClient for CoreKrakenClient {
     fn new_with_url(
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
-        url: String,
+        url: impl ToString,
     ) -> Self {
         let https = HttpsConnector::new();
         let http_client = Client::builder(TokioExecutor::new()).build(https);
         CoreKrakenClient {
-            api_url: url,
+            api_url: url.to_string(),
             secrets_provider,
             nonce_provider,
             http_client,
@@ -141,7 +137,7 @@ impl KrakenClient for CoreKrakenClient {
         let https = HttpsConnector::new();
         let http_client = Client::builder(TokioExecutor::new()).build(https);
         CoreKrakenClient {
-            api_url: KRAKEN_BASE_URL.into(),
+            api_url: KRAKEN_BASE_URL.to_string(),
             secrets_provider,
             nonce_provider,
             http_client,
@@ -150,8 +146,8 @@ impl KrakenClient for CoreKrakenClient {
         }
     }
 
-    async fn set_user_agent(&mut self, user_agent: String) {
-        self.user_agent = Some(user_agent);
+    async fn set_user_agent(&mut self, user_agent: impl ToString) {
+        self.user_agent = Some(user_agent.to_string());
     }
 
     #[tracing::instrument(ret, err(Debug), skip(self))]
@@ -801,10 +797,6 @@ impl CoreKrakenClient {
         if !status.is_success() {
             Err(ClientError::HttpStatus(text))
         } else {
-            if cfg!(feature = "debug-inbound") {
-                debug!("Received: {}", text);
-            }
-
             if self.trace_inbound {
                 trace!("Received: {}", text);
             }
