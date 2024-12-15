@@ -7,6 +7,7 @@ mod test_macros;
 mod wss_messages;
 mod wss_testing;
 
+pub use rate_limits::*;
 pub use rest_responses::*;
 pub use test_auth::*;
 pub use test_client_impl::*;

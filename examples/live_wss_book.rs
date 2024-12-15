@@ -1,4 +1,3 @@
-use kraken_async_rs::clients::kraken_client::KrakenClient;
 use kraken_async_rs::test_support::set_up_logging;
 use kraken_async_rs::wss::KrakenWSSClient;
 use kraken_async_rs::wss::{BookSubscription, Message, WssMessage};

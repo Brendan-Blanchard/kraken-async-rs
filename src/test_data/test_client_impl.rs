@@ -29,7 +29,7 @@ use crate::response_types::{
     Withdrawal, WithdrawalAddress,
 };
 use crate::secrets::secrets_provider::SecretsProvider;
-use crate::test_data::get_null_secrets_provider;
+use crate::test_data::{get_null_secrets_provider, TestRateLimitedClient};
 use rust_decimal_macros::dec;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -44,8 +44,6 @@ pub fn get_rate_limit_test_client(verification: VerificationTier) -> TestRateLim
 
     RateLimitedKrakenClient::new_with_client(client, verification)
 }
-
-pub type TestRateLimitedClient = RateLimitedKrakenClient<TestClient>;
 
 pub struct TestClient {
     current_id: u64,
