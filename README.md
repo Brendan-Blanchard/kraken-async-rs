@@ -13,8 +13,8 @@ the library since they're outside this library's control and subject to change.
 
 ### Example: Calling a Public Endpoint
 
-Public endpoint calls are as easy a creating a client object and awaiting a request. Since no API secrets are required,
-a blank, static set is provided using `StaticSecretsProvider` with empty `&str` values. See
+Public endpoint calls are as easy as creating a client object and awaiting a request. Since no API secrets are required,
+a blank static set of credentials is provided using `StaticSecretsProvider` with empty `&str` values. See
 the [full example](examples/live_public_endpoint_request.rs) for imports.
 
 ```rust
@@ -84,7 +84,7 @@ async fn main() {
 Public websockets require no authentication, so it's as easy as creating a `v2::KrakenWSSClient`, connecting, and
 sending any subscription methods and then awaiting the `.next()` method of the returned `KrakenMessageStream`.
 
-You can also visit the [full example](examples/live_wss_ohlc) with logging and imports.
+You can also visit the [full example](examples/live_wss_ohlc.rs) with logging and imports.
 
 ```rust
 #[tokio::main]
@@ -143,9 +143,14 @@ example of your issue!
 ### Security
 
 - The `secrecy` crate is used to prevent accidental logging of websocket tokens in request and response objects
-- The features `debug-inbound` and `debug-outbound` are off by default, and **will log tokens when enabled**, as they
-  log
-  incoming and outgoing messages as strings, which cannot be redacted easily
+- Tracing of requests and responses are off by default, and **will log tokens when enabled**, as they log incoming and
+  outgoing messages as strings, which cannot be redacted easily.
+
+### Stability
+
+- This crate aims to be a stable base for others to build from, following semantic versioning.
+- Breaking changes will be noted ahead of time in the changelog as much as possible, and will be noted along with an
+  upgrade plan in each version's changelog notes.
 
 ### Misc Details
 

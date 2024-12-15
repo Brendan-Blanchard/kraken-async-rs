@@ -9,8 +9,9 @@
 
 ### v0.7.0
 
-All changes are breaking unless otherwise noted and given upgrade instructions.
+**All changes are breaking unless otherwise noted and given upgrade instructions.**
 
+- Minor version bumps for hyper, tokio, serde, url, tracing, tokio-stream, time, and tracing-subscriber (non-breaking)
 - Relax type bounds for `KrakenWSSClient`'s `new_with_urls` and `new_with_tracing` (non-breaking)
 - Remove V1 websockets, `KrakenWSSClient` and all associated tests and data
     - Upgrade path for existing V2 users:
