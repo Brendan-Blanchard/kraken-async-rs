@@ -7,6 +7,10 @@
 - Secrecy had a major breaking change (if moving to 0.10.3), which will force breaking changes to the `Secrets` struct
   and `SecretsProvider` trait
 
+### v0.7.1
+
+- Update minor versions of dependencies
+
 ### v0.7.0
 
 **All changes are breaking unless otherwise noted and given upgrade instructions.**
