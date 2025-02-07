@@ -1,6 +1,6 @@
 [package]
 name = "kraken-async-rs"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 authors = ["Brendan Blanchard"]
 description = "An async REST and WSS client for the Kraken Pro APIs"
