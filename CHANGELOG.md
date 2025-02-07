@@ -10,6 +10,7 @@
 ### v0.7.1
 
 - Update minor versions of dependencies
+- Fix flagged openssl vulnerability
 
 ### v0.7.0
 
