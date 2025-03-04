@@ -1,14 +1,14 @@
 //! Trait and implementations for retrieving API keys and secrets needed for private calls
 use dotenvy::dotenv;
-use secrecy::Secret;
+use secrecy::SecretString;
 use std::env;
 use std::fmt::Debug;
 
 /// A struct containing the API key and secret (using [secrecy::Secret])
 #[derive(Debug, Clone)]
 pub struct Secrets {
-    pub key: Secret<String>,
-    pub secret: Secret<String>,
+    pub key: SecretString,
+    pub secret: SecretString,
 }
 
 /// Trait that exposes a method for retrieving secrets.
@@ -55,13 +55,13 @@ impl SecretsProvider for EnvSecretsProvider<'_> {
 impl EnvSecretsProvider<'_> {
     fn set_secrets(&mut self) {
         dotenv().ok();
-        let key = Secret::new(match env::var(self.key_name) {
-            Ok(secret) => secret,
+        let key = SecretString::new(match env::var(self.key_name) {
+            Ok(secret) => secret.into(),
             _ => panic!("Error retrieving Kraken key from env"),
         });
 
-        let secret = Secret::new(match env::var(self.secret_name) {
-            Ok(secret) => secret,
+        let secret = SecretString::new(match env::var(self.secret_name) {
+            Ok(secret) => secret.into(),
             _ => panic!("Error retrieving Kraken secret from env"),
         });
 
@@ -91,8 +91,8 @@ impl<'a> StaticSecretsProvider<'a> {
 impl SecretsProvider for StaticSecretsProvider<'_> {
     fn get_secrets(&mut self) -> Secrets {
         Secrets {
-            key: Secret::new(self.key.to_string()),
-            secret: Secret::new(self.secret.to_string()),
+            key: self.key.to_string().into(),
+            secret: self.secret.to_string().into(),
         }
     }
 }

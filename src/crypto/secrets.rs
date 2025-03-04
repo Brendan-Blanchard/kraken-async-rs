@@ -1,13 +1,14 @@
-use secrecy::{ExposeSecret, Secret};
+use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::{Debug, Formatter};
 
 #[derive(Clone)]
-pub struct Token(Secret<String>);
+pub struct Token(SecretString);
 
 impl Token {
     pub fn new(token: impl Into<String>) -> Self {
-        Token(Secret::new(token.into()))
+        let string = token.into();
+        Token(string.into())
     }
 }
 
@@ -31,7 +32,7 @@ impl<'de> Deserialize<'de> for Token {
         D: Deserializer<'de>,
     {
         let token = String::deserialize(deserializer)?;
-        Ok(Token(Secret::new(token)))
+        Ok(Token::new(token))
     }
 }
 

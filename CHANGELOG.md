@@ -22,6 +22,9 @@
 - Update to ws-mock v0.3.0 and tokio-tungstenite v0.26.2
     - This was breaking internally (core tungstenite types changed), but should not break clients unless they also
       depended on tokio-tungstenite < 0.26.0
+- Update to secrecy v0.10.3
+    - This is breaking if you consumed the `Secrets` class from this library directly, otherwise there should be no
+      changes required
 
 ### v0.7.1
 
