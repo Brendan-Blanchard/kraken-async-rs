@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use serde_this_or_that::as_i64;
 use serde_tuple::Deserialize_tuple;
 use serde_with::formats::CommaSeparator;
+use serde_with::serde_as;
 use serde_with::StringWithSeparator;
-use serde_with::{serde_as, DisplayFromStr};
 use std::collections::HashMap;
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
@@ -596,8 +596,7 @@ pub struct RecentTrade {
 #[serde_as]
 #[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct RecentTrades {
-    #[serde_as(as = "DisplayFromStr")]
-    pub last: i64,
+    pub last: String,
     #[serde(flatten)]
     pub trades: HashMap<String, Vec<RecentTrade>>,
 }

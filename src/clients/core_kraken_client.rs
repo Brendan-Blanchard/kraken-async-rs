@@ -1175,11 +1175,13 @@ mod tests {
 
         let request = RecentTradesRequest::builder("XXBTZUSD".to_string())
             .count(10)
+            .since("20081031".to_string())
             .build();
 
         Mock::given(method("GET"))
             .and(path("0/public/Trades"))
             .and(query_param("count", "10"))
+            .and(query_param("since", "20081031"))
             .and(query_param("pair", "XXBTZUSD"))
             .respond_with(ResponseTemplate::new(200).set_body_json(get_recent_trades_json()))
             .expect(1)

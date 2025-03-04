@@ -35,7 +35,8 @@ async fn main() {
     let since = OffsetDateTime::now_utc()
         .checked_sub(Duration::hours(1))
         .unwrap()
-        .unix_timestamp();
+        .unix_timestamp()
+        .to_string();
 
     // get recent trades starting 1 hour ago in blocks of 1000 (max Kraken allows)
     let request = RecentTradesRequest::builder("XXBTZUSD".to_string())
@@ -44,7 +45,7 @@ async fn main() {
         .build();
 
     let mut results: HashMap<String, Vec<RecentTrade>> = HashMap::new();
-    let mut last = request.since;
+    let mut last = request.since.clone();
 
     // keep retrieving and adding to results until no new data is seen
     loop {
@@ -53,7 +54,7 @@ async fn main() {
 
         let result = client.get_recent_trades(&request).await.unwrap().result;
 
-        last = result.as_ref().map(|o| o.last);
+        last = result.as_ref().map(|o| o.last.clone());
 
         if let Some(data) = result {
             let mut no_new_data = false;

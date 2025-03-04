@@ -168,5 +168,5 @@ value. Cases like these are numerous and *not* enforced by this library.
 [^2]: Examples include `refid` -> `ref_id`, `endtm` -> `end_time`, `ofs` -> `order_flags` (
 or `offset`...), `vol_exec` -> `executed_volume`, `qty` -> `quantity`, and many more.
 
-[^3]: NFT trading added some 20+ endpoints near the completion of this library's initial version. I'm considering adding
-it, but have no use case for it. Reach out if you do, or want to contribute.
+[^3]: This crate never supported NFT trading, however it has since been removed. If you find a feature missing, feel
+free to contribute or reach out for support!

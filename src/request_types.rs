@@ -396,7 +396,7 @@ pub struct RecentTradesRequest {
     #[query(required)]
     #[builder(required)]
     pub pair: String,
-    pub since: Option<i64>,
+    pub since: Option<String>,
     pub count: Option<i64>,
 }
 

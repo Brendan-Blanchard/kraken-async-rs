@@ -7,6 +7,19 @@
 - Secrecy had a major breaking change (if moving to 0.10.3), which will force breaking changes to the `Secrets` struct
   and `SecretsProvider` trait
 
+### v0.8.0
+
+**All changes are breaking unless otherwise noted and given upgrade instructions.**
+
+- Change `RecentTrades.last` to `String` (since unix timestamp nanoseconds can be i128), and change
+  `RecentTradesRequest.since` to `String` to match docs and allow for any precision input
+    - Upgrade by changing anywhere you've consumed `RecentTrades.last`, or supplied `RecentTradesRequest.since` to use
+      `String` instead of `i64`
+        - The fast but unsafe (on read) approach would be `trades.last.parse::<i64>.unwrap()` or
+          `request.since = Some(123.to_string())` if you relied on the value itself, but the `last` field should really
+          only
+          be used to pipe back in as the `since` field in a subsequent request, which should make changes minor
+
 ### v0.7.1
 
 - Update minor versions of dependencies
