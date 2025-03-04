@@ -30,7 +30,7 @@ secrecy = { version = "0.8.0", features = ["default", "serde"] }
 async-rate-limit = "0.1.1"
 simple-builder = "0.0.2"
 to-query-params = "0.0.4"
-tokio-tungstenite = { version = "0.24.0", features = ["native-tls"] }
+tokio-tungstenite = { version = "0.26.2", features = ["native-tls"] }
 futures-util = "0.3.31"
 tokio-stream = "0.1.17"
 serde-this-or-that = "0.5.0"
@@ -41,7 +41,7 @@ tracing-subscriber = { version = "0.3.19", optional = true }
 
 [dev-dependencies]
 wiremock = "0.6.3"
-ws-mock = "0.2.1"
+ws-mock = "0.3.0"
 tracing-test = { version = "0.2.5", features = ["no-env-filter"] }
 
 [features]

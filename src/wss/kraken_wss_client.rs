@@ -151,7 +151,9 @@ where
         }
 
         self.stream
-            .send(TungsteniteMessage::Binary(message_json.as_bytes().to_vec()))
+            .send(TungsteniteMessage::Binary(
+                message_json.as_bytes().to_vec().into(),
+            ))
             .await?;
         Ok(())
     }

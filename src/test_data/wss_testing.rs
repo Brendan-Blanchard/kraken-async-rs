@@ -8,7 +8,6 @@ use std::time::Duration;
 use tokio::sync::mpsc;
 use tokio::time::timeout;
 use tokio_stream::StreamExt;
-use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
 use ws_mock::matchers::JsonExact;
 use ws_mock::ws_mock_server::{WsMock, WsMockServer};
 
@@ -78,10 +77,7 @@ impl ParseIncomingTest {
             .into_iter()
             .zip(self.expected_messages.iter())
         {
-            mpsc_send
-                .send(TungsteniteMessage::Text(message))
-                .await
-                .unwrap();
+            mpsc_send.send(message.into()).await.unwrap();
 
             let result = timeout(Duration::from_secs(1), stream.next())
                 .await
@@ -120,7 +116,7 @@ where
         WsMock::new()
             .matcher(JsonExact::new(self.match_on.take().unwrap()))
             .expect(1)
-            .respond_with(TungsteniteMessage::Text(self.respond_with.take().unwrap()))
+            .respond_with(self.respond_with.take().unwrap().into())
             .mount(&test_state.mock_server)
             .await;
 
@@ -152,10 +148,7 @@ pub async fn parse_for_test(incoming: &str) -> Result<WssMessage, WSSError> {
 
     let mut stream = test_state.ws_client.connect::<WssMessage>().await.unwrap();
 
-    mpsc_send
-        .send(TungsteniteMessage::Text(incoming.to_string()))
-        .await
-        .unwrap();
+    mpsc_send.send(incoming.into()).await.unwrap();
 
     timeout(Duration::from_secs(1), stream.next())
         .await

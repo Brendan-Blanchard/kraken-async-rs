@@ -19,6 +19,9 @@
           `request.since = Some(123.to_string())` if you relied on the value itself, but the `last` field should really
           only
           be used to pipe back in as the `since` field in a subsequent request, which should make changes minor
+- Update to ws-mock v0.3.0 and tokio-tungstenite v0.26.2
+    - This was breaking internally (core tungstenite types changed), but should not break clients unless they also
+      depended on tokio-tungstenite < 0.26.0
 
 ### v0.7.1
 
