@@ -4,8 +4,10 @@
 
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
-- Secrecy had a major breaking change (if moving to 0.10.3), which will force breaking changes to the `Secrets` struct
-  and `SecretsProvider` trait
+
+### v0.8.1
+
+- Add Trade.trade_id field, which was missing
 
 ### v0.8.0
 

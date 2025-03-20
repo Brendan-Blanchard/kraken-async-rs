@@ -791,6 +791,7 @@ pub struct Trade {
     pub margin: Decimal,
     pub misc: String,
     pub ledgers: Option<Vec<String>>,
+    pub trade_id: u64,
     pub maker: bool,
 }
 
