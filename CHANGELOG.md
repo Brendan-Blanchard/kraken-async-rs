@@ -5,7 +5,7 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
-### v0.8.1
+### v0.9.0
 
 - Add Trade.trade_id field, which was missing
 
