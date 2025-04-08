@@ -5,6 +5,17 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
+### v0.10.0
+
+**All changes are breaking unless otherwise noted and given upgrade instructions.**
+
+- Remove `ClosedOrder` model - differences in documentation were incorrect
+    - Upgrade by changing any `ClosedOrder` types to `Order` - the documentation had the "descr" field not present in
+      responses (but it is now(?))
+- Add missing `without_count` and `consolidate_taker` fields to `ClosedOrderRequest`
+    - Upgrade by specifying these fields if you've used the struct syntax, and considering using a builder in the future
+      to avoid additional parameters breaking your usage
+
 ### v0.9.0
 
 - Add Trade.trade_id field, which was missing

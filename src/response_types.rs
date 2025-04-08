@@ -721,50 +721,10 @@ pub struct Order {
     pub reason: Option<String>,
 }
 
-/// Order object for closed orders
-#[serde_as]
-#[derive(Debug, Deserialize, PartialEq, Clone)]
-pub struct ClosedOrder {
-    #[serde(rename = "refid")]
-    pub ref_id: Option<String>,
-    pub userref: Option<i64>,
-    #[serde(rename = "cl_ord_id")]
-    pub client_order_id: Option<String>,
-    pub status: OrderStatus,
-    #[serde(rename = "opentm")]
-    pub open_time: f64,
-    #[serde(rename = "starttm")]
-    pub start_time: f64,
-    #[serde(rename = "expiretm")]
-    pub expire_time: f64,
-    #[serde(rename = "closetm")]
-    pub close_time: Option<f64>,
-    #[serde(rename(deserialize = "vol"))]
-    pub volume: Decimal,
-    #[serde(rename(deserialize = "vol_exec"))]
-    pub volume_executed: Decimal,
-    pub cost: Decimal,
-    pub fee: Decimal,
-    pub price: Decimal,
-    #[serde(rename = "stopprice")]
-    pub stop_price: Decimal,
-    #[serde(rename = "limitprice")]
-    pub limit_price: Decimal,
-    pub trigger: Option<TriggerType>,
-    pub margin: Option<bool>,
-    pub misc: String,
-    #[serde(rename = "oflags")]
-    #[serde_as(as = "StringWithSeparator::<CommaSeparator, OrderFlag>")]
-    pub order_flags: Vec<OrderFlag>,
-    pub trades: Option<Vec<String>>,
-    pub sender_sub_id: Option<String>,
-    pub reason: Option<String>,
-}
-
 /// Response type for mapping order ids to orders
 #[derive(Debug, Deserialize, PartialEq, Clone)]
 pub struct ClosedOrders {
-    pub closed: HashMap<String, ClosedOrder>,
+    pub closed: HashMap<String, Order>,
     pub count: i64,
 }
 

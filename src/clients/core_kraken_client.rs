@@ -1427,6 +1427,8 @@ mod tests {
         let request = ClosedOrdersRequestBuilder::new()
             .trades(true)
             .start(12340000)
+            .without_count(true)
+            .consolidate_taker(false)
             .build();
 
         let mock_server = MockServer::start().await;
@@ -1438,6 +1440,8 @@ mod tests {
             .and(header_exists("API-Sign"))
             .and(body_string_contains("trades=true"))
             .and(body_string_contains("start=12340000"))
+            .and(body_string_contains("without_count=true"))
+            .and(body_string_contains("consolidate_taker=false"))
             .respond_with(ResponseTemplate::new(200).set_body_json(get_closed_orders_json()))
             .expect(1)
             .mount(&mock_server)

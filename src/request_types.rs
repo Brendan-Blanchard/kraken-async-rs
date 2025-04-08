@@ -444,6 +444,8 @@ pub struct ClosedOrdersRequest {
     pub close_time: Option<CloseTime>,
     #[query(rename = "cl_ord_id")]
     pub client_order_id: Option<String>,
+    pub consolidate_taker: Option<bool>,
+    pub without_count: Option<bool>,
 }
 
 /// A request for the details of up to 50 orders by id.

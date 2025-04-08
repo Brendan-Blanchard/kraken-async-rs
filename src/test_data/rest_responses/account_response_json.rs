@@ -354,56 +354,15 @@ pub fn get_open_orders_json() -> Value {
 
 pub fn get_closed_orders_json() -> Value {
     json!({
-        "error": [ ],
+        "error":[],
         "result": {
-          "closed": {
-            "1A33O3-W29BC-4FA9UK": {
-              "refid": "None",
-              "userref": 1,
-              "status": "canceled",
-              "reason": "User requested",
-              "opentm": 1688148493.7708,
-              "closetm": 1688148610.0482,
-              "starttm": 0,
-              "expiretm": 0,
-              "descr": {},
-              "vol": "0.00100000",
-              "vol_exec": "0.00000000",
-              "cost": "0.00000",
-              "fee": "0.00000",
-              "price": "0.00000",
-              "stopprice": "0.00000",
-              "limitprice": "0.00000",
-              "margin": false,
-              "misc": "",
-              "oflags": "fciq",
-              "trigger": "index"
-          },
-          "9JTQTA-CLTS8-9W8YOP": {
-              "refid": "None",
-              "userref": 26492662,
-              "status": "canceled",
-              "reason": "User requested",
-              "opentm": 1688148493.7708,
-              "closetm": 1688148610.0477,
-              "starttm": 0,
-              "expiretm": 0,
-              "descr": {},
-              "vol": "0.00100000",
-              "vol_exec": "0.00000000",
-              "cost": "0.00000",
-              "fee": "0.00000",
-              "price": "0.00000",
-              "stopprice": "0.00000",
-              "limitprice": "0.00000",
-              "margin": true,
-              "misc": "",
-              "oflags": "fciq",
-              "trigger": "index"
-          }
-        },
-        "count": 2
-      }
+            "closed": {
+                "KGOWV8-P15FK-YG75U7":{"refid":null,"userref":0,"status":"closed","opentm":1721519777.553314,"starttm":0,"expiretm":0,"descr":{"pair":"ETHUSD","aclass":"forex","type":"buy","ordertype":"limit","price":"750.00","price2":"0","leverage":"none","order":"buy 0.05000000 ETHUSD @ limit 1500.00","close":""},"vol":"0.05000000","vol_exec":"0.05000000","cost":"37.50000","fee":"0.09375","price":"750.00","stopprice":"0.00000","limitprice":"0.00000","misc":"","oflags":"fciq","reason":null,"closetm":1731519777.553314},
+                "MSMU5X-PKW32-HQCHHD":{"refid":null,"userref":0,"status":"closed","opentm":1713586800.623244,"starttm":0,"expiretm":0,"descr":{"pair":"ALGOUSD","aclass":"forex","type":"sell","ordertype":"limit","price":"0.00570","price2":"0","leverage":"none","order":"sell 851.00000000 ALGOUSD @ limit 0.00570","close":""},"vol":"851.00000000","vol_exec":"851.00000000","cost":"4.8507000000000","fee":"0.01249","price":"0.00570","stopprice":"0.00000","limitprice":"0.00000","misc":"","oflags":"fciq","reason":null,"closetm":1723586800.623244},
+                "1OX8PJ-DOX9B-1TAW4M":{"refid":null,"userref":0,"status":"canceled","opentm":1732443716.701851,"starttm":0,"expiretm":0,"descr":{"pair":"SOLUSD","aclass":"forex","type":"sell","ordertype":"limit","price":"0.01050","price2":"0","leverage":"none","order":"sell 89.90977172 SOLUSD @ limit 0.01050","close":""},"vol":"89.90977172","vol_exec":"0.00000000","cost":"0.00000","fee":"0.00000","price":"0.00000","stopprice":"0.00000","limitprice":"0.00000","misc":"","oflags":"fciq","reason":"User requested","closetm":1742443716.701851}
+            },
+            "count":99
+        }
     })
 }
 
