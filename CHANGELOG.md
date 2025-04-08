@@ -15,6 +15,8 @@
 - Add missing `without_count` and `consolidate_taker` fields to `ClosedOrderRequest`
     - Upgrade by specifying these fields if you've used the struct syntax, and considering using a builder in the future
       to avoid additional parameters breaking your usage
+- Update tokio for security vulnerability (non-breaking)
+- Update rust_decimal (non-breaking)
 
 ### v0.9.0
 
