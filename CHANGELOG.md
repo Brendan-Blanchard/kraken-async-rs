@@ -16,7 +16,7 @@
     - Upgrade by specifying these fields if you've used the struct syntax, and considering using a builder in the future
       to avoid additional parameters breaking your usage
 - Update tokio for security vulnerability (non-breaking)
-- Update rust_decimal (non-breaking)
+- Update rust_decimal, ws-mock (non-breaking)
 
 ### v0.9.0
 

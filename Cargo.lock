@@ -2561,9 +2561,9 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
 name = "ws-mock"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edd1b0377dd4cbbc31affb144933c027bf1331037edba8f40130d1cfb48ba6ed"
+checksum = "f02318b64a6211c03437192118a3ee6bff27a18e064066faaf8359838fc84f00"
 dependencies = [
  "futures-util",
  "serde_json",
