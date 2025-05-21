@@ -179,6 +179,12 @@ pub enum TradeType {
     TakeProfitLimit,
     #[serde(rename = "settle position")]
     SettlePosition,
+    #[serde(rename = "stop market")]
+    StopMarket,
+    #[serde(rename = "touched market")]
+    TouchedMarket,
+    #[serde(rename = "liquidation market")]
+    LiquidationMarket,
 }
 
 impl Display for OrderType {
