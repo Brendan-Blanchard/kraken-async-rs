@@ -688,7 +688,8 @@ mod tests {
             {"order_id":"OUPTOY-CCUJG-BMAZ5S","limit_price":66579.3,"order_qty":0.07800000,"timestamp":"2024-05-19T18:55:22.531833732Z"},
             {"order_id":"OFUNE7-IGNAY-5UATGI","limit_price":66581.5,"order_qty":1.50192021,"timestamp":"2024-05-19T18:55:25.967603045Z"},
             {"order_id":"ORCUC4-UGIUC-MT5KBA","limit_price":66583.7,"order_qty":0.87745184,"timestamp":"2024-05-19T18:55:18.938264721Z"}
-        ]
+        ],
+        "timestamp":"2024-05-19T18:59:44.999999999Z"
     }]}"#.to_string();
 
         let expected_snapshot = WssMessage::Channel(ChannelMessage::L3(SingleResponse {
@@ -741,6 +742,7 @@ mod tests {
                     },
                 ],
                 checksum: 1361442827,
+                timestamp: "2024-05-19T18:59:44.999999999Z".to_string(),
             }),
         }));
 
@@ -758,6 +760,7 @@ mod tests {
         "type":"update",
         "data":[{
             "checksum":2143854316,
+            "timestamp":"2024-05-19T18:59:44.999999999Z",
             "symbol":"BTC/USD",
             "bids":[
                 {
@@ -801,6 +804,7 @@ mod tests {
                 ],
                 asks: vec![],
                 checksum: 2143854316,
+                timestamp: "2024-05-19T18:59:44.999999999Z".to_string(),
             }),
         }));
 

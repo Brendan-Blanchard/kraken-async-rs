@@ -168,6 +168,7 @@ pub struct L3Orderbook {
     pub bids: Vec<L3BidAsk>,
     pub asks: Vec<L3BidAsk>,
     pub checksum: u32,
+    pub timestamp: String, // rfc3339
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -176,6 +177,7 @@ pub struct L3OrderbookUpdate {
     pub bids: Vec<L3BidAskUpdate>,
     pub asks: Vec<L3BidAskUpdate>,
     pub checksum: u32,
+    pub timestamp: String, // rfc3339
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

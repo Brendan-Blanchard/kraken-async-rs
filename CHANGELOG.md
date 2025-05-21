@@ -11,6 +11,8 @@
 
 - Add "stop market", "touched market" and "liquidation market" to `TradeType`
     - If you've matched on this enum exhaustively, these cases will need to be added. Otherwise, this is non-breaking.
+- Add `timestamp` field to `L3Orderbook` and `L3OrderbookUpdate`
+    - If you've instantiated these directly, struct definitions will require the new fields
 
 ### v0.10.0
 
