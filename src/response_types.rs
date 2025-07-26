@@ -589,7 +589,8 @@ pub struct Orderbook {
 pub struct RecentTrade {
     pub price: Decimal,
     pub volume: Decimal,
-    pub time: f64,
+    /// f64, but this side-steps a serde_json issue: https://github.com/Brendan-Blanchard/kraken-async-rs/issues/13
+    pub time: Decimal,
     pub buy_sell: BuySellChar,
     pub market_limit: MarketLimitChar,
     pub misc: String,

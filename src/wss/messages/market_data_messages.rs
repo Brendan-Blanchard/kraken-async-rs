@@ -365,7 +365,6 @@ pub struct Instruments {
 #[cfg(test)]
 mod tests {
     use super::*;
-
     use rust_decimal_macros::dec;
 
     #[test]
@@ -411,5 +410,15 @@ mod tests {
         let deserialized = serde_json::from_str::<Pair>(raw).unwrap();
 
         assert_eq!(expected, deserialized);
+    }
+
+    #[test]
+    fn test_deserialize_bid_ask_precision() {
+        let serialized = r#"{"price":119174.000,"qty":0.00672000}"#;
+
+        let bid_ask: BidAsk = serde_json::from_str(serialized).unwrap();
+
+        assert_eq!("119174.000", bid_ask.price.to_string());
+        assert_eq!("0.00672000", bid_ask.quantity.to_string());
     }
 }

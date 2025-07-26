@@ -35,7 +35,7 @@ futures-util = "0.3.31"
 tokio-stream = "0.1.17"
 serde-this-or-that = "0.5.0"
 time = { version = "0.3.37", features = ["serde", "macros", "parsing"] }
-rust_decimal = { version = "1.37.1", features = ["serde-with-str", "serde-with-float"] }
+rust_decimal = { version = "1.37.1", features = ["serde-with-str", "serde-with-float", "serde-with-arbitrary-precision"] }
 rust_decimal_macros = "1.37.1"
 tracing-subscriber = { version = "0.3.19", optional = true }
 

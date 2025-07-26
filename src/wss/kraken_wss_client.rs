@@ -198,7 +198,7 @@ mod tests {
         get_expected_trade_subscription, get_instruments_subscription_response,
         get_l3_subscription_response, get_ohlc_subscription_response, get_pong,
         get_ticker_subscription_response, get_trade_subscription_response, parse_for_test,
-        CallResponseTest, ParseIncomingTest,
+        CallResponseTest, ParseIncomingTest, WssTestState,
     };
     use crate::wss::ChannelMessage::{Heartbeat, Status};
     use crate::wss::MethodMessage::{AddOrder, AmendOrder, CancelOrder, EditOrder};
@@ -224,7 +224,7 @@ mod tests {
     use tokio_stream::StreamExt;
     use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
     use tracing_test::traced_test;
-    use ws_mock::matchers::Any;
+    use ws_mock::matchers::{Any, StringExact};
     use ws_mock::ws_mock_server::{WsMock, WsMockServer};
 
     #[test]
@@ -1287,6 +1287,73 @@ mod tests {
             .build()
             .test()
             .await;
+    }
+
+    /// This ensures that string-based comparisons after serialization are also correct.
+    ///
+    /// Turning on serde_json's arbitrary-precision feature has known issues, and it is turned on
+    /// automatically by rust_decimal's `serde-with-arbitrary-precision`.
+    #[traced_test]
+    #[tokio::test]
+    async fn test_amend_order_string() {
+        let expected_request = r#"{"method":"amend_order","params":{"order_id":"BQS60L-EGW18-UPAK9U","order_qty":5.1,"limit_price":0.96,"post_only":false,"token":"aToken"},"req_id":0}"#;
+        let response = r#"{"method":"amend_order","req_id":0,"result":{"amend_id":"1M2JV8-OEJZD-G5GSBF","order_id":"BQS60L-EGW18-UPAK9U"},"success":true,"time_in":"2024-10-11T12:12:21.003873Z","time_out":"2024-10-11T12:12:21.005064Z"}"#.to_string();
+        let expected_response = WssMessage::Method(AmendOrder(ResultResponse {
+            result: Some(AmendOrderResult {
+                amend_id: "1M2JV8-OEJZD-G5GSBF".to_string(),
+                order_id: Some("BQS60L-EGW18-UPAK9U".to_string()),
+                client_order_id: None,
+                warnings: None,
+            }),
+            error: None,
+            success: true,
+            req_id: 0,
+            time_in: "2024-10-11T12:12:21.003873Z".to_string(),
+            time_out: "2024-10-11T12:12:21.005064Z".to_string(),
+        }));
+
+        let amend_order = AmendOrderParams {
+            order_id: Some("BQS60L-EGW18-UPAK9U".to_string()),
+            limit_price: Some(dec!(0.96)),
+            limit_price_type: None,
+            post_only: Some(false),
+            trigger_price: None,
+            trigger_price_type: None,
+            deadline: None,
+            token: Token::new("aToken".to_string()),
+            client_order_id: None,
+            order_quantity: dec!(5.1),
+            display_quantity: None,
+        };
+
+        let message = Message {
+            method: "amend_order".to_string(),
+            params: amend_order,
+            req_id: 0,
+        };
+
+        let mut test_state = WssTestState::new().await;
+
+        WsMock::new()
+            .matcher(StringExact::new(expected_request))
+            .expect(1)
+            .respond_with(response.into())
+            .mount(&test_state.mock_server)
+            .await;
+
+        let mut stream = test_state.ws_client.connect::<WssMessage>().await.unwrap();
+
+        stream.send(&message).await.unwrap();
+
+        let result = timeout(Duration::from_secs(3), stream.next()).await;
+        println!("{:?}", result);
+
+        test_state.mock_server.verify().await;
+
+        let response = result.unwrap().unwrap().unwrap();
+
+        println!("{:?}", response);
+        assert_eq!(expected_response, response);
     }
 
     #[tokio::test]
