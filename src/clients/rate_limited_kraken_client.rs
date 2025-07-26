@@ -1257,7 +1257,7 @@ mod tests {
         assert!(amend_elapsed < Duration::from_secs(8));
     }
 
-    fn get_amend_for_order(orders: &Vec<AddOrder>, i: usize) -> AmendOrderRequest {
+    fn get_amend_for_order(orders: &[AddOrder], i: usize) -> AmendOrderRequest {
         AmendOrderRequest::builder()
             .tx_id(orders.get(i).unwrap().tx_id.first().unwrap().clone()) // TODO: cleanup
             .build()

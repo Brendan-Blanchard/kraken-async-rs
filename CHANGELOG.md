@@ -5,6 +5,15 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
+### v0.12.0
+
+**All changes are breaking unless otherwise noted and given upgrade instructions.**
+
+- Enabled rust-decimal serde-with-arbitrary-precision feature to preserve trailing zeros (helps with book checksums)
+- Changed `RecentTrade.time` to a `Decimal`, which side-steps a serde-json issue with `arbitrary-precision`
+  feature: https://github.com/Brendan-Blanchard/kraken-async-rs/issues/13
+    - Either consume as a `Decimal` or convert back down to `f64` (technically fallible, but very unlikely in this case)
+
 ### v0.11.0
 
 **All changes are breaking unless otherwise noted and given upgrade instructions.**
