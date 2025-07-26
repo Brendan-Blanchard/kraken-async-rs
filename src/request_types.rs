@@ -830,8 +830,8 @@ pub enum Cursor {
 impl Display for Cursor {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Cursor::String(str) => write!(f, "{}", str),
-            Cursor::Bool(b) => write!(f, "{}", b),
+            Cursor::String(str) => write!(f, "{str}"),
+            Cursor::Bool(b) => write!(f, "{b}"),
         }
     }
 }

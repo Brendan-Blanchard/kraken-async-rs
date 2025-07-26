@@ -66,15 +66,15 @@ impl From<SerdeError> for ClientError {
 impl Display for ClientError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ClientError::Serde(err) => write!(f, "{}", err),
-            ClientError::Hyper(err) => write!(f, "{}", err),
-            ClientError::HyperClient(err) => write!(f, "{}", err),
-            ClientError::HyperHttp(err) => write!(f, "{}", err),
-            ClientError::HyperUri(err) => write!(f, "{}", err),
-            ClientError::HttpStatus(body) => write!(f, "Non-successful status with body: {}", body),
-            ClientError::UrlParse(err) => write!(f, "{}", err),
-            ClientError::Parse(err) => write!(f, "{}", err),
-            ClientError::Kraken(err) => write!(f, "{}", err),
+            ClientError::Serde(err) => write!(f, "{err}"),
+            ClientError::Hyper(err) => write!(f, "{err}"),
+            ClientError::HyperClient(err) => write!(f, "{err}"),
+            ClientError::HyperHttp(err) => write!(f, "{err}"),
+            ClientError::HyperUri(err) => write!(f, "{err}"),
+            ClientError::HttpStatus(body) => write!(f, "Non-successful status with body: {body}"),
+            ClientError::UrlParse(err) => write!(f, "{err}"),
+            ClientError::Parse(err) => write!(f, "{err}"),
+            ClientError::Kraken(err) => write!(f, "{err}"),
         }
     }
 }
