@@ -151,7 +151,8 @@ pub struct ResultResponse<T> {
 pub struct ErrorResponse {
     pub error: Option<String>,
     pub method: String,
-    pub status: String,
+    pub status: Option<String>,
+    pub symbol: Option<String>,
     pub success: bool,
     pub req_id: i64,
     pub time_in: String,
@@ -222,11 +223,31 @@ mod tests {
         let expected = WssMessage::Error(ErrorResponse {
             error: Some("ESession:Invalid session".to_string()),
             method: "subscribe".to_string(),
-            status: "error".to_string(),
+            status: Some("error".to_string()),
+            symbol: None,
             success: false,
             req_id: 42,
             time_in: "2023-04-19T12:04:41.320119Z".to_string(),
             time_out: "2023-04-19T12:04:41.980119Z".to_string(),
+        });
+
+        let parsed = serde_json::from_str::<WssMessage>(raw).unwrap();
+        assert_eq!(expected, parsed);
+    }
+
+    #[test]
+    fn test_deserializing_subscribe_error_message() {
+        let raw = r#" {"error":"Currency pair not supported WWW/USD","method":"subscribe","req_id":0,"success":false,"symbol":"WWW/USD","time_in":"2025-08-26T00:09:18.071184Z","time_out":"2025-08-26T00:09:18.071225Z"}"#;
+
+        let expected = WssMessage::Error(ErrorResponse {
+            error: Some("Currency pair not supported WWW/USD".to_string()),
+            method: "subscribe".to_string(),
+            status: None,
+            symbol: Some("WWW/USD".to_string()),
+            success: false,
+            req_id: 0,
+            time_in: "2025-08-26T00:09:18.071184Z".to_string(),
+            time_out: "2025-08-26T00:09:18.071225Z".to_string(),
         });
 
         let parsed = serde_json::from_str::<WssMessage>(raw).unwrap();
