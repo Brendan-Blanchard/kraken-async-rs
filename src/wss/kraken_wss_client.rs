@@ -1346,13 +1346,13 @@ mod tests {
         stream.send(&message).await.unwrap();
 
         let result = timeout(Duration::from_secs(3), stream.next()).await;
-        println!("{:?}", result);
+        println!("{result:?}");
 
         test_state.mock_server.verify().await;
 
         let response = result.unwrap().unwrap().unwrap();
 
-        println!("{:?}", response);
+        println!("{response:?}");
         assert_eq!(expected_response, response);
     }
 

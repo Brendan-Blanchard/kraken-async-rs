@@ -130,7 +130,7 @@ where
 
         let response = result.unwrap().unwrap().unwrap();
 
-        println!("{:?}", response);
+        println!("{response:?}");
         assert_eq!(self.expect.take().unwrap(), response);
     }
 }

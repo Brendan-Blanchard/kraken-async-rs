@@ -957,7 +957,7 @@ mod tests {
         let end = Instant::now();
         let elapsed = end - start;
 
-        println!("{:?}", elapsed);
+        println!("{elapsed:?}");
 
         assert!(elapsed > Duration::from_secs(n_calls - 1));
         assert!(elapsed < Duration::from_secs(n_calls));
@@ -1228,7 +1228,7 @@ mod tests {
 
         let end = Instant::now();
         let elapsed = end - start;
-        println!("{:?}", elapsed);
+        println!("{elapsed:?}");
 
         assert!(elapsed > Duration::from_secs(4));
         assert!(elapsed < Duration::from_secs(5));
@@ -1251,7 +1251,7 @@ mod tests {
         }
 
         let amend_elapsed = amend_start.elapsed();
-        println!("{:?}", amend_elapsed);
+        println!("{amend_elapsed:?}");
 
         assert!(amend_elapsed > Duration::from_secs(7));
         assert!(amend_elapsed < Duration::from_secs(8));
@@ -1282,7 +1282,7 @@ mod tests {
 
         let end = Instant::now();
         let elapsed = end - start;
-        println!("{:?}", elapsed);
+        println!("{elapsed:?}");
 
         assert!(elapsed > Duration::from_secs(3));
         assert!(elapsed < Duration::from_secs(4));
@@ -1314,7 +1314,7 @@ mod tests {
 
         let edit_end = Instant::now();
         let edit_elapsed = edit_end - edit_start;
-        println!("{:?}", edit_elapsed);
+        println!("{edit_elapsed:?}");
 
         assert!(edit_elapsed > Duration::from_secs(12));
         assert!(edit_elapsed < Duration::from_secs(13));
@@ -1347,7 +1347,7 @@ mod tests {
 
         let edit_end = Instant::now();
         let edit_elapsed = edit_end - edit_start;
-        println!("{:?}", edit_elapsed);
+        println!("{edit_elapsed:?}");
 
         assert!(edit_elapsed > Duration::from_secs(14));
         assert!(edit_elapsed < Duration::from_secs(15));
@@ -1397,7 +1397,7 @@ mod tests {
 
         let edit_end = Instant::now();
         let edit_elapsed = edit_end - edit_start;
-        println!("{:?}", edit_elapsed);
+        println!("{edit_elapsed:?}");
 
         assert!(edit_elapsed > Duration::from_secs(18));
         assert!(edit_elapsed < Duration::from_secs(19));
@@ -1427,7 +1427,7 @@ mod tests {
 
         let end = Instant::now();
         let elapsed = end - start;
-        println!("{:?}", elapsed);
+        println!("{elapsed:?}");
 
         assert!(elapsed >= Duration::from_secs(0));
         assert!(elapsed < Duration::from_millis(10));

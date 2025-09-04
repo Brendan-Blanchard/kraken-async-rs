@@ -53,7 +53,7 @@ mod tests {
     fn test_secret_debug() {
         let token = Token::new("shhh");
 
-        let str = format!("{:?}", token);
+        let str = format!("{token:?}");
 
         assert_eq!("[REDACTED TOKEN]", str);
     }

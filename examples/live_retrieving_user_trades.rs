@@ -29,6 +29,6 @@ async fn main() {
 
     let trades = client.get_trades_history(&request).await.unwrap();
 
-    println!("{:?}", trades);
+    println!("{trades:?}");
     println!("{:?}", trades.result.unwrap().trades.len());
 }

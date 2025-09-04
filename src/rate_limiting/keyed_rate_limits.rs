@@ -190,7 +190,7 @@ mod tests {
         assert!(elapsed_start_mid > Duration::from_secs(4));
         assert!(elapsed_start_mid < Duration::from_millis(4300));
 
-        println!("{:?}", elapsed_mid_end);
+        println!("{elapsed_mid_end:?}");
         assert!(elapsed_mid_end > Duration::from_secs(2));
         assert!(elapsed_mid_end < Duration::from_millis(2200));
     }

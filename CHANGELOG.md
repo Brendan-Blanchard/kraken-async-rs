@@ -11,6 +11,7 @@
 
 - Made `ErrorResponse.status` optional and added `ErrorResponse.symbol` to match real returned data
     - Update any raw struct definitions in client code
+- Updated to tracing-subscriber 0.3.19 for security patch
 
 ### v0.12.0
 
