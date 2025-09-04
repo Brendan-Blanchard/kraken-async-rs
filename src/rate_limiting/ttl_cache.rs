@@ -59,7 +59,7 @@ where
     T: Clone,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.ttl.cmp(&other.ttl))
+        Some(self.cmp(other))
     }
 }
 
