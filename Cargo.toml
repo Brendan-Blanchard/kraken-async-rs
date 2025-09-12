@@ -18,7 +18,7 @@ hyper-util = { version = "0.1.10", features = ["full", "client-legacy", "tokio"]
 http-body-util = "0.1.2"
 hyper-tls = "0.6.0"
 sha2 = "0.10.8"
-tokio = { version = "1.44.2", features = ["full"] }
+tokio = { version = "1.47.1", features = ["full"] }
 dotenvy = "0.15.7"
 serde = { version = "1.0.218", features = ["derive"] }
 serde_json = { version = "1.0.140", features = [] }
