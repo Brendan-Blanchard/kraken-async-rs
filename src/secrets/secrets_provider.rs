@@ -109,8 +109,10 @@ mod tests {
         let key = "api-key";
         let secret = "api-secret";
 
-        std::env::set_var(key_name, key);
-        std::env::set_var(secret_name, secret);
+        unsafe {
+            std::env::set_var(key_name, key);
+            std::env::set_var(secret_name, secret);
+        }
 
         let mut secrets_provider = EnvSecretsProvider::new(key_name, secret_name);
 

@@ -11,8 +11,7 @@
 
 - Made `ErrorResponse.status` optional and added `ErrorResponse.symbol` to match real returned data
     - Update any raw struct definitions in client code
-- Updated to tracing-subscriber 0.3.19 for security patch
-- Update tokio to 1.47.1
+- Update to 2024 edition and bump many dependencies
 
 ### v0.12.0
 
