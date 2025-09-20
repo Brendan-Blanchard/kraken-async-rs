@@ -4,8 +4,8 @@ use crate::wss::{
     CancelOnDisconnectResult, CancelOrderResult, EditOrderResult,
 };
 use crate::wss::{BalanceResponse, ExecutionResult, SubscriptionResult};
-use crate::wss::{Instruments, Ohlc, Ticker, Trade, L2, L3};
-use serde::{de, Deserialize, Deserializer, Serialize};
+use crate::wss::{Instruments, L2, L3, Ohlc, Ticker, Trade};
+use serde::{Deserialize, Deserializer, Serialize, de};
 use serde_json::Value::Null;
 use std::collections::VecDeque;
 use std::fmt::Debug;

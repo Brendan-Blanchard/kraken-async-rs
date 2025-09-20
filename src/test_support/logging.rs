@@ -1,6 +1,6 @@
 use std::fs::File;
 use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::{fmt, Registry};
+use tracing_subscriber::{Registry, fmt};
 
 pub fn set_up_logging(filename: &str) {
     let subscriber = Registry::default()

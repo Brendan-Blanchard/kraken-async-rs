@@ -1,6 +1,6 @@
 //! Kraken WSS client and message streams
-use crate::wss::errors::WSSError;
 use crate::wss::Message;
+use crate::wss::errors::WSSError;
 use futures_util::SinkExt;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -10,7 +10,7 @@ use std::task::{Context, Poll};
 use tokio::net::TcpStream;
 use tokio_stream::Stream;
 use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
-use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
+use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async};
 use tracing::trace;
 use url::Url;
 
@@ -186,10 +186,10 @@ mod tests {
     use crate::request_types::{TimeInForce, TimeInForceV2, TriggerType};
     use crate::response_types::{BuySell, OrderStatusV2, OrderType, SystemStatus};
     use crate::test_data::{
-        get_balances_subscription_response, get_book_subscription_response,
-        get_execution_subscription_response, get_expected_balances_message,
-        get_expected_balances_subscription, get_expected_book_message,
-        get_expected_book_subscription, get_expected_execution_message,
+        CallResponseTest, ParseIncomingTest, WssTestState, get_balances_subscription_response,
+        get_book_subscription_response, get_execution_subscription_response,
+        get_expected_balances_message, get_expected_balances_subscription,
+        get_expected_book_message, get_expected_book_subscription, get_expected_execution_message,
         get_expected_execution_subscription, get_expected_instruments_message,
         get_expected_instruments_subscription, get_expected_l3_message,
         get_expected_l3_subscription, get_expected_ohlc_message, get_expected_ohlc_subscription,
@@ -198,7 +198,6 @@ mod tests {
         get_expected_trade_subscription, get_instruments_subscription_response,
         get_l3_subscription_response, get_ohlc_subscription_response, get_pong,
         get_ticker_subscription_response, get_trade_subscription_response, parse_for_test,
-        CallResponseTest, ParseIncomingTest, WssTestState,
     };
     use crate::wss::ChannelMessage::{Heartbeat, Status};
     use crate::wss::MethodMessage::{AddOrder, AmendOrder, CancelOrder, EditOrder};
@@ -209,15 +208,15 @@ mod tests {
         CancelAllOrdersResult, CancelOnDisconnectParams, CancelOnDisconnectResult,
         CancelOrderParams, CancelOrderResult, ChannelMessage, EditOrderParams, EditOrderResult,
         ExecutionResult, ExecutionSubscription, ExecutionType, Fee, FeePreference, Instruments,
-        InstrumentsSubscription, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate,
+        InstrumentsSubscription, L2, L3, L3BidAsk, L3BidAskUpdate, L3Orderbook, L3OrderbookUpdate,
         LedgerCategory, LedgerEntryTypeV2, LedgerUpdate, MakerTaker, MarketDataResponse,
         MarketLimit, MethodMessage, Ohlc, OhlcSubscription, Orderbook, OrderbookEvent,
         OrderbookUpdate, Pair, PairStatus, PriceType, Response, ResultResponse, SingleResponse,
         StatusUpdate, Ticker, TickerSubscription, Trade, TradesSubscription, TriggerDescription,
-        TriggerStatus, Wallet, WalletId, WalletType, WssMessage, L2, L3,
+        TriggerStatus, Wallet, WalletId, WalletType, WssMessage,
     };
     use rust_decimal_macros::dec;
-    use serde_json::{json, Number};
+    use serde_json::{Number, json};
     use std::str::FromStr;
     use std::time::Duration;
     use tokio::time::timeout;

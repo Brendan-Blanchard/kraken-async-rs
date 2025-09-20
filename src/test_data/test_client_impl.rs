@@ -29,7 +29,7 @@ use crate::response_types::{
     Withdrawal, WithdrawalAddress,
 };
 use crate::secrets::secrets_provider::SecretsProvider;
-use crate::test_data::{get_null_secrets_provider, TestRateLimitedClient};
+use crate::test_data::{TestRateLimitedClient, get_null_secrets_provider};
 use rust_decimal_macros::dec;
 use std::collections::HashMap;
 use std::sync::Arc;

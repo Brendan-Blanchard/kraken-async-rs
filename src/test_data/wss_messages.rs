@@ -4,7 +4,7 @@ use crate::wss::{
     OhlcSubscriptionResponse, PongResponse, ResultResponse, SubscriptionResult,
     TickerSubscriptionResponse, TradeSubscriptionResponse, WssMessage,
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 pub fn get_expected_ping() -> Value {
     json!({"method":"ping","req_id":1})

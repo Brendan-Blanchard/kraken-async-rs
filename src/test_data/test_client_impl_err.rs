@@ -1,7 +1,7 @@
 use crate::clients::errors::ClientError;
 use crate::clients::http_response_types::ResultErrorResponse;
-use crate::clients::kraken_client::endpoints::KRAKEN_BASE_URL;
 use crate::clients::kraken_client::KrakenClient;
+use crate::clients::kraken_client::endpoints::KRAKEN_BASE_URL;
 use crate::clients::rate_limited_kraken_client::RateLimitedKrakenClient;
 use crate::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use crate::request_types::{

@@ -1,8 +1,8 @@
 use crate::crypto::secrets::Token;
 use crate::request_types::{IntOrString, SelfTradePrevention, TimeInForceV2, TriggerType};
 use crate::response_types::{BuySell, OrderType};
-use rust_decimal::serde::{float, float_option};
 use rust_decimal::Decimal;
+use rust_decimal::serde::{float, float_option};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use simple_builder::Builder;
