@@ -1,7 +1,7 @@
 //! Client error type and sub-types
-use hyper::http::uri::InvalidUri;
-use hyper::http::Error as HyperHttpError;
 use hyper::Error as HyperError;
+use hyper::http::Error as HyperHttpError;
+use hyper::http::uri::InvalidUri;
 use hyper_util::client::legacy::Error as HyperClientError;
 use serde::Deserialize;
 use serde_json::Error as SerdeError;

@@ -1,4 +1,4 @@
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 pub fn get_allocate_earn_funds_json() -> Value {
     json!({

@@ -3,8 +3,8 @@
 use crate::response_types::{BuySell, LedgerEntryType, OrderFlag, OrderType};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use serde_with::formats::CommaSeparator;
 use serde_with::StringWithSeparator;
+use serde_with::formats::CommaSeparator;
 use serde_with::{serde_as, skip_serializing_none};
 use simple_builder::Builder;
 use std::fmt::{Display, Formatter};

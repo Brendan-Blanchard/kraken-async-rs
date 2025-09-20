@@ -259,7 +259,7 @@ mod tests {
     ///
     use crate::response_types::VerificationTier::{Intermediate, Pro};
     use std::time::Duration;
-    use tokio::time::{pause, Instant};
+    use tokio::time::{Instant, pause};
 
     #[tokio::test]
     async fn test_trading_rate_limiter_intermediate_add_order_limit() {

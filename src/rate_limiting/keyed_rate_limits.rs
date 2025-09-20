@@ -92,7 +92,7 @@ mod tests {
     use crate::rate_limiting::keyed_rate_limits::KeyedRateLimiter;
     use async_rate_limit::sliding_window::SlidingWindowRateLimiter;
     use std::time::Duration;
-    use tokio::time::{pause, Instant};
+    use tokio::time::{Instant, pause};
 
     #[test]
     fn test_add_remove() {

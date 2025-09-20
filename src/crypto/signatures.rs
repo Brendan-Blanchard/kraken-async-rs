@@ -1,6 +1,6 @@
 //! Core signature implementation for signing messages
-use base64::engine::general_purpose::STANDARD as base64;
 use base64::Engine;
+use base64::engine::general_purpose::STANDARD as base64;
 use hmac::{Hmac, Mac};
 use sha2::{Digest, Sha256, Sha512};
 
@@ -72,8 +72,7 @@ mod tests {
     #[test]
     fn test_generate_signature_form_data() {
         let expected = "4/dpxb3iT4tp/ZCVEwSnEsLxx0bqyhLpdfOpc6fn7OR8+UClSV5n9E6aSS8MPtnRfp32bAb0nmbRn6H8ndwLUQ==";
-        let key =
-            "kQH5HW/8p1uGOVjbgWA7FunAmGO8lsSUXNsu3eow76sz84Q18fWxnyRzBHCd3pd5nE9qa99HAZtuZuj6F1huXg==";
+        let key = "kQH5HW/8p1uGOVjbgWA7FunAmGO8lsSUXNsu3eow76sz84Q18fWxnyRzBHCd3pd5nE9qa99HAZtuZuj6F1huXg==";
 
         let nonce = 1616492376594_u64;
 
@@ -102,8 +101,7 @@ mod tests {
     #[test]
     fn test_generate_signature_json_data() {
         let expected = "oTOXlYtwCD1eL/j45C8gSWB49XQO1Sguv3nnScc8TTNpgmsnDvAA3yu6geyXXjGIsfCUEOzslsv4ugTZNsM7RA==";
-        let key =
-            "kQH5HW/8p1uGOVjbgWA7FunAmGO8lsSUXNsu3eow76sz84Q18fWxnyRzBHCd3pd5nE9qa99HAZtuZuj6F1huXg==";
+        let key = "kQH5HW/8p1uGOVjbgWA7FunAmGO8lsSUXNsu3eow76sz84Q18fWxnyRzBHCd3pd5nE9qa99HAZtuZuj6F1huXg==";
 
         let nonce = 1616492376594_u64;
 

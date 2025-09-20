@@ -750,8 +750,8 @@ where
 #[cfg(test)]
 mod tests {
     use crate::clients::core_kraken_client::CoreKrakenClient;
-    use crate::clients::kraken_client::endpoints::KRAKEN_BASE_URL;
     use crate::clients::kraken_client::KrakenClient;
+    use crate::clients::kraken_client::endpoints::KRAKEN_BASE_URL;
     use crate::clients::rate_limited_kraken_client::RateLimitedKrakenClient;
     use crate::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
     use crate::request_types::{
@@ -772,8 +772,8 @@ mod tests {
     use crate::response_types::VerificationTier::{Intermediate, Pro};
     use crate::response_types::{AddOrder, BuySell, OrderFlag, OrderType, VerificationTier};
     use crate::secrets::secrets_provider::StaticSecretsProvider;
-    use crate::test_data::public_response_json::get_server_time_json;
     use crate::test_data::TestRateLimitedClient;
+    use crate::test_data::public_response_json::get_server_time_json;
     use crate::test_data::{
         get_null_secrets_provider, get_rate_limit_test_client, get_rate_limit_test_client_err,
     };
@@ -782,8 +782,8 @@ mod tests {
     use std::sync::Arc;
     use std::time::Duration;
     use tokio::sync::Mutex;
-    use tokio::time::pause;
     use tokio::time::Instant;
+    use tokio::time::pause;
     use wiremock::matchers::{header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 

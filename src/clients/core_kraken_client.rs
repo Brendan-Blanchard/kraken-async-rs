@@ -2,11 +2,11 @@
 use crate::clients::errors::ClientError;
 use crate::clients::errors::KrakenError;
 use crate::clients::http_response_types::ResultErrorResponse;
-use crate::clients::kraken_client::endpoints::*;
 use crate::clients::kraken_client::KrakenClient;
+use crate::clients::kraken_client::endpoints::*;
 use crate::crypto::nonce_provider::NonceProvider;
 use crate::crypto::nonce_request::NonceRequest;
-use crate::crypto::signatures::{generate_signature, Signature};
+use crate::crypto::signatures::{Signature, generate_signature};
 use crate::request_types::*;
 use crate::response_types::*;
 use crate::secrets::secrets_provider::SecretsProvider;
@@ -16,8 +16,8 @@ use http_body_util::BodyExt;
 use hyper::http::request::Builder;
 use hyper::{Method, Request, Uri};
 use hyper_tls::HttpsConnector;
-use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::client::legacy::Client;
+use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::rt::TokioExecutor;
 use secrecy::ExposeSecret;
 use serde::{Deserialize, Serialize};
@@ -27,7 +27,7 @@ use std::sync::Arc;
 use to_query_params::{QueryParams, ToQueryParams};
 use tokio::sync::Mutex;
 use tracing::trace;
-use url::{form_urlencoded, Url};
+use url::{Url, form_urlencoded};
 
 #[derive(QueryParams, Default)]
 struct EmptyRequest {}
