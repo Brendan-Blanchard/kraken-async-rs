@@ -132,12 +132,13 @@ impl KrakenClient for CoreKrakenClient {
     fn new_with_tracing(
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
+        url: impl ToString,
         trace_inbound: bool,
     ) -> Self {
         let https = HttpsConnector::new();
         let http_client = Client::builder(TokioExecutor::new()).build(https);
         CoreKrakenClient {
-            api_url: KRAKEN_BASE_URL.to_string(),
+            api_url: url.to_string(),
             secrets_provider,
             nonce_provider,
             http_client,
@@ -1314,9 +1315,12 @@ mod tests {
 
         let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
             Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
-        let mut client =
-            CoreKrakenClient::new_with_tracing(secrets_provider, nonce_provider, trace_inbound);
-        client.api_url = mock_server.uri();
+        let mut client = CoreKrakenClient::new_with_tracing(
+            secrets_provider,
+            nonce_provider,
+            mock_server.uri(),
+            trace_inbound,
+        );
 
         Mock::given(method("GET"))
             .and(path("/0/public/Time"))

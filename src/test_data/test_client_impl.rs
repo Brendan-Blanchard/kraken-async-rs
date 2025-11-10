@@ -75,6 +75,7 @@ impl KrakenClient for TestClient {
     fn new_with_tracing(
         _secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         _nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
+        _url: impl ToString,
         _trace_inbound: bool,
     ) -> Self {
         Self { current_id: 0 }

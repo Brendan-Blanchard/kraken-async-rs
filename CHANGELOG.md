@@ -5,6 +5,13 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
+### v0.14.0
+
+**All changes are breaking unless otherwise noted and given upgrade instructions.**
+
+- Add `url` to `KrakenClient::new_with_tracing` for completeness
+    - If not needed, you can provide `KRAKEN_BASE_URL`
+
 ### v0.13.0
 
 **All changes are breaking unless otherwise noted and given upgrade instructions.**

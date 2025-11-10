@@ -100,10 +100,11 @@ where
     fn new_with_tracing(
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
+        url: impl ToString,
         trace_inbound: bool,
     ) -> Self {
         RateLimitedKrakenClient {
-            core_client: C::new_with_tracing(secrets_provider, nonce_provider, trace_inbound),
+            core_client: C::new_with_tracing(secrets_provider, nonce_provider, url, trace_inbound),
             private_rate_limiter: Self::get_private_rate_limiter(VerificationTier::Intermediate),
             public_rate_limiter: Self::get_public_rate_limiter(),
             trading_rate_limiter: KrakenTradingRateLimiter::new(VerificationTier::Intermediate),

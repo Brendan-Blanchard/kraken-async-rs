@@ -1,6 +1,7 @@
 use kraken_async_rs::clients::core_kraken_client::CoreKrakenClient;
 use kraken_async_rs::clients::http_response_types::ResultErrorResponse;
 use kraken_async_rs::clients::kraken_client::KrakenClient;
+use kraken_async_rs::clients::kraken_client::endpoints::KRAKEN_BASE_URL;
 use kraken_async_rs::crypto::nonce_provider::{IncreasingNonceProvider, NonceProvider};
 use kraken_async_rs::request_types::TradableAssetPairsRequest;
 use kraken_async_rs::secrets::secrets_provider::{SecretsProvider, StaticSecretsProvider};
@@ -18,7 +19,8 @@ async fn main() {
         Box::new(Arc::new(Mutex::new(StaticSecretsProvider::new("", ""))));
     let nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>> =
         Box::new(Arc::new(Mutex::new(IncreasingNonceProvider::new())));
-    let mut client = CoreKrakenClient::new_with_tracing(secrets_provider, nonce_provider, true);
+    let mut client =
+        CoreKrakenClient::new_with_tracing(secrets_provider, nonce_provider, KRAKEN_BASE_URL, true);
 
     let request = TradableAssetPairsRequest::builder()
         .pair("BTCUSD".into())

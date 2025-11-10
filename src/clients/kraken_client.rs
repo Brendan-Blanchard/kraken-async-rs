@@ -104,6 +104,7 @@ pub trait KrakenClient: Send + Sync {
     fn new_with_tracing(
         secrets_provider: Box<Arc<Mutex<dyn SecretsProvider>>>,
         nonce_provider: Box<Arc<Mutex<dyn NonceProvider>>>,
+        url: impl ToString,
         trace_inbound: bool,
     ) -> Self;
 
