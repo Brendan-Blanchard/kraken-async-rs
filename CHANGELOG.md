@@ -11,6 +11,7 @@
 
 - Add `url` to `KrakenClient::new_with_tracing` for completeness
     - If not needed, you can provide `KRAKEN_BASE_URL`
+- Bump tokio, tokio-tungstenite, rust-decimal and ws-mock versions
 
 ### v0.13.0
 
