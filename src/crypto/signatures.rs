@@ -1,7 +1,7 @@
 //! Core signature implementation for signing messages
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as base64;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, Mac, KeyInit};
 use sha2::{Digest, Sha256, Sha512};
 
 /// Struct containing the encoded message body and finalized signature

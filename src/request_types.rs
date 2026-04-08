@@ -8,7 +8,7 @@ use serde_with::formats::CommaSeparator;
 use serde_with::{serde_as, skip_serializing_none};
 use simple_builder::Builder;
 use std::fmt::{Display, Formatter};
-use to_query_params::{QueryParams, ToQueryParams};
+use to_query_params::QueryParams;
 
 /// Wrapper type for submitting order cancels by Kraken id (String) or user-ref (Int).
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
