@@ -5,6 +5,10 @@
 - Considering package re-organization for better imports etc.
 - Convenient type defs and functions for verbose type signatures like `Box<Arc<Mutex<dyn SecretsProvider>>>`
 
+### v0.16.0
+
+- Bump tokio-tungstenite (major), and hyper, tokio minor versions
+
 ### v0.15.0
 
 - Bump tokio-tungstenite, ws-mock, hyper, hmac, sha2, etc
